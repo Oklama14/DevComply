@@ -13,11 +13,9 @@ export class Report {
   @Column()
   pontuacao: number;
 
-  // Relação: Vários relatórios pertencem a um projeto
   @ManyToOne(() => Project, project => project.relatorios)
   projeto: Project;
 
-  // Relação: Um relatório pode ter várias recomendações
   @OneToMany(() => Recommendation, recommendation => recommendation.relatorio)
   recomendacoes: Recommendation[];
 }

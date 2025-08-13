@@ -13,6 +13,8 @@ import {
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto'; // 2. Importe o DTO de update
+import { AuthGuard } from '@nestjs/passport';
+
 
 @Controller('projects')
 export class ProjectsController {
