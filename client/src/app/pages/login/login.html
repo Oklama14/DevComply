@@ -1,0 +1,36 @@
+    <div class="login-container">
+      <div class="logo">
+        <span class="icon">🛡️</span>
+        <span>DevComply</span>
+      </div>
+      <h2>Bem-vindo de volta!</h2>
+      <p>Faça login para acessar seus projetos.</p>
+
+      <!-- Conecta o formulário ao FormGroup e ao método onSubmit -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <!-- Conecta o input ao controle 'email' -->
+          <input type="email" id="email" class="form-control" placeholder="seu@email.com" formControlName="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <!-- Conecta o input ao controle 'senha' -->
+          <input type="password" id="password" class="form-control" placeholder="Sua senha" formControlName="senha">
+        </div>
+
+        <!-- Exibe uma mensagem de erro, se houver -->
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Desabilita o botão se o formulário for inválido -->
+        <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">Entrar</button>
+      </form>
+
+      <div class="footer-text">
+        Não tem uma conta? <a href="#">Crie uma agora</a>
+      </div>
+    </div>
+    
