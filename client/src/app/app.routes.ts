@@ -1,10 +1,23 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login'; // 1. Importe o LoginComponent
+import { LoginComponent } from './pages/login/login';
+import { MainLayout } from './layouts/main-layout/main-layout';
+import { Projects } from './pages/projects/projects';
+import { Checklist } from './pages/checklist/checklist'; // 1. Importe o Checklist
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
-  // 2. Adicione a rota para o login
   { path: 'login', component: LoginComponent },
-  
-  // 3. Adicione uma rota padrão para redirecionar para o login
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
+
+  {
+    path: '',
+    component: MainLayout,
+    //canActivate: [authGuard],
+    children: [
+      { path: 'projects', component: Projects },
+      { path: 'checklist', component: Checklist }, // 2. Adicione a rota do checklist
+      { path: '', redirectTo: 'projects', pathMatch: 'full' }
+    ]
+  },
+
+  { path: '**', redirectTo: 'login' }
 ];

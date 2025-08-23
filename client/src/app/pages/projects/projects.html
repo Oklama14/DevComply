@@ -1,0 +1,49 @@
+<div class="projects-page">
+  <header class="page-header">
+    <h1>Meus Projetos</h1>
+    <!-- (click)="openNewProjectModal()" irá abrir o nosso futuro modal -->
+    <button class="btn-primary" (click)="openNewProjectModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      <span>Novo Projeto</span>
+    </button>
+  </header>
+
+  <!-- Se estiver a carregar, mostra uma mensagem -->
+  <div *ngIf="isLoading" class="loading-state">
+    <p>A carregar projetos...</p>
+  </div>
+
+  <!-- Se não estiver a carregar e não houver projetos, mostra o estado vazio -->
+  <div *ngIf="!isLoading && projects.length === 0" class="empty-state">
+    <h3>Nenhum projeto encontrado</h3>
+    <p>Crie o seu primeiro projeto para começar a verificação de conformidade LGPD.</p>
+    <button class="btn-primary" (click)="openNewProjectModal()">Criar Novo Projeto</button>
+  </div>
+
+  <!-- Se não estiver a carregar e houver projetos, mostra a grelha -->
+  <div *ngIf="!isLoading && projects.length > 0" class="projects-grid">
+    <!-- O *ngFor irá repetir este card para cada 'project' na lista 'projects' -->
+    <div *ngFor="let project of projects" class="project-card">
+      <div class="card-header">
+        <h3>{{ project.nome }}</h3>
+        <!-- (Vamos adicionar o status dinâmico depois) -->
+        <span class="status in-progress">Em Progresso</span>
+      </div>
+      <p class="description">{{ project.descricao }}</p>
+      <div class="progress-bar">
+        <div class="progress" style="width: 10%;"></div>
+      </div>
+      <div class="card-footer">
+        <span>Progresso: 10%</span>
+        <a href="#" class="details-link">Ver detalhes →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- O nosso modal de novo projeto (será controlado pelo projects.ts) -->
+<app-new-project-modal 
+  *ngIf="isModalOpen" 
+  (close)="closeNewProjectModal()"
+  (save)="handleCreateProject($event)">
+</app-new-project-modal>

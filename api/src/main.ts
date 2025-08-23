@@ -5,6 +5,12 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Habilitar CORS para o frontend
+  app.enableCors({
+    origin: ['http://localhost:4200', 'http://client:4200'],
+    credentials: true,
+  });
+
   // Habilita o ValidationPipe globalmente.
   // Isso garante que todas as requisições que chegam aos controladores
   // e que usam DTOs com decoradores de validação sejam automaticamente validadas.
@@ -16,6 +22,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(3000);
+  // Escutar em todas as interfaces para funcionar no Docker
+  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

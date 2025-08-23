@@ -1,14 +1,14 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'; // 1. Importe o withFetch
+import { authInterceptor } from './interceptors/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    // A configuração da Zone.js deve estar aqui
     provideZoneChangeDetection({ eventCoalescing: true }),
-    
     provideRouter(routes),
-    provideHttpClient()
+    // 2. Adicione o withFetch() para habilitar a API fetch
+    provideHttpClient(withInterceptors([authInterceptor]), withFetch())
   ]
 };

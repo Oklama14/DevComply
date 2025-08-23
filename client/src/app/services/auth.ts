@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -7,34 +8,41 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  // URL base da sua API NestJS
   private apiUrl = 'http://localhost:3000/auth';
+  // Variável para saber se estamos no navegador
+  private isBrowser: boolean;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    // Injetamos o PLATFORM_ID para verificar o ambiente de execução
+    this.isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  }
 
   login(credentials: any): Observable<{ access_token: string }> {
     return this.http.post<{ access_token: string }>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        // Salva o token no localStorage após um login bem-sucedido
-        localStorage.setItem('access_token', response.access_token);
+        // Só salvamos no localStorage se estivermos no navegador
+        if (this.isBrowser) {
+          localStorage.setItem('access_token', response.access_token);
+        }
       })
     );
   }
 
-  // (Opcional) Adicione métodos para registro, logout, etc. aqui no futuro
-  // register(userInfo: any): Observable<any> {
-  //   return this.http.post(`${this.apiUrl}/register`, userInfo);
-  // }
-
   logout(): void {
-    localStorage.removeItem('access_token');
+    if (this.isBrowser) {
+      localStorage.removeItem('access_token');
+    }
   }
 
   getToken(): string | null {
-    return localStorage.getItem('access_token');
+    if (this.isBrowser) {
+      return localStorage.getItem('access_token');
+    }
+    return null; // Retorna null se estiver no servidor
   }
 
   isLoggedIn(): boolean {
+    // Esta verificação agora é segura para rodar no servidor
     return !!this.getToken();
   }
 }

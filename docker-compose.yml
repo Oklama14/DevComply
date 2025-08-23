@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   postgres:
     image: postgres:13
@@ -12,6 +13,64 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - devcomply-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devcomply_user -d devcomply_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api:
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    container_name: devcomply_api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://devcomply_user:Direto00@@postgres:5432/devcomply_db
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=devcomply_user
+      - DB_PASSWORD=Direto00@
+      - DB_NAME=devcomply_db
+    volumes:
+      - ./API:/app
+      - api_node_modules:/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - devcomply-network
+    command: npm run start:dev
+
+  client:
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    container_name: devcomply_client
+    restart: always
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./Client:/app
+      - client_node_modules:/app/node_modules
+    depends_on:
+      - api
+    networks:
+      - devcomply-network
+    command: ng serve --host 0.0.0.0 --port 4200
 
 volumes:
   postgres_data:
+  api_node_modules:
+  client_node_modules:
+
+networks:
+  devcomply-network:
+    driver: bridge
