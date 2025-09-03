@@ -1,8 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { LgpdArticle } from './lgpd-article.entity';
-import { ChecklistResponse } from './checklist-response.entity';
 
-@Entity({ name: 'checklist_perguntas' })
+@Entity('checklist_perguntas')
 export class ChecklistQuestion {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,14 +9,14 @@ export class ChecklistQuestion {
   @Column({ length: 10 })
   codigo: string;
 
-  @Column({ type: 'text' })
+  @Column('text')
   pergunta: string;
 
-  // Relação: Várias perguntas pertencem a um artigo
-  @ManyToOne(() => LgpdArticle, article => article.perguntas)
-  artigoLgpd: LgpdArticle;
+  @Column({ name: 'artigo_id' }) // Mapeia a coluna de chave estrangeira
+  artigoId: number;
 
-  // Relação: Uma pergunta pode ter várias respostas
-  @OneToMany(() => ChecklistResponse, response => response.pergunta)
-  respostas: ChecklistResponse[];
+  // Ela diz ao TypeORM que muitas ChecklistQuestions pertencem a um LgpdArticle.
+  @ManyToOne(() => LgpdArticle, (article) => article.questoes)
+  @JoinColumn({ name: 'artigo_id' }) // Especifica qual coluna armazena a relação
+  artigo: LgpdArticle;
 }

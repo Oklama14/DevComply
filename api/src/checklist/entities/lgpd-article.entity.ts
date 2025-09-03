@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ChecklistQuestion } from './checklist-question.entity';
 
-@Entity({ name: 'artigos_lgpd' })
+@Entity('artigos_lgpd')
 export class LgpdArticle {
   @PrimaryGeneratedColumn()
   id: number;
@@ -12,10 +12,11 @@ export class LgpdArticle {
   @Column({ length: 200 })
   titulo: string;
 
-  @Column({ type: 'text' })
+  @Column('text')
   descricao: string;
 
-  // Relação: Um artigo pode ter várias perguntas de checklist
-  @OneToMany(() => ChecklistQuestion, question => question.artigoLgpd)
-  perguntas: ChecklistQuestion[];
+  // Esta é a relação que estava em falta.
+  // Ela diz ao TypeORM que um LgpdArticle pode ter muitas ChecklistQuestions.
+  @OneToMany(() => ChecklistQuestion, (question) => question.artigo)
+  questoes: ChecklistQuestion[];
 }

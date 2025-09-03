@@ -2,40 +2,50 @@
   <header class="page-header">
     <h1>Checklist LGPD</h1>
     <button class="btn-primary">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5C17.3 10.7 18 9.9 18 9c0-1.1-.9-2-2-2s-2 .9-2 2c0 .9.7 1.7 1.5 2.5"/><path d="M9 14c.2-1 .7-1.7 1.5-2.5C11.3 10.7 12 9.9 12 9c0-1.1-.9-2-2-2s-2 .9-2 2c0 .9.7 1.7 1.5 2.5"/><path d="M12 22v-2"/><path d="M20 22v-2"/><path d="m4 22-1-1"/><path d="m21 21-1-1"/><path d="M4 4.5 3 5"/><path d="m21 4.5 1 .5"/><path d="M12 2a2.5 2.5 0 0 1 2.5 2.5c0 1.4-1.1 2.5-2.5 2.5S9.5 5.9 9.5 4.5A2.5 2.5 0 0 1 12 2Z"/><path d="M4.2 11.2a2.5 2.5 0 0 0-2.4 2.3 2.5 2.5 0 0 0 2.5 2.5c1.4 0 2.5-1.1 2.5-2.5a2.5 2.5 0 0 0-2.6-2.3Z"/><path d="M19.8 11.2a2.5 2.5 0 0 1 2.4 2.3 2.5 2.5 0 0 1-2.5 2.5c-1.4 0-2.5-1.1-2.5-2.5a2.5 2.5 0 0 1 2.6-2.3Z"/></svg>
       <span>Gerar Relatório</span>
     </button>
   </header>
 
-  <!-- Cabeçalho do Projeto (Exemplo) -->
   <div class="project-header">
     <h2>Projeto: E-commerce App</h2>
     <p>Aplicativo de e-commerce com processamento de dados de clientes.</p>
-    <div class="progress-info">
-      <span>Progresso: 45%</span>
-    </div>
   </div>
 
-  <!-- Categorias do Checklist -->
   <div *ngFor="let category of checklistCategories" class="category-container">
     <div class="category-header">
-      <div>
-        <h3>{{ category.name }}</h3>
-        <p>{{ category.description }}</p>
-      </div>
-      <span>0% completo</span>
+      <h3>{{ category.name }}</h3>
     </div>
-    <div class="items-list">
-      <div *ngFor="let item of category.items" class="checklist-item">
-        <div class="item-main">
-          <input type="checkbox" [id]="item.id" [checked]="item.checked">
-          <label [for]="item.id">{{ item.text }}</label>
-          <span class="article-tag">{{ item.article }}</span>
+    <!-- O mat-accordion garante que apenas um painel esteja aberto de cada vez -->
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let item of category.items" class="checklist-item-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="item-main">
+            <input 
+              type="checkbox" 
+              [id]="item.id" 
+              [(ngModel)]="item.checked"
+              (ngModelChange)="onCheckboxChange(item)"
+              (click)="$event.stopPropagation()">
+            <label [for]="item.id">{{ item.text }}</label>
+            <span class="article-tag">{{ item.article }}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        
+        <!-- Conteúdo que aparece quando o painel expande -->
+        <div class="expanded-content">
+          <div class="item-details">
+            <p>{{ item.details }}</p>
+          </div>
+          <div class="form-group">
+            <label>Explicação da sua implementação:</label>
+            <textarea [(ngModel)]="item.implementationDetails" placeholder="Descreva como a sua solução atende a este requisito..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Detalhes técnicos:</label>
+            <textarea [(ngModel)]="item.technicalDetails" placeholder="Detalhe aspetos técnicos como: tecnologias utilizadas, etc."></textarea>
+          </div>
         </div>
-        <div class="item-details">
-          <p>{{ item.details }}</p>
-        </div>
-      </div>
-    </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>

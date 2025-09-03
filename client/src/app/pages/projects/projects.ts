@@ -54,7 +54,6 @@ export class Projects implements OnInit {
       },
       error: (err: any) => {
         console.error('Erro ao criar projeto:', err);
-        // (Opcional) Adicionar uma mensagem de erro para o utilizador
       }
     });
   }
