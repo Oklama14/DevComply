@@ -22,4 +22,5 @@ export class Project {
 
   @OneToMany(() => ChecklistResponse, response => response.projeto)
   respostasChecklist: ChecklistResponse[];
+  respostas: any;
 }

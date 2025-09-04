@@ -11,7 +11,7 @@
     <p>Aplicativo de e-commerce com processamento de dados de clientes.</p>
   </div>
 
-  <div *ngFor="let category of checklistCategories" class="category-container">
+<div *ngFor="let category of checklistData" class="category-container">
     <div class="category-header">
       <h3>{{ category.name }}</h3>
     </div>
@@ -47,5 +47,11 @@
         </div>
       </mat-expansion-panel>
     </mat-accordion>
+    <!-- Botão Salvar fora do mat-accordion -->
+    <div class="save-container">
+      <button mat-flat-button color="primary" (click)="saveProgress()">
+        Salvar Progresso
+      </button>
+    </div>
   </div>
 </div>

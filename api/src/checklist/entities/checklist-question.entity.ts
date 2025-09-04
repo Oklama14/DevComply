@@ -19,4 +19,5 @@ export class ChecklistQuestion {
   @ManyToOne(() => LgpdArticle, (article) => article.questoes)
   @JoinColumn({ name: 'artigo_id' }) // Especifica qual coluna armazena a relação
   artigo: LgpdArticle;
+  respostas: any;
 }

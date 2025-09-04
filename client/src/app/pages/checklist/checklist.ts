@@ -1,43 +1,115 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ChecklistService, ChecklistCategory, ChecklistItem } from '../../services/checklist';
-// 1. Importe o MatExpansionModule
+import { ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-checklist',
   standalone: true,
-  // 2. Adicione o MatExpansionModule às importações do componente
-  imports: [CommonModule, FormsModule, MatExpansionModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatExpansionModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
   templateUrl: './checklist.html',
   styleUrls: ['./checklist.scss']
 })
 export class Checklist implements OnInit {
-  checklistCategories: ChecklistCategory[] = [];
-  isLoading = true;
+  checklistData: ChecklistCategory[] = [];
+  private projectId: string | null = null;
 
-  constructor(private checklistService: ChecklistService) {}
+  constructor(
+    private checklistService: ChecklistService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    this.loadChecklist();
+    // Captura o ID do projeto da URL
+    this.projectId = this.route.snapshot.paramMap.get('projectId');
+    if (this.projectId) {
+      this.loadChecklistData();
+    } else {
+      console.error("ID do projeto não encontrado na URL.");
+    }
   }
 
-  loadChecklist(): void {
-    this.isLoading = true;
-    this.checklistService.getChecklistData().subscribe({
-      next: (data: ChecklistCategory[]) => {
-        this.checklistCategories = data;
-        this.isLoading = false;
+  loadChecklistData(): void {
+    if (!this.projectId) return;
+
+    // Usa forkJoin para esperar que ambas as chamadas à API terminem
+    forkJoin({
+      structure: this.checklistService.getChecklistData(),
+      responses: this.checklistService.getChecklistResponses(this.projectId)
+    }).subscribe({
+      next: ({ structure, responses }) => {
+        // Mapeia as respostas para fácil acesso (ex: { '15': { checked: true, ... } })
+        const responseMap = new Map(
+          responses.map(r => [r.pergunta.id, r])
+        );
+
+        // Mescla as respostas salvas com a estrutura do checklist
+        structure.forEach(category => {
+          category.items.forEach(item => {
+            const questionId = parseInt(item.id.replace('item_', ''), 10);
+            const response = responseMap.get(questionId);
+            if (response) {
+              item.checked = response.conformidade;
+              item.implementationDetails = response.resposta || '';
+              // Adapte para outros campos se necessário, como technicalDetails
+            }
+          });
+        });
+
+        this.checklistData = structure;
       },
-      error: (err: any) => {
-        console.error('Erro ao carregar checklist:', err);
-        this.isLoading = false;
+      error: (err) => {
+        console.error('Erro ao carregar dados do checklist:', err);
       }
     });
   }
 
+  saveProgress(): void {
+    if (!this.projectId) {
+      console.error("ID do projeto não encontrado, impossível salvar.");
+      return;
+    }
+
+    // Transforma os dados do checklist para o formato que a API espera
+    const itemsToSave = this.checklistData.flatMap(category =>
+      category.items.map(item => ({
+        id: item.id,
+        checked: item.checked,
+        implementationDetails: item.implementationDetails,
+        technicalDetails: item.technicalDetails
+      }))
+    );
+
+    this.checklistService.saveChecklistResponses(this.projectId, itemsToSave)
+      .subscribe({
+        next: (response) => {
+          console.log('Progresso salvo com sucesso!', response);
+          // O ideal aqui é mostrar uma notificação de sucesso (toast) para o utilizador
+        },
+        error: (err) => {
+          console.error('Erro ao salvar o progresso:', err);
+          // E aqui, uma notificação de erro
+        }
+      });
+  }
+
   onCheckboxChange(item: ChecklistItem): void {
-    console.log('Item alterado:', item.id, 'Novo estado:', item.checked);
+    item.checked = !item.checked;
+    // Aqui pode-se colocar lógica extra, como atualizar estado no backend, etc.
   }
 }

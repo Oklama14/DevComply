@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
-// Mantemos as interfaces para tipagem forte
+// Definindo as interfacees para tipar os nossos dados, garantindo consistência
 export interface ChecklistItem {
   id: string;
   text: string;
@@ -24,23 +23,21 @@ export interface ChecklistCategory {
   providedIn: 'root'
 })
 export class ChecklistService {
-  private apiUrl = 'http://localhost:3000/checklist'; // URL da nossa API
+  private apiUrl = 'http://localhost:3000/checklist';
 
   constructor(private http: HttpClient) { }
 
-  // Agora, este método busca os dados da API
   getChecklistData(): Observable<ChecklistCategory[]> {
-    return this.http.get<ChecklistCategory[]>(this.apiUrl).pipe(
-      catchError(this.handleError<ChecklistCategory[]>('getChecklistData', []))
-    );
+    return this.http.get<ChecklistCategory[]>(this.apiUrl);
+  }
+  
+  // Novo método para buscar as respostas salvas
+  getChecklistResponses(projectId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/responses/${projectId}`);
   }
 
-  // Função de tratamento de erros para manter a aplicação a funcionar
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      console.error(`${operation} failed: ${error.message}`);
-      // Retorna um resultado vazio para que a aplicação não quebre
-      return of(result as T);
-    };
+  saveChecklistResponses(projectId: string, items: any[]): Observable<any> {
+    const payload = { items };
+    return this.http.post(`${this.apiUrl}/responses/${projectId}`, payload);
   }
 }
