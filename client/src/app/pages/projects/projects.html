@@ -1,49 +1,42 @@
 <div class="projects-page">
   <header class="page-header">
     <h1>Meus Projetos</h1>
-    <!-- (click)="openNewProjectModal()" irá abrir o nosso futuro modal -->
-    <button class="btn-primary" (click)="openNewProjectModal()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-      <span>Novo Projeto</span>
+    <button class="btn-primary" (click)="isModalOpen = true">
+      + Novo Projeto
     </button>
   </header>
 
-  <!-- Se estiver a carregar, mostra uma mensagem -->
-  <div *ngIf="isLoading" class="loading-state">
-    <p>Carregando projetos...</p>
+  <div *ngIf="projects.length === 0; else projectGrid" class="no-projects-placeholder">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+    </svg>
+    <h3 class="message-title">Nenhum projeto encontrado</h3>
+    <p class="message-subtitle">Crie seu primeiro projeto para começar a verificação de conformidade LGPD.</p>
+    <button class="btn-primary" (click)="isModalOpen = true">Criar Novo Projeto</button>
   </div>
 
-  <!-- Se não estiver a carregar e não houver projetos, mostra o estado vazio -->
-  <div *ngIf="!isLoading && projects.length === 0" class="empty-state">
-    <h3>Nenhum projeto encontrado</h3>
-    <p>Crie o seu primeiro projeto para começar a verificação de conformidade LGPD.</p>
-    <button class="btn-primary" (click)="openNewProjectModal()">Criar Novo Projeto</button>
-  </div>
-
-  <!-- Se não estiver a carregar e houver projetos, mostra a grelha -->
-  <div *ngIf="!isLoading && projects.length > 0" class="projects-grid">
-    <!-- O *ngFor irá repetir este card para cada 'project' na lista 'projects' -->
-    <div *ngFor="let project of projects" class="project-card">
-      <div class="card-header">
-        <h3>{{ project.nome }}</h3>
-        <!-- (Vamos adicionar o status dinâmico depois) -->
-        <span class="status in-progress">Em Progresso</span>
-      </div>
-      <p class="description">{{ project.descricao }}</p>
-      <div class="progress-bar">
-        <div class="progress" style="width: 10%;"></div>
-      </div>
-      <div class="card-footer">
-        <span>Progresso: 10%</span>
-        <a href="#" class="details-link">Ver detalhes →</a>
+  <ng-template #projectGrid>
+    <div class="project-grid">
+      <div *ngFor="let project of projects" class="project-card">
+        <div class="card-header">
+          <span class="status-badge status-pending">Pendente</span>
+        </div>
+        <div class="card-body">
+          <h2 class="project-name">{{ project.nome }}</h2>
+          <p class="project-description">{{ project.descricao }}</p>
+        </div>
+        <div class="card-footer">
+          <button class="btn-secondary" (click)="startChecklist(project.id)">
+            Iniciar Checklist
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </ng-template>
 </div>
 
-<!-- O modal de novo projeto (será controlado pelo projects.ts) -->
-<app-new-project-modal 
-  *ngIf="isModalOpen" 
-  (close)="closeNewProjectModal()"
+<app-new-project-modal
+  *ngIf="isModalOpen"
+  (close)="isModalOpen = false"
   (save)="handleCreateProject($event)">
 </app-new-project-modal>

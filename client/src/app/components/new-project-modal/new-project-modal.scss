@@ -92,3 +92,9 @@
     cursor: not-allowed;
   }
 }
+
+.form-group textarea {
+  width: 100%;  
+  box-sizing: border-box;  
+  min-height: 120px; 
+}

@@ -1,0 +1,156 @@
+// Variáveis de Cor
+$primary-color: #3b82f6;
+$text-dark: #111827;
+$text-light: #6b7280;
+$border-color: #e5e7eb;
+$green: #10b981;
+$amber: #f59e0b;
+
+.dashboard-page {
+  padding: 2rem;
+}
+
+// Hero Section
+.hero-section {
+  background: linear-gradient(90deg, #f0f9ff, #f3f4ff);
+  border-radius: 1rem;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+
+  h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin-bottom: 1rem;
+    max-width: 600px;
+    line-height: 1.2; // A CORREÇÃO ESTÁ AQUI: Adiciona mais espaço entre as linhas
+  }
+  p {
+    font-size: 1.125rem;
+    color: $text-light;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+// Botões
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  &:hover { background-color: darken($primary-color, 10%); }
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: $primary-color;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid $primary-color;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  &:hover { background-color: rgba($primary-color, 0.05); }
+}
+
+// Stats Section
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+.stat-card {
+  background-color: white;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid $border-color;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  .stat-label { font-size: 1rem; font-weight: 500; color: $text-light; }
+  .stat-value { font-size: 2rem; font-weight: 600; color: $text-dark; margin-top: 0.25rem; }
+  .text-green { color: $green; }
+  .text-amber { color: $amber; }
+  .text-blue { color: $primary-color; }
+}
+
+// Features & CTA
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: $text-dark;
+  margin-bottom: 1.25rem;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.feature-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid $border-color;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.feature-icon {
+  background-color: #e0f2fe;
+  padding: 0.75rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  svg { color: $primary-color; }
+}
+.feature-name {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: $text-dark;
+  margin-bottom: 0.5rem;
+}
+.feature-description {
+  color: $text-light;
+}
+.cta-banner {
+  background-color: $primary-color;
+  color: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+.cta-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.cta-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.25rem; }
+.btn-cta {
+  background-color: white;
+  color: $primary-color;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s;
+  &:hover { transform: scale(1.05); }
+}

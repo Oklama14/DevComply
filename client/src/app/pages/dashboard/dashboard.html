@@ -1,0 +1,64 @@
+<div class="dashboard-page">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1>Ferramenta de Conformidade LGPD para Desenvolvedores</h1>
+      <p>
+        Implemente os requisitos da Lei Geral de Proteção de Dados em seus projetos
+        com um checklist interativo, análises técnicas e recomendações práticas.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" routerLink="/projects">Meus Projetos ({{ totalProjects }})</button>
+        <button class="btn-outline" routerLink="/checklist">Iniciar Checklist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total de Projetos</div>
+      <div class="stat-value">{{ totalProjects }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Projetos Completos</div>
+      <div class="stat-value text-green">{{ completedProjects }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Projetos em Progresso</div>
+      <div class="stat-value text-amber">{{ inProgressProjects }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Projetos Pendentes</div>
+      <div class="stat-value text-blue">{{ pendingProjects }}</div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <h2 class="section-title">Funcionalidades</h2>
+  <div class="features-grid">
+    <div *ngFor="let feature of features" class="feature-card">
+      <div class="feature-icon" [innerHTML]="feature.svg"></div>
+      <div>
+        <h3 class="feature-name">{{ feature.name }}</h3>
+        <p class="feature-description">{{ feature.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Call to Action -->
+  <div class="cta-banner">
+    <div class="cta-content">
+      <div>
+        <h2 class="cta-title">Pronto para começar?</h2>
+        <p class="cta-description">
+          Crie seu primeiro projeto e comece a implementar a conformidade com a LGPD agora mesmo.
+        </p>
+      </div>
+      <button class="btn-cta" routerLink="/projects">
+        Criar Projeto 
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>

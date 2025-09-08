@@ -4,18 +4,18 @@ import { MainLayout } from './layouts/main-layout/main-layout';
 import { Projects } from './pages/projects/projects';
 import { Checklist } from './pages/checklist/checklist';
 import { authGuard } from './guards/auth-guard';
+import { Dashboard } from './pages/dashboard/dashboard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: '',
     component: MainLayout,
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     children: [
-      { path: 'projects', component: Projects },
-      // A rota agora espera um ID de projeto
-      { path: 'checklist/:projectId', component: Checklist },
-      { path: '', redirectTo: 'projects', pathMatch: 'full' }
+      { path: 'dashboard', component: Dashboard }, 
+      { path: 'checklist/:id', component: Checklist },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
   { path: '**', redirectTo: 'login' }

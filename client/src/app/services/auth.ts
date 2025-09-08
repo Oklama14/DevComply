@@ -1,48 +1,51 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, tap } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID, inject } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:3000/auth';
-  // Variável para saber se estamos no navegador
-  private isBrowser: boolean;
+  private platformId = inject(PLATFORM_ID);
 
-  constructor(private http: HttpClient) {
-    // Injetamos o PLATFORM_ID para verificar o ambiente de execução
-    this.isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  constructor(private http: HttpClient) {}
+
+  // O método de login espera um único objeto com as credenciais
+  login(credentials: { email: string; senha: string }): Observable<{ access_token: string }> {
+    return this.http.post<{ access_token: string }>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        tap(response => {
+          // Após a API responder com sucesso, guardamos o token
+          if (response.access_token) {
+            this.setToken(response.access_token);
+          }
+        })
+      );
   }
 
-  login(credentials: any): Observable<{ access_token: string }> {
-    return this.http.post<{ access_token: string }>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        // Só salvamos no localStorage se estivermos no navegador
-        if (this.isBrowser) {
-          localStorage.setItem('access_token', response.access_token);
-        }
-      })
-    );
-  }
-
-  logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem('access_token');
+  private setToken(token: string): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('access_token', token);
     }
   }
 
   getToken(): string | null {
-    if (this.isBrowser) {
+    if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem('access_token');
     }
-    return null; // Retorna null se estiver no servidor
+    return null;
   }
 
   isLoggedIn(): boolean {
-    // Esta verificação agora é segura para rodar no servidor
     return !!this.getToken();
+  }
+
+  logout(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('access_token');
+    }
   }
 }
