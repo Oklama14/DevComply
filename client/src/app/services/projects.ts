@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// (Opcional) Crie uma interface para tipar os seus projetos
+// 1. Adicione a propriedade 'status' à interface Project
 export interface Project {
   id: number;
   nome: string;
   descricao: string;
-  // Adicione outras propriedades se necessário
+  status: string; // Pode ser 'Completo', 'Em Progresso', 'Pendente', etc.
 }
 
 @Injectable({
@@ -15,16 +15,13 @@ export interface Project {
 })
 export class ProjectsService {
   private apiUrl = 'http://localhost:3000/projects';
-
-  constructor(private http: HttpClient) { }
+  private http = inject(HttpClient);
 
   getProjects(): Observable<Project[]> {
     return this.http.get<Project[]>(this.apiUrl);
   }
 
-  createProject(projectData: { nome: string; descricao: string }): Observable<Project> {
-    return this.http.post<Project>(this.apiUrl, projectData);
+  createProject(project: { nome: string; descricao: string }): Observable<Project> {
+    return this.http.post<Project>(this.apiUrl, project);
   }
-
-  // Adicione os métodos update e delete aqui no futuro
 }

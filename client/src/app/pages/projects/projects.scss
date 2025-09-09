@@ -1,4 +1,4 @@
-// Variáveis de Cor (Exemplo)
+@use 'sass:color';
 $primary-color: #3b82f6;
 $secondary-color: #6b7280;
 $light-gray: #f3f4f6;
@@ -32,7 +32,7 @@ $border-color: #e5e7eb;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: darken($primary-color, 10%);
+    background-color: color.adjust($primary-color, $lightness: -10%);
   }
 }
 

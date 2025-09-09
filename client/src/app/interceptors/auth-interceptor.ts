@@ -19,3 +19,4 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Se não houver token, passa o pedido original
   return next(req);
 };
+

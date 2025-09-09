@@ -10,10 +10,11 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     
-    // HttpClient para usar o intercetor
+    // 2. Configure o HttpClient para usar o fetch e o nosso intercetor
     provideHttpClient(
       withFetch(), 
       withInterceptors([authInterceptor])
     )
   ]
 };
+

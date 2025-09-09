@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // 1. Importar o Router
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ProjectsService, Project } from '../../services/projects';
 import { NewProjectModal } from '../../components/new-project-modal/new-project-modal';
 
@@ -15,14 +15,15 @@ export class Projects implements OnInit {
   projects: Project[] = [];
   isModalOpen = false;
 
-  // 2. Injetar o Router no construtor
-  constructor(
-    private projectsService: ProjectsService,
-    private router: Router
-  ) {}
+  private platformId = inject(PLATFORM_ID);
+  private projectsService = inject(ProjectsService);
+  private router = inject(Router);
 
   ngOnInit(): void {
-    this.loadProjects();
+    // Apenas executa o código se estiver no ambiente do navegador
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadProjects();
+    }
   }
 
   loadProjects(): void {
@@ -36,21 +37,27 @@ export class Projects implements OnInit {
     });
   }
 
+  openNewProjectModal(): void {
+    this.isModalOpen = true;
+  }
+
+  closeNewProjectModal(): void {
+    this.isModalOpen = false;
+  }
+
   handleCreateProject(newProject: { nome: string; descricao: string }): void {
     this.projectsService.createProject(newProject).subscribe({
-      next: (createdProject: Project) => {
-        this.projects.push(createdProject);
-        this.isModalOpen = false;
+      next: () => {
+        this.loadProjects(); // Recarrega a lista após a criação
+        this.closeNewProjectModal();
       },
       error: (err: any) => {
         console.error('Erro ao criar projeto:', err);
       }
     });
   }
-
-  // 3. Criar o método que realiza a navegação
+  
   startChecklist(projectId: number): void {
-    // Navega para a rota do checklist, passando o ID do projeto
     this.router.navigate(['/checklist', projectId]);
   }
 }

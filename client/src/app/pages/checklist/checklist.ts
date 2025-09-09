@@ -99,17 +99,17 @@ export class Checklist implements OnInit {
       .subscribe({
         next: (response) => {
           console.log('Progresso salvo com sucesso!', response);
-          // O ideal aqui é mostrar uma notificação de sucesso (toast) para o utilizador
+          // notificação de sucessopara o utilizador
         },
         error: (err) => {
           console.error('Erro ao salvar o progresso:', err);
-          // E aqui, uma notificação de erro
+
         }
       });
   }
 
   onCheckboxChange(item: ChecklistItem): void {
     item.checked = !item.checked;
-    // Aqui pode-se colocar lógica extra, como atualizar estado no backend, etc.
+    // lógica extra, como atualizar estado no backen
   }
 }

@@ -1,4 +1,4 @@
-// Variáveis de Cor
+@use 'sass:color'; 
 $primary-color: #3b82f6;
 $text-dark: #111827;
 $text-light: #6b7280;
@@ -17,6 +17,10 @@ $amber: #f59e0b;
   padding: 2.5rem;
   margin-bottom: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  &:hover {
+    // 2. Usar a nova sintaxe para escurecer a cor
+    background-color: color.adjust($primary-color, $lightness: -10%);
+  }
 
   h1 {
     font-size: 2.25rem;
