@@ -46,20 +46,17 @@
     </div>
   </div>
 
-  <!-- Secção Call to Action -->
-  <div class="cta-section">
-    <div class="cta-content">
-      <div>
-        <h2>Pronto para começar?</h2>
-        <p>
-          Crie seu primeiro projeto e comece a implementar a conformidade com a LGPD agora mesmo.
-        </p>
-      </div>
-      <button (click)="navigateToProjects()" class="btn btn-secondary">
-        <span>Criar Projeto</span>
-        <!-- SVG da seta diretamente no template -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
+  <!-- Secção Call to Action (Estilo Corrigido) -->
+  <div class="cta-card">
+    <div class="cta-text">
+      <h2>Pronto para começar?</h2>
+      <p>
+        Crie seu primeiro projeto e comece a implementar a conformidade com a LGPD agora mesmo.
+      </p>
     </div>
+    <button (click)="navigateToProjects()" class="btn btn-cta">
+      <span>Criar Projeto</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
   </div>
 </div>
