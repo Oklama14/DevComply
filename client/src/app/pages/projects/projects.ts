@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProjectsService, Project } from '../../services/projects';
 import { NewProjectModal } from '../../components/new-project-modal/new-project-modal';
@@ -12,15 +12,16 @@ import { NewProjectModal } from '../../components/new-project-modal/new-project-
   styleUrls: ['./projects.scss']
 })
 export class Projects implements OnInit {
+  platformId = inject(PLATFORM_ID);
   projects: Project[] = [];
   isModalOpen = false;
 
-  private platformId = inject(PLATFORM_ID);
-  private projectsService = inject(ProjectsService);
-  private router = inject(Router);
+  constructor(
+    private projectsService: ProjectsService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Apenas executa o código se estiver no ambiente do navegador
     if (isPlatformBrowser(this.platformId)) {
       this.loadProjects();
     }
@@ -31,8 +32,20 @@ export class Projects implements OnInit {
       next: (data: Project[]) => {
         this.projects = data;
       },
-      error: (err: any) => {
-        console.error('Erro ao carregar projetos:', err);
+      error: (err) => {
+        console.error('Erro ao carregar projetos', err);
+      }
+    });
+  }
+
+  handleCreateProject(newProject: { nome: string; descricao: string }): void {
+    this.projectsService.createProject(newProject).subscribe({
+      next: (createdProject) => {
+        this.projects.push(createdProject);
+        this.closeNewProjectModal();
+      },
+      error: (err) => {
+        console.error('Erro ao criar projeto', err);
       }
     });
   }
@@ -45,18 +58,6 @@ export class Projects implements OnInit {
     this.isModalOpen = false;
   }
 
-  handleCreateProject(newProject: { nome: string; descricao: string }): void {
-    this.projectsService.createProject(newProject).subscribe({
-      next: () => {
-        this.loadProjects(); // Recarrega a lista após a criação
-        this.closeNewProjectModal();
-      },
-      error: (err: any) => {
-        console.error('Erro ao criar projeto:', err);
-      }
-    });
-  }
-  
   startChecklist(projectId: number): void {
     this.router.navigate(['/checklist', projectId]);
   }

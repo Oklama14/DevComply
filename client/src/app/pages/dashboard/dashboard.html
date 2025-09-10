@@ -1,5 +1,5 @@
-<div class="dashboard-page">
-  <!-- Hero Section -->
+<div class="dashboard-container">
+  <!-- Secção Hero -->
   <div class="hero-section">
     <div class="hero-content">
       <h1>Ferramenta de Conformidade LGPD para Desenvolvedores</h1>
@@ -8,13 +8,13 @@
         com um checklist interativo, análises técnicas e recomendações práticas.
       </p>
       <div class="hero-actions">
-        <button class="btn-primary" routerLink="/projects">Meus Projetos ({{ totalProjects }})</button>
-        <button class="btn-outline" routerLink="/checklist">Iniciar Checklist</button>
+        <button class="btn btn-primary" (click)="navigateToProjects()">Meus Projetos ({{ totalProjects }})</button>
+        <button class="btn btn-outline" (click)="navigateToProjects()">Iniciar Checklist</button>
       </div>
     </div>
   </div>
 
-  <!-- Stats Section -->
+  <!-- Secção de Estatísticas -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-label">Total de Projetos</div>
@@ -34,30 +34,31 @@
     </div>
   </div>
 
-  <!-- Features Section -->
+  <!-- Secção de Funcionalidades -->
   <h2 class="section-title">Funcionalidades</h2>
   <div class="features-grid">
     <div *ngFor="let feature of features" class="feature-card">
-      <div class="feature-icon" [innerHTML]="feature.svg"></div>
+      <div class="feature-icon" [innerHTML]="feature.svg | safeHtml"></div>
       <div>
-        <h3 class="feature-name">{{ feature.name }}</h3>
-        <p class="feature-description">{{ feature.description }}</p>
+        <h3>{{ feature.name }}</h3>
+        <p>{{ feature.description }}</p>
       </div>
     </div>
   </div>
 
-  <!-- Call to Action -->
-  <div class="cta-banner">
+  <!-- Secção Call to Action -->
+  <div class="cta-section">
     <div class="cta-content">
       <div>
-        <h2 class="cta-title">Pronto para começar?</h2>
-        <p class="cta-description">
+        <h2>Pronto para começar?</h2>
+        <p>
           Crie seu primeiro projeto e comece a implementar a conformidade com a LGPD agora mesmo.
         </p>
       </div>
-      <button class="btn-cta" routerLink="/projects">
-        Criar Projeto 
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      <button (click)="navigateToProjects()" class="btn btn-secondary">
+        <span>Criar Projeto</span>
+        <!-- SVG da seta diretamente no template -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
     </div>
   </div>

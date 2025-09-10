@@ -27,11 +27,16 @@
         <span>Configurações</span>
       </a>
     </nav>
+    <div class="sidebar-footer">
+      <!-- Botão de Logout -->
+      <button (click)="logout()" class="logout-button">
+        <!-- SVG para Logout -->
+        <span>Sair</span>
+      </button>
+    </div>
   </aside>
 
-  <!-- Conteúdo Principal -->
   <main class="main-content">
-    <!-- O <router-outlet> irá renderizar a página atual (ex: Projetos) aqui -->
     <router-outlet></router-outlet>
   </main>
 </div>
