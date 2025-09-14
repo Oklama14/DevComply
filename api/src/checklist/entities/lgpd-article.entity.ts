@@ -6,7 +6,7 @@ export class LgpdArticle {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 10 })
+  @Column({ length: 50 })
   artigo: string;
 
   @Column({ length: 200 })
@@ -14,6 +14,7 @@ export class LgpdArticle {
 
   @Column({ type: 'text' })
   descricao: string;
+
 
   // Define a relação: um artigo (categoria) tem muitas questões.
   @OneToMany(() => ChecklistQuestion, (question) => question.artigo)

@@ -16,6 +16,12 @@ export class ChecklistQuestion {
   @Column({ name: 'artigo_id' })
   artigoId: number;
 
+  @Column({ type: 'text', nullable: true })
+  descricao: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  dica: string | null;
+
   @ManyToOne(() => LgpdArticle, (article) => article.questoes)
   @JoinColumn({ name: 'artigo_id' })
   artigo: LgpdArticle;

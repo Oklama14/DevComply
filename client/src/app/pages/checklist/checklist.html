@@ -1,111 +1,111 @@
-<div class="page-header">
-  <nav class="breadcrumb">
-    <a routerLink="/dashboard">Home</a>
-    <span>›</span>
-    <span>Checklist LGPD</span>
-  </nav>
+<div class="page">
+  <!-- Breadcrumb + botão -->
+  <div class="page-header">
+    <nav class="breadcrumb">
+      <a routerLink="/dashboard">Home</a>
+      <span>›</span>
+      <span>Checklist LGPD</span>
+    </nav>
 
-  <div class="title-row">
-    <h1>Checklist LGPD</h1>
-    <button class="btn-primary" (click)="generateReport()">
-      <svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 3h13l5 5v13a1 1 0 0 1-1 1H3zM16 3v6h6"/></svg>
-      Gerar Relatório
-    </button>
-  </div>
-</div>
-
-<!-- Cartão do projeto -->
-<div class="project-card" *ngIf="project">
-  <div class="header">
-    <h2>Projeto: {{ project.nome }}</h2>
-  </div>
-  <p class="description">{{ project.descricao }}</p>
-
-  <div class="progress-line">
-    <span class="label">Progresso:</span>
-    <span class="value">{{ overallProgress }}%</span>
-  </div>
-  <div class="progressbar">
-    <div class="progressbar-fill" [style.width.%]="overallProgress"></div>
-  </div>
-</div>
-
-<!-- Loading / vazio -->
-<div *ngIf="isLoading" class="loading">Carregando checklist…</div>
-<div *ngIf="!isLoading && (!checklistData || !checklistData.length)" class="empty">
-  Nenhuma pergunta encontrada.
-</div>
-
-<!-- Categorias -->
-<section *ngFor="let category of checklistData" class="category">
-  <div class="category-header">
-    <h3>{{ category.nome }}</h3>
-    <span class="cat-progress">{{ category.progress || 0 }}% completo</span>
+    <div class="title-row">
+      <h1>Checklist LGPD</h1>
+      <button class="btn btn-primary" (click)="generateReport()">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path d="M3 3h13l5 5v13a1 1 0 0 1-1 1H3zM16 3v6h6" fill="currentColor"></path>
+        </svg>
+        Gerar Relatório
+      </button>
+    </div>
   </div>
 
-  <div class="progressbar small">
-    <div class="progressbar-fill" [style.width.%]="category.progress || 0"></div>
+  <!-- Cartão do projeto -->
+  <section class="project-card" *ngIf="project">
+    <div class="project-title">Projeto: {{ project.nome }}</div>
+    <p class="project-desc">{{ project.descricao }}</p>
+
+    <div class="progress-row">
+      <span>Progresso:</span> <strong>{{ overallProgress }}%</strong>
+    </div>
+    <div class="progressbar">
+      <div class="progressbar-fill" [style.width.%]="overallProgress"></div>
+    </div>
+  </section>
+
+  <!-- Estados -->
+  <div *ngIf="isLoading" class="state muted">Carregando checklist…</div>
+  <div *ngIf="!isLoading && (!checklistData || !checklistData.length)" class="state muted">
+    Nenhuma pergunta encontrada.
   </div>
 
-  <p class="category-desc" *ngIf="category.descricao">{{ category.descricao }}</p>
+  <!-- Categorias -->
+  <section *ngFor="let category of checklistData" class="category">
+    <div class="category-header">
+      <h2>{{ category.nome }}</h2>
+      <span class="cat-progress">{{ category.progress || 0 }}% completo</span>
+    </div>
+    <div class="category-desc" *ngIf="category.descricao">{{ category.descricao }}</div>
 
-  <div class="items">
-    <article *ngFor="let item of category.items" class="item" [class.item-completed]="item.completed">
-      <div class="item-head" (click)="toggleItemExpansion(item)">
-        <div class="left">
-          <input
-            type="checkbox"
-            [(ngModel)]="item.completed"
-            (click)="$event.stopPropagation()"
-            class="lgpd-checkbox"
-          />
-          <div>
-            <h4>{{ item.titulo }}</h4>
-            <p class="subtitle" *ngIf="item.descricao">{{ item.descricao }}</p>
+    <div class="progressbar small">
+      <div class="progressbar-fill" [style.width.%]="category.progress || 0"></div>
+    </div>
+
+    <!-- Itens -->
+    <div class="items">
+      <article *ngFor="let item of category.items"
+               class="item"
+               [class.item-completed]="item.completed">
+
+        <!-- Cabeçalho do item -->
+        <div class="item-head" (click)="toggleItemExpansion(item)">
+          <div class="left">
+            <input type="checkbox"
+                   class="checkbox"
+                   [(ngModel)]="item.completed"
+                   (click)="$event.stopPropagation()" />
+
+            <div class="title-wrap">
+              <h3 class="q-title">{{ item.titulo }}</h3>
+              <p class="q-sub" *ngIf="item.descricao">{{ item.descricao }}</p>
+            </div>
+          </div>
+
+          <div class="right">
+            <!-- Tooltip do protótipo: usa item.tipText (coluna 'dica') -->
+            <div class="tooltip" *ngIf="item.tipText" (click)="$event.stopPropagation()">
+              <button class="chip help" aria-label="Ver dica">?</button>
+              <div class="tooltip-bubble">
+                <strong>💡 Dica:</strong> {{ item.tipText }}
+              </div>
+            </div>
+
+            <!-- Badge com referência LGPD -->
+            <span class="chip law" *ngIf="item.lgpdReference">{{ item.lgpdReference }}</span>
+
+            <span class="chevron" [class.up]="item.expanded">⌄</span>
           </div>
         </div>
 
-        <div class="right">
-          <button
-            class="tip"
-            title="Ver dica"
-            *ngIf="item.tipText"
-            (click)="$event.stopPropagation(); showTip(item)"
-          >?</button>
+        <!-- Corpo expandido -->
+        <div class="item-body" *ngIf="item.expanded">
+          <label class="field">
+            <span>Explicação da sua implementação:</span>
+            <textarea [(ngModel)]="item.answer"
+                      placeholder="Descreva como sua solução atende a este requisito..."></textarea>
+          </label>
 
-          <span class="badge" *ngIf="item.lgpdReference">{{ item.lgpdReference }}</span>
-
-          <span class="chevron" [class.up]="item.expanded">⌄</span>
+          <label class="field">
+            <span>Detalhes técnicos:</span>
+            <textarea [(ngModel)]="item.technicalDetails"
+                      placeholder="Tecnologias, métodos de criptografia, estruturas de BD, etc."></textarea>
+          </label>
         </div>
-      </div>
+      </article>
+    </div>
+  </section>
 
-      <div class="item-body" *ngIf="item.expanded">
-        <p class="inline-tip" *ngIf="item.tipText">
-          <strong>💡 Dica:</strong> {{ item.tipText }}
-        </p>
-
-        <label class="field">
-          <span>Explicação da sua implementação:</span>
-          <textarea
-            [(ngModel)]="item.answer"
-            placeholder="Descreva como sua solução atende a este requisito..."
-          ></textarea>
-        </label>
-
-        <label class="field">
-          <span>Detalhes técnicos:</span>
-          <textarea
-            [(ngModel)]="item.technicalDetails"
-            placeholder="Tecnologias, métodos de criptografia, estruturas de BD, etc."
-          ></textarea>
-        </label>
-      </div>
-    </article>
+  <!-- Rodapé -->
+  <div class="footer-actions" *ngIf="!isLoading && checklistData?.length">
+    <button class="btn btn-primary" (click)="generateReport()">Gerar Relatório</button>
+    <button class="btn btn-secondary" (click)="saveProgress()">Salvar Progresso</button>
   </div>
-</section>
-
-<!-- Rodapé de ações -->
-<div class="footer-actions" *ngIf="!isLoading && checklistData?.length">
-  <button class="btn-primary" (click)="generateReport()">Gerar Relatório</button>
-  <button class="btn-secondary" (click)="saveProgress()">Salvar Progresso</button>
 </div>

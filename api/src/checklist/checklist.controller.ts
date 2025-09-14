@@ -19,7 +19,7 @@ export class ChecklistController {
 
 @Get('questions')
 async getQuestions(): Promise<ChecklistCategoryDto[]> {
-  return this.checklistService.getQuestions();
+  return this.checklistService.getStructuredQuestions();
 }
 
   // 📹 POST /checklist/project/:id - Salva respostas do checklist para um projeto
