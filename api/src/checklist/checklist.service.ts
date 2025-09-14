@@ -1,89 +1,105 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LgpdArticle } from './entities/lgpd-article.entity';
-import { ChecklistResponse } from './entities/checklist-response.entity';
-import { SaveChecklistDto } from './dto/save-checklist.dto';
 import { ChecklistQuestion } from './entities/checklist-question.entity';
+import { ChecklistResponse } from './entities/checklist-response.entity';
+import { LgpdArticle } from './entities/lgpd-article.entity';
+import { SaveChecklistDto } from './dto/save-checklist.dto';
+import { ChecklistCategoryDto, ChecklistItemDto } from './dto/checklist.dto';
 
 @Injectable()
 export class ChecklistService {
   constructor(
-    @InjectRepository(LgpdArticle)
-    private readonly articleRepository: Repository<LgpdArticle>,
-    @InjectRepository(ChecklistResponse)
-    private readonly responseRepository: Repository<ChecklistResponse>,
-  ) {}
+  @InjectRepository(ChecklistResponse) private readonly responseRepo: Repository<ChecklistResponse>,
+  @InjectRepository(ChecklistQuestion) private readonly questionRepo: Repository<ChecklistQuestion>,
+  @InjectRepository(LgpdArticle)      private readonly articleRepo: Repository<LgpdArticle>,
+) {}
 
-  /**
-   * Busca toda a estrutura de artigos e perguntas do checklist.
-   */
-  async getChecklistStructure() {
-    const articles = await this.articleRepository.find({
-      relations: ['questoes'], // Carrega as perguntas relacionadas a cada artigo
-      order: {
-        id: 'ASC', // Garante uma ordem consistente
-      },
+  /** Estrutura agrupada por artigo (categoria) que o front consome */
+  async getStructuredQuestions(): Promise<ChecklistCategoryDto[]> {
+    const rows = await this.questionRepo.find({
+      relations: ['artigo'],
+      order: { artigo: { id: 'ASC' }, id: 'ASC' },
     });
 
-    // Mapeia os dados para o formato que o front-end espera
-    return articles.map(article => ({
-      id: `category_${article.id}`,
-      title: article.titulo,
-      description: article.descricao,
-      items: article.questoes.map(question => ({
-        id: `item_${question.id}`,
-        text: question.pergunta,
-        helpText: `Ref: ${article.artigo}`, // Exemplo de texto de ajuda
-        checked: false, // Valor padrão
-        implementationDetails: '', // Valor padrão
-        technicalDetails: '', // Valor padrão
-      })),
-    }));
-  }
+    const map = new Map<number, ChecklistCategoryDto>();
 
-  /**
-   * Salva as respostas do checklist para um projeto específico.
-   * @param projectId - O ID do projeto.
-   * @param data - Os dados das respostas enviadas pelo front-end.
-   */
-  async saveChecklistResponses(projectId: number, data: SaveChecklistDto) {
-    for (const item of data.items) {
-      // Extrai o ID numérico da pergunta a partir do ID do item (ex: "item_15")
-      const questionId = parseInt(item.id.replace('item_', ''), 10);
+    for (const q of rows) {
+      const artigo = q.artigo; // LgpdArticle
+      const catId = artigo?.id ?? 0;
 
-      // Procura se já existe uma resposta para esta pergunta e este projeto
-      let response = await this.responseRepository.findOne({
-        where: { projeto: { id: projectId }, pergunta: { id: questionId } },
-      });
-
-      // Se não existir, cria uma nova instância
-      if (!response) {
-        response = this.responseRepository.create({
-          projeto: { id: projectId },
-          pergunta: { id: questionId },
+      if (!map.has(catId)) {
+        map.set(catId, {
+          id: catId,
+          nome: artigo?.titulo ?? 'Geral',
+          descricao: artigo?.descricao ?? undefined,
+          items: [],
         });
       }
 
-      // Atualiza os dados da resposta com as informações recebidas
-      response.resposta = item.implementationDetails; // Adapte conforme necessário
-      response.conformidade = item.checked;
-      
-      // Salva a resposta no banco de dados (cria uma nova ou atualiza a existente)
-      await this.responseRepository.save(response);
+      const item: ChecklistItemDto = {
+        id: q.id,
+        titulo: q.pergunta,
+        descricao: undefined, // adicione coluna em checklist_perguntas se quiser
+        lgpdReference: artigo?.artigo || q.codigo, // badge: "Art. X" com fallback no código
+        tipText: undefined, // adicione coluna 'dica' em checklist_perguntas, se desejar
+      };
+
+      map.get(catId)!.items.push(item);
     }
 
-    return { message: 'Progresso salvo com sucesso!' };
+    return Array.from(map.values());
   }
-  
-  /**
-   * Busca as respostas salvas de um checklist para um projeto específico.
-   * @param projectId - O ID do projeto.
-   */
-  async getChecklistResponses(projectId: number) {
-    return this.responseRepository.find({
-      where: { projeto: { id: projectId } },
-      relations: ['pergunta'], // Carrega os detalhes da pergunta relacionada para referência
+
+  /** Compatibilidade com seu controller atual: vamos fazer getQuestions() delegar ao formato estruturado */
+  async getQuestions(): Promise<ChecklistCategoryDto[]> {
+    return this.getStructuredQuestions();
+  }
+
+  /** GET /checklist/project/:id — respostas por projeto */
+  async findByProjectId(projectId: number): Promise<ChecklistResponse[]> {
+    return this.responseRepo.find({
+      where: { projetoId: projectId }, // ajuste para 'projectId' se sua entity usar inglês
+      order: { id: 'ASC' },
     });
   }
+
+  /** POST /checklist/project/:id — salvar (upsert por pergunta) */
+  async saveChecklistResponses(
+  projectId: number,
+  dtos: SaveChecklistDto[],
+): Promise<ChecklistResponse[]> {
+  if (!Array.isArray(dtos) || dtos.length === 0) {
+    return [];
+  }
+
+  const existing = await this.responseRepo.find({
+    where: { projetoId: projectId },  
+  });
+
+  const byPergunta = new Map<number, ChecklistResponse>(
+    existing.map(r => [r.perguntaId, r]),
+  );
+
+  const toSave: ChecklistResponse[] = [];
+
+  for (const dto of dtos) {
+    let current: ChecklistResponse | undefined = byPergunta.get(dto.perguntaId);
+
+    if (!current) {
+      current = this.responseRepo.create({
+        projetoId: projectId,           
+        perguntaId: dto.perguntaId,
+      } as Partial<ChecklistResponse>);
+    }
+
+    current.resposta = dto.resposta ?? null;
+    current.detalhesTecnicos = dto.detalhesTecnicos ?? null;
+    current.conformidade = !!dto.conformidade;
+
+    toSave.push(current);
+  }
+
+  return this.responseRepo.save(toSave);
+}
 }

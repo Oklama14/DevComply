@@ -1,4 +1,3 @@
-// Ficheiro: api/src/checklist/checklist.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChecklistController } from './checklist.controller';
@@ -17,5 +16,7 @@ import { ChecklistResponse } from './entities/checklist-response.entity';
   ],
   controllers: [ChecklistController],
   providers: [ChecklistService],
+  exports: [ChecklistService],
+
 })
 export class ChecklistModule {}

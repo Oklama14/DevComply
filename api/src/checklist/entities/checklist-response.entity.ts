@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Project } from '../../projects/entities/project.entity';
 import { ChecklistQuestion } from './checklist-question.entity';
 
@@ -7,17 +7,25 @@ export class ChecklistResponse {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text', { nullable: true })
-  resposta: string;
+  @Column()
+  projetoId: number; // ou projectId
 
-  @Column({ default: false })
+  @Column()
+  perguntaId: number;
+
+  @Column({ type: 'text', nullable: true })
+  resposta: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  detalhesTecnicos: string | null;
+
+  @Column({ type: 'boolean', default: false })
   conformidade: boolean;
-
-  // Relação: Muitas respostas pertencem a um projeto
-  @ManyToOne(() => Project, (projeto) => projeto.respostas)
+  @ManyToOne(() => Project, (project) => project.respostas)
+  @JoinColumn({ name: 'projeto_id' })
   projeto: Project;
 
-  // Relação: Muitas respostas pertencem a uma pergunta
   @ManyToOne(() => ChecklistQuestion, (pergunta) => pergunta.respostas)
+  @JoinColumn({ name: 'pergunta_id' })
   pergunta: ChecklistQuestion;
 }

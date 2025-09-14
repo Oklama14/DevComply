@@ -12,11 +12,11 @@ export class LgpdArticle {
   @Column({ length: 200 })
   titulo: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   descricao: string;
 
-  // Esta é a relação que estava em falta.
-  // Ela diz ao TypeORM que um LgpdArticle pode ter muitas ChecklistQuestions.
+  // Define a relação: um artigo (categoria) tem muitas questões.
   @OneToMany(() => ChecklistQuestion, (question) => question.artigo)
   questoes: ChecklistQuestion[];
 }
+

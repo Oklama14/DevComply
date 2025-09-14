@@ -1,7 +1,6 @@
 @use 'sass:color';
 
-// Variáveis de Cor (exemplo)
-$primary-color: #3b82f6; // Azul
+$primary-color: #3b82f6; // Azuleta
 $text-color: #1f2937;
 $text-light: #6b7280;
 $card-background: #ffffff;
@@ -82,7 +81,7 @@ $border-color: #e5e7eb;
   border: 1px solid $border-color;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; // Adiciona espaçamento entre o texto e o número
+  gap: 0.5rem; // espaçamento entre o texto e o número
 }
 
 .stat-label {

@@ -1,43 +1,47 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Project } from './projects';
 
-// Definindo as interfacees para tipar os nossos dados, garantindo consistência
 export interface ChecklistItem {
-  id: string;
-  text: string;
-  details: string;
-  article: string;
-  checked: boolean;
-  implementationDetails: string;
-  technicalDetails: string;
+  id: number;
+  titulo: string;
+  descricao?: string;
+  completed: boolean;
+  lgpdReference?: string;
+  tipText?: string;
 }
 
 export interface ChecklistCategory {
-  id: string;
-  name: string;
+  id: number;
+  nome: string;
+  descricao?: string;
   items: ChecklistItem[];
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ChecklistService {
-  private apiUrl = 'http://localhost:3000/checklist';
+  private apiUrl = 'http://localhost:3000';  
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getChecklistData(): Observable<ChecklistCategory[]> {
-    return this.http.get<ChecklistCategory[]>(this.apiUrl);
-  }
-  
-  // Novo método para buscar as respostas salvas
-  getChecklistResponses(projectId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/responses/${projectId}`);
+  /** Estrutura/perguntas do checklist ( backend: GET /checklist/questions) */
+  getChecklistStructure(): Observable<ChecklistCategory[]> {
+    return this.http.get<ChecklistCategory[]>(`${this.apiUrl}/checklist/questions`);
   }
 
-  saveChecklistResponses(projectId: string, items: any[]): Observable<any> {
-    const payload = { items };
-    return this.http.post(`${this.apiUrl}/responses/${projectId}`, payload);
+  /** Projeto */
+  getProjectById(projectId: number): Observable<Project> {
+    return this.http.get<Project>(`${this.apiUrl}/projects/${projectId}`);
+  }
+
+  /** Respostas do projeto ( backend: GET /checklist/project/:id) */
+  getChecklistResponses(projectId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/checklist/project/${projectId}`);
+  }
+
+  /** Salvar respostas ( backend: POST /checklist/project/:id) */
+  saveChecklistResponses(projectId: number, responses: any[]): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/checklist/project/${projectId}`, responses);
   }
 }

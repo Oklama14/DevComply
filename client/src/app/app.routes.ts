@@ -18,7 +18,8 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: Dashboard },
       { path: 'projects', component: Projects },
-      { path: 'checklist/:projectId', component: Checklist },
+      { path: 'checklist/:id', component: Checklist }, // use o nome real do componente
+      { path: 'checklist', redirectTo: '/projects', pathMatch: 'full' }, // evita abrir sem id
       // Redireciona a raiz da área logada para o dashboard
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

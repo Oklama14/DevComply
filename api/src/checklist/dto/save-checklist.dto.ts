@@ -1,21 +1,17 @@
-import { IsArray, IsBoolean, IsNotEmpty, IsString } from 'class-validator';
-
-export class ChecklistItemDto {
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-
-  @IsBoolean()
-  checked: boolean;
-
-  @IsString()
-  implementationDetails: string;
-
-  @IsString()
-  technicalDetails: string;
-}
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class SaveChecklistDto {
-  @IsArray()
-  items: ChecklistItemDto[];
+  @IsInt()
+  perguntaId: number;
+
+  @IsOptional()
+  @IsString()
+  resposta?: string;
+
+  @IsOptional()
+  @IsString()
+  detalhesTecnicos?: string;
+
+  @IsBoolean()
+  conformidade: boolean;
 }
