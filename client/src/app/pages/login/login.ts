@@ -27,7 +27,7 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    console.log("O método onSubmit foi chamado!"); // Para depuração
+    console.log("O método onSubmit foi chamado!"); // Para depuração, consegue ver laa no f12 -> console
     if (this.loginForm.invalid) {
       this.errorMessage = "Por favor, preencha todos os campos corretamente.";
       return;
