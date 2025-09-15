@@ -1,0 +1,114 @@
+<div class="register-container">
+  <div class="register-box">
+    <div class="logo-container">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-icon">
+        <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2 7L12 12L22 7" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 22V12" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="logo-text">
+        <span class="main-title">DevComply</span>
+        <span class="subtitle">LGPD Dev Compliance</span>
+      </div>
+    </div>
+    
+    <p class="welcome-message">Crie sua conta para começar a usar o DevComply</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="nome">Nome Completo</label>
+        <input 
+          id="nome" 
+          type="text" 
+          formControlName="nome" 
+          placeholder="Seu nome completo"
+          [class.error]="f['nome'].invalid && f['nome'].touched">
+        <div class="error-text" *ngIf="f['nome'].invalid && f['nome'].touched">
+          <span *ngIf="f['nome'].errors?.['required']">Nome é obrigatório</span>
+          <span *ngIf="f['nome'].errors?.['minlength']">Nome deve ter pelo menos 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          id="email" 
+          type="email" 
+          formControlName="email" 
+          placeholder="seu-email@exemplo.com"
+          [class.error]="f['email'].invalid && f['email'].touched">
+        <div class="error-text" *ngIf="f['email'].invalid && f['email'].touched">
+          <span *ngIf="f['email'].errors?.['required']">Email é obrigatório</span>
+          <span *ngIf="f['email'].errors?.['email']">Email inválido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="perfil">Perfil</label>
+        <select 
+          id="perfil" 
+          formControlName="perfil"
+          [class.error]="f['perfil'].invalid && f['perfil'].touched">
+          <option value="desenvolvedor">Desenvolvedor</option>
+          <option value="gestor">Gestor</option>
+          <option value="dpo">DPO</option>
+          <option value="admin">Administrador</option>
+        </select>
+        <div class="error-text" *ngIf="f['perfil'].invalid && f['perfil'].touched">
+          <span *ngIf="f['perfil'].errors?.['required']">Perfil é obrigatório</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input 
+          id="senha" 
+          type="password" 
+          formControlName="senha" 
+          placeholder="Mínimo 6 caracteres"
+          [class.error]="f['senha'].invalid && f['senha'].touched">
+        <div class="error-text" *ngIf="f['senha'].invalid && f['senha'].touched">
+          <span *ngIf="f['senha'].errors?.['required']">Senha é obrigatória</span>
+          <span *ngIf="f['senha'].errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmSenha">Confirmar Senha</label>
+        <input 
+          id="confirmSenha" 
+          type="password" 
+          formControlName="confirmSenha" 
+          placeholder="Digite novamente a senha"
+          [class.error]="f['confirmSenha'].invalid && f['confirmSenha'].touched">
+        <div class="error-text" *ngIf="f['confirmSenha'].invalid && f['confirmSenha'].touched">
+          <span *ngIf="f['confirmSenha'].errors?.['required']">Confirmação de senha é obrigatória</span>
+        </div>
+        <div class="error-text" *ngIf="form.errors?.['passwordMismatch'] && f['confirmSenha'].touched">
+          <span>As senhas não coincidem</span>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
+
+      <div class="alt-action">
+        Já tem uma conta?
+        <a routerLink="/login">Faça login aqui</a>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-primary" 
+        [disabled]="form.invalid || loading">
+        <span *ngIf="loading">Criando conta...</span>
+        <span *ngIf="!loading">Criar Conta</span>
+      </button>
+    </form>
+  </div>
+</div>

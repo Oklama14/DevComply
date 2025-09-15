@@ -4,42 +4,62 @@ import { Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface RegisterDto { nome: string; email: string; senha: string; perfil: string; }
+export interface LoginDto { email: string; senha: string; }
+export interface JwtResponse { access_token: string }
+export interface ApiOk { ok: boolean; message?: string }
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = 'http://localhost:3000/auth';
   private platformId = inject(PLATFORM_ID);
-  
-  constructor(private http: HttpClient, private router: Router) { }
 
-  register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+  constructor(private http: HttpClient, private router: Router) {}
+
+  // ---- helpers
+  private saveToken(token: string) {
+    if (isPlatformBrowser(this.platformId)) localStorage.setItem('access_token', token);
+  }
+  private clearToken() {
+    if (isPlatformBrowser(this.platformId)) localStorage.removeItem('access_token');
   }
 
-  login(credentials: { email: string, senha: string }): Observable<{ access_token: string }> {
-    return this.http.post<{ access_token: string }>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
+  // ---- API
+register(
+  userData: RegisterDto,
+  opts: { autoLogin?: boolean; redirectTo?: string } = {}
+): Observable<ApiOk | JwtResponse> {
+  const { autoLogin = false, redirectTo = '/projects' } = opts;
+
+  return this.http.post<ApiOk | JwtResponse>(`${this.apiUrl}/register`, userData).pipe(
+    tap((res) => {
+      const maybeJwt = (res as JwtResponse)?.access_token;
+      if (autoLogin && maybeJwt) {
         if (isPlatformBrowser(this.platformId)) {
-          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('access_token', maybeJwt);
         }
+        this.router.navigate([redirectTo]);
+      }
+    })
+  );
+}
+
+  login(credentials: LoginDto): Observable<JwtResponse> {
+    return this.http.post<JwtResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap((res) => {
+        this.saveToken(res.access_token);
       })
     );
   }
 
   logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('access_token');
-    }
-    // 3. Navegar para a página de login após remover o token
+    this.clearToken();
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('access_token');
-    }
-    return null;
+    if (!isPlatformBrowser(this.platformId)) return null;
+    return localStorage.getItem('access_token');
   }
 
   isLoggedIn(): boolean {

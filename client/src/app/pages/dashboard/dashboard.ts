@@ -2,12 +2,12 @@ import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ProjectsService, Project } from '../../services/projects';
 import { Router, RouterLink } from '@angular/router';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe'; // Importe o pipe
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';  
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, SafeHtmlPipe], // Adicione o pipe aqui
+  imports: [CommonModule, RouterLink, SafeHtmlPipe],  
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })

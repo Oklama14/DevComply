@@ -5,26 +5,32 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Projects } from './pages/projects/projects';
 import { Checklist } from './pages/checklist/checklist';
 import { authGuard } from './guards/auth-guard';
+import { Settings } from './pages/settings/settings';
 
 export const routes: Routes = [
-  // Rota pública
+  // === PÚBLICAS ===
   { path: 'login', component: LoginComponent },
+  // Register como standalone lazy
+  { path: 'register', loadComponent: () =>
+      import('./pages/login/register/register').then(m => m.Register) },
 
-  // Rotas protegidas que usam o MainLayout
+  // === ÁREA PROTEGIDA (usa MainLayout) ===
   {
     path: '',
     component: MainLayout,
-    canActivate: [authGuard], // O guarda protege este grupo de rotas
+    canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
       { path: 'projects', component: Projects },
-      { path: 'checklist/:id', component: Checklist }, // use o nome real do componente
-      { path: 'checklist', redirectTo: '/projects', pathMatch: 'full' }, // evita abrir sem id
-      // Redireciona a raiz da área logada para o dashboard
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+      { path: 'checklist/:id', component: Checklist },
+      { path: 'checklist', redirectTo: 'projects', pathMatch: 'full' },
+
+      // ✅ Rota de Configurações
+      { path: 'settings', component: Settings },
+
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]
   },
 
-  // Se nenhuma rota corresponder, redireciona para o login
   { path: '**', redirectTo: 'login' }
 ];

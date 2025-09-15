@@ -1,0 +1,150 @@
+<div class="settings-container">
+  <!-- Header -->
+  <div class="settings-header">
+    <nav class="breadcrumb">
+      <a routerLink="/dashboard">Home</a>
+      <span>›</span>
+      <span>Configurações</span>
+    </nav>
+    
+    <div class="title-row">
+      <h1>Configurações</h1>
+    </div>
+  </div>
+
+  <!-- Mensagens de feedback -->
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+  
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Formulário de configurações -->
+  <form [formGroup]="settingsForm" (ngSubmit)="onSaveSettings()">
+    
+    <!-- Seção de Integrações -->
+    <div class="settings-section">
+      <div class="section-header">
+        <h2>Integrações</h2>
+        <p>Configure as integrações com serviços externos</p>
+      </div>
+      
+      <div class="form-group">
+        <label for="openaiApiKey">Chave API da OpenAI</label>
+        <input 
+          id="openaiApiKey" 
+          type="password" 
+          formControlName="openaiApiKey"
+          placeholder="sk-..."
+          class="form-control">
+        <small class="form-hint">
+          Necessária para análises de conformidade baseadas em IA.
+        </small>
+      </div>
+    </div>
+
+    <!-- Seção de Preferências -->
+    <div class="settings-section">
+      <div class="section-header">
+        <h2>Preferências</h2>
+        <p>Personalize sua experiência na plataforma</p>
+      </div>
+
+      <!-- Toggle para Sugestões de IA -->
+      <div class="toggle-item">
+        <div class="toggle-content">
+          <label for="enableAiSuggestions" class="toggle-label">Sugestões de IA</label>
+          <p class="toggle-description">
+            Receba sugestões técnicas baseadas em IA para melhorar a conformidade.
+          </p>
+        </div>
+        <div class="toggle-switch">
+          <input 
+            type="checkbox" 
+            id="enableAiSuggestions" 
+            formControlName="enableAiSuggestions"
+            class="switch-input">
+          <label for="enableAiSuggestions" class="switch-label">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Toggle para Salvamento Automático -->
+      <div class="toggle-item">
+        <div class="toggle-content">
+          <label for="autoSaveResponses" class="toggle-label">Salvar automaticamente</label>
+          <p class="toggle-description">
+            Salve automaticamente suas respostas ao checklist enquanto você digita.
+          </p>
+        </div>
+        <div class="toggle-switch">
+          <input 
+            type="checkbox" 
+            id="autoSaveResponses" 
+            formControlName="autoSaveResponses"
+            class="switch-input">
+          <label for="autoSaveResponses" class="switch-label">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Toggle para Relatórios Detalhados -->
+      <div class="toggle-item">
+        <div class="toggle-content">
+          <label for="detailedReports" class="toggle-label">Relatórios detalhados</label>
+          <p class="toggle-description">
+            Inclua recomendações técnicas detalhadas nos relatórios de conformidade.
+          </p>
+        </div>
+        <div class="toggle-switch">
+          <input 
+            type="checkbox" 
+            id="detailedReports" 
+            formControlName="detailedReports"
+            class="switch-input">
+          <label for="detailedReports" class="switch-label">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Toggle para Notificações -->
+      <div class="toggle-item">
+        <div class="toggle-content">
+          <label for="enableNotifications" class="toggle-label">Notificações</label>
+          <p class="toggle-description">
+            Receba notificações quando novos requisitos LGPD forem adicionados ao checklist.
+          </p>
+        </div>
+        <div class="toggle-switch">
+          <input 
+            type="checkbox" 
+            id="enableNotifications" 
+            formControlName="enableNotifications"
+            class="switch-input">
+          <label for="enableNotifications" class="switch-label">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="settings-actions">
+      <button type="button" class="btn btn-secondary" (click)="onResetSettings()">
+        Restaurar Padrão
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="loading">
+        <span *ngIf="loading">Salvando...</span>
+        <span *ngIf="!loading">Salvar Configurações</span>
+      </button>
+    </div>
+  </form>
+</div>

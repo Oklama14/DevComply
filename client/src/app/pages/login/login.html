@@ -26,6 +26,10 @@
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
+      <div class="alt-action" style="text-align:center; margin-top:12px; color:#6b7280;">
+  Não tem conta?
+  <a routerLink="/register" style="color:#2563eb; font-weight:600; text-decoration:none;">Criar conta</a>
+</div>
 
       <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">
         Entrar
