@@ -24,8 +24,6 @@ export const routes: Routes = [
       { path: 'projects', component: Projects },
       { path: 'checklist/:id', component: Checklist },
       { path: 'checklist', redirectTo: 'projects', pathMatch: 'full' },
-
-      // ✅ Rota de Configurações
       { path: 'settings', component: Settings },
 
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

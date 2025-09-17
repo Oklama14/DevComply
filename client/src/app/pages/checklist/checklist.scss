@@ -529,3 +529,39 @@ textarea {
     }
   }
 }
+
+// Disclaimer sobre IA
+.ai-disclaimer {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: rgba($amber-50, 0.5);
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 24px 0 0;
+
+  .disclaimer-icon {
+    flex-shrink: 0;
+    color: #d97706;
+    margin-top: 2px;
+  }
+
+  .disclaimer-content {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: $gray-900;
+    }
+
+    p {
+      margin: 0;
+      color: $gray-700;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+}

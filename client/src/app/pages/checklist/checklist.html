@@ -103,9 +103,27 @@
     </div>
   </section>
 
-  <!-- Rodapé -->
+    <!-- Rodapé -->
   <div class="footer-actions" *ngIf="!isLoading && checklistData?.length">
     <button class="btn btn-primary" (click)="generateReport()">Gerar Relatório</button>
     <button class="btn btn-secondary" (click)="saveProgress()">Salvar Progresso</button>
+  </div>
+
+  <!-- Disclaimer sobre IA -->
+  <div class="ai-disclaimer" *ngIf="!isLoading && checklistData?.length">
+    <div class="disclaimer-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="m9 12 2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="disclaimer-content">
+      <h3>Sobre as Análises por IA</h3>
+      <p>
+        As sugestões e análises baseadas em Inteligência Artificial são ferramentas de apoio e podem conter imprecisões ou "alucinações". 
+        Sempre valide as recomendações com especialistas jurídicos e técnicos qualificados antes de implementar mudanças críticas em seus sistemas. 
+        A conformidade com a LGPD requer análise humana especializada e não deve ser baseada exclusivamente em análises automatizadas.
+      </p>
+    </div>
   </div>
 </div>
