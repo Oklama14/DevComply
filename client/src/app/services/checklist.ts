@@ -44,4 +44,12 @@ export class ChecklistService {
   saveChecklistResponses(projectId: number, responses: any[]): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/checklist/project/${projectId}`, responses);
   }
+
+// Envia o arquivo JSON (multipart/form-data)
+sendChecklistReportFile(form: FormData) {
+  return this.http.post(`${this.apiUrl}/reports/checklist`, form, {
+    responseType: 'blob'
+  });
+}
+
 }

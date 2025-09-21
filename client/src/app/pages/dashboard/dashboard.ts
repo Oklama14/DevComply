@@ -7,7 +7,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, SafeHtmlPipe],  
+  imports: [CommonModule, SafeHtmlPipe],  
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
