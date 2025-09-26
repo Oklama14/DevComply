@@ -31,6 +31,7 @@ export class Checklist implements OnInit {
   project: Project | null = null;
   checklistData: DisplayableChecklistCategory[] = [];
   isLoading = true;
+  isGeneratingReport = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -166,50 +167,57 @@ export class Checklist implements OnInit {
   }
 
   generateReport(): void {
-    const payload = (this.checklistData || [])
-      .map(cat => {
-        const checked = (cat.items || []).filter(i => !!i.completed);
-        if (checked.length === 0) return null;
+  const payload = (this.checklistData || [])
+    .map(cat => {
+      const checked = (cat.items || []).filter(i => !!i.completed);
+      if (checked.length === 0) return null;
 
-        return {
-          categoria_nome: cat.nome,
-          items: checked.map(i => ({
-            titulo_item: i.titulo,
-            resposta_implementacao: i.answer ?? '',
-            resposta_tecnica: i.technicalDetails ?? '',
-            artigo_referente: i.lgpdReference ?? undefined
-          }))
-        };
-      })
-      .filter(Boolean) as Array<{ categoria_nome: string; items: any[] }>;
+      return {
+        categoria_nome: cat.nome,
+        items: checked.map(i => ({
+          titulo_item: i.titulo,
+          resposta_implementacao: i.answer ?? '',
+          resposta_tecnica: i.technicalDetails ?? '',
+          artigo_referente: i.lgpdReference ?? undefined
+        }))
+      };
+    })
+    .filter(Boolean) as Array<{ categoria_nome: string; items: any[] }>;
 
-    if (!payload.length) {
-      console.warn('[Relatório] Nenhum item marcado — nada para enviar.');
-      return;
-    }
-
-    const json = JSON.stringify(payload, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const filename = `checklist-${this.project?.id ?? 'sem-projeto'}.json`;
-
-    const form = new FormData();
-    form.append('file', blob, filename);
-    if (this.projectId) form.append('projectId', String(this.projectId));
-    if (this.project?.nome) form.append('projectName', this.project.nome);
-
-    this.checklistService.sendChecklistReportFile(form).subscribe({
-      next: (pdfBlob: Blob) => {
-        console.log('[Relatório] PDF recebido com sucesso');
-        const url = window.URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `relatorio-lgpd-${this.project?.id ?? 'sem-projeto'}.pdf`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err: any) => {
-        console.error('[Relatório] Falha ao enviar', err);
-      }
-    });
+  if (!payload.length) {
+    console.warn('[Relatório] Nenhum item marcado — nada para enviar.');
+    return;
   }
+
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const filename = `checklist-${this.project?.id ?? 'sem-projeto'}.json`;
+
+  const form = new FormData();
+  form.append('file', blob, filename);
+  if (this.projectId) form.append('projectId', String(this.projectId));
+  if (this.project?.nome) form.append('projectName', this.project.nome);
+
+  this.isGeneratingReport = true; // 🔥 ativa estado
+
+  this.checklistService.sendChecklistReportFile(form).subscribe({
+    next: (pdfBlob: Blob) => {
+      console.log('[Relatório] PDF recebido com sucesso');
+      const url = window.URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio-lgpd-${this.project?.id ?? 'sem-projeto'}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      this.isGeneratingReport = false; // 🔥 IMPORTANTE: resetar aqui também
+    },
+    error: (err: any) => {
+      console.error('[Relatório] Falha ao enviar', err);
+      this.isGeneratingReport = false; // 🔥 resetar no erro
+    },
+    complete: () => {
+      this.isGeneratingReport = false; // 🔥 redundante, mas seguro
+    }
+  });
+}
 }
