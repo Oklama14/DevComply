@@ -9,7 +9,7 @@ const logoPath = path.join(__dirname, '..', '..', 'logo.png');
 @Injectable()
 export class AiService {
   private readonly genAI = new GoogleGenerativeAI(
-    process.env.GOOGLE_API_KEY ?? 'AIzaSyCJkcwqxrDvQTAsB3H_ArslAUGa8AJVPYA'
+    process.env.GOOGLE_API_KEY ?? 'xxxxx'
   );
 
   async gerarJSON(dto: GerarRelatorioDto): Promise<Resposta[]> {
