@@ -88,6 +88,61 @@
           <span>As senhas não coincidem</span>
         </div>
       </div>
+      
+      <div class="checkbox-group">
+        <div class="checkbox-item">
+          <div class="checkbox-wrapper"
+            (mouseenter)="showPoliticaPopup = true"
+            (mouseleave)="hidePoliticaPopup()"> <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                formControlName="aceitaPolitica"
+                class="checkbox-input">
+              <span class="checkmark"></span>
+              Concordo com a <span class="link-text">Política de Privacidade</span>
+            </label>
+            
+            <div class="popup" 
+                 *ngIf="showPoliticaPopup"
+                 (mouseenter)="keepPoliticaPopup()"
+                 (mouseleave)="hidePoliticaPopup()">
+              <h4>Política de Privacidade</h4>
+              <p>Resumo da política: Coletamos apenas dados necessários para o funcionamento do sistema, protegemos suas informações conforme a LGPD, não compartilhamos dados com terceiros sem consentimento e garantimos seu direito à transparência sobre como seus dados são utilizados.</p>
+              <a routerLink="/politica-privacidade" class="popup-link" (click)="$event.stopPropagation()">Ver política completa</a>
+            </div>
+          </div>
+          <div class="error-text" *ngIf="f['aceitaPolitica'].invalid && f['aceitaPolitica'].touched">
+            <span>Você deve aceitar a Política de Privacidade</span>
+          </div>
+        </div>
+
+        <div class="checkbox-item">
+          <div class="checkbox-wrapper"
+            (mouseenter)="showTermosPopup = true"
+            (mouseleave)="hideTermosPopup()"> <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                formControlName="aceitaTermos"
+                class="checkbox-input">
+              <span class="checkmark"></span>
+              Aceito os <span class="link-text">Termos de Uso</span>
+            </label>
+            
+            <div class="popup" 
+                 *ngIf="showTermosPopup"
+                 (mouseenter)="keepTermosPopup()"
+                 (mouseleave)="hideTermosPopup()">
+              <h4>Termos de Uso</h4>
+              <p>Resumo dos termos: Ao usar nossa plataforma, você concorda em utilizar os recursos de forma ética, respeitar os direitos de propriedade intelectual, não realizar atividades maliciosas e cumprir com as obrigações legais aplicáveis ao tratamento de dados pessoais.</p>
+              <a routerLink="/termos-uso" class="popup-link" (click)="$event.stopPropagation()">Ver termos completos</a>
+            </div>
+          </div>
+          <div class="error-text" *ngIf="f['aceitaTermos'].invalid && f['aceitaTermos'].touched">
+            <span>Você deve aceitar os Termos de Uso</span>
+          </div>
+        </div>
+      </div>
+
 
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}

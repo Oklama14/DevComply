@@ -1,0 +1,528 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <h1>Política de Privacidade - DevComply</h1>
+    <p>Ferramenta de Apoio à Conformidade com a LGPD para Desenvolvedores</p>
+    <div class="last-update">
+      <strong>Última atualização:</strong> 28 de outubro de 2025 | <strong>Versão:</strong> 1.0
+    </div>
+  </div>
+</header>
+
+<!-- Quick Navigation -->
+<nav class="nav-container">
+  <div class="nav-menu">
+    <a (click)="scrollToSection('introducao', $event)">Introdução</a>
+    <a (click)="scrollToSection('dados-coletados', $event)">Dados Coletados</a>
+    <a (click)="scrollToSection('finalidades', $event)">Finalidades</a>
+    <a (click)="scrollToSection('compartilhamento', $event)">Compartilhamento</a>
+    <a (click)="scrollToSection('seguranca', $event)">Segurança</a>
+    <a (click)="scrollToSection('direitos', $event)">Seus Direitos</a>
+    <a (click)="scrollToSection('contato', $event)">Contato</a>
+    <a (click)="scrollToSection('resumo', $event)">Resumo</a>
+  </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <h3>Índice</h3>
+    <ul class="toc-list">
+      <li><a (click)="scrollToSection('introducao', $event)" 
+             [class.active]="isActiveSection('introducao')">1. Introdução</a></li>
+      <li><a (click)="scrollToSection('dados-coletados', $event)"
+             [class.active]="isActiveSection('dados-coletados')">2. Dados Coletados</a></li>
+      <li><a (click)="scrollToSection('finalidades', $event)"
+             [class.active]="isActiveSection('finalidades')">3. Finalidades</a></li>
+      <li><a (click)="scrollToSection('bases-legais', $event)"
+             [class.active]="isActiveSection('bases-legais')">4. Bases Legais</a></li>
+      <li><a (click)="scrollToSection('compartilhamento', $event)"
+             [class.active]="isActiveSection('compartilhamento')">5. Compartilhamento</a></li>
+      <li><a (click)="scrollToSection('transferencia', $event)"
+             [class.active]="isActiveSection('transferencia')">6. Transferência Internacional</a></li>
+      <li><a (click)="scrollToSection('seguranca', $event)"
+             [class.active]="isActiveSection('seguranca')">7. Segurança</a></li>
+      <li><a (click)="scrollToSection('retencao', $event)"
+             [class.active]="isActiveSection('retencao')">8. Retenção</a></li>
+      <li><a (click)="scrollToSection('cookies', $event)"
+             [class.active]="isActiveSection('cookies')">9. Cookies</a></li>
+      <li><a (click)="scrollToSection('direitos', $event)"
+             [class.active]="isActiveSection('direitos')">10. Seus Direitos</a></li>
+      <li><a (click)="scrollToSection('menores', $event)"
+             [class.active]="isActiveSection('menores')">11. Menores de Idade</a></li>
+      <li><a (click)="scrollToSection('alteracoes', $event)"
+             [class.active]="isActiveSection('alteracoes')">12. Alterações</a></li>
+      <li><a (click)="scrollToSection('dpo', $event)"
+             [class.active]="isActiveSection('dpo')">13. Encarregado (DPO)</a></li>
+      <li><a (click)="scrollToSection('contato', $event)"
+             [class.active]="isActiveSection('contato')">14. Contato</a></li>
+      <li><a (click)="scrollToSection('disposicoes', $event)"
+             [class.active]="isActiveSection('disposicoes')">15. Disposições Finais</a></li>
+      <li><a (click)="scrollToSection('resumo', $event)"
+             [class.active]="isActiveSection('resumo')">📌 Resumo Executivo</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    <!-- Section 1: Introdução -->
+    <section id="introducao" class="section">
+      <h2>1. INTRODUÇÃO</h2>
+      
+      <p>A presente Política de Privacidade ("Política") descreve como o <strong>[NOME DA EMPRESA/ENTIDADE PROVEDORA]</strong>, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº <strong>[NÚMERO]</strong>, com sede em <strong>[ENDEREÇO COMPLETO]</strong> (doravante denominado "Provedor", "DevComply", "nós" ou "nosso"), coleta, usa, armazena, compartilha e protege os dados pessoais dos usuários ("você", "usuário" ou "titular dos dados") da plataforma <strong>DevComply</strong>.</p>
+
+      <p>Esta Política foi elaborada em conformidade com a <strong>Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais - LGPD)</strong> e demais legislações aplicáveis sobre proteção de dados e privacidade no Brasil.</p>
+
+      <div class="alert alert-warning">
+        <strong>⚠️ IMPORTANTE:</strong> AO UTILIZAR O DEVCOMPLY, VOCÊ DECLARA TER LIDO, COMPREENDIDO E CONCORDADO COM ESTA POLÍTICA DE PRIVACIDADE E COM OS TERMOS DE USO.
+      </div>
+
+      <h3>1.1. Compromisso com a Privacidade</h3>
+      <p>O DevComply está comprometido com a proteção da privacidade e dos dados pessoais de seus usuários. Tratamos seus dados com responsabilidade, transparência e segurança, implementando medidas técnicas e organizacionais adequadas para garantir a conformidade com a LGPD.</p>
+
+      <h3>1.2. Público-Alvo</h3>
+      <p>Esta Política se aplica a desenvolvedores de software, profissionais de tecnologia e demais pessoas que utilizem o DevComply para avaliar a conformidade de projetos com a LGPD.</p>
+
+      <h3>1.3. Definições Importantes</h3>
+      <p>Para fins desta Política, aplicam-se as seguintes definições conforme a LGPD:</p>
+      <ul>
+        <li><strong>Dado Pessoal:</strong> Informação relacionada a pessoa natural identificada ou identificável.</li>
+        <li><strong>Titular dos Dados:</strong> Pessoa natural a quem se referem os dados pessoais.</li>
+        <li><strong>Tratamento:</strong> Toda operação realizada com dados pessoais.</li>
+        <li><strong>Controlador:</strong> O DevComply, responsável pelas decisões sobre o tratamento de dados pessoais.</li>
+        <li><strong>Operador:</strong> Pessoa que realiza o tratamento de dados pessoais em nome do controlador (ex: Google Gemini).</li>
+        <li><strong>Encarregado (DPO):</strong> Pessoa responsável por atuar como canal de comunicação entre o controlador, os titulares e a ANPD.</li>
+      </ul>
+    </section>
+
+    <!-- Section 2: Dados Coletados -->
+    <section id="dados-coletados" class="section">
+      <h2>2. DADOS PESSOAIS COLETADOS</h2>
+      
+      <p>O DevComply coleta e trata as seguintes categorias de dados pessoais:</p>
+
+      <h3>2.1. Dados de Cadastro e Identificação</h3>
+      <p>Coletados durante o processo de criação de conta:</p>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Dado</th>
+              <th>Finalidade</th>
+              <th>Base Legal (LGPD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Nome completo</td>
+              <td>Identificação do usuário, personalização da experiência</td>
+              <td>Execução de contrato (Art. 7º, V)</td>
+            </tr>
+            <tr>
+              <td>Endereço de e-mail</td>
+              <td>Autenticação, comunicações, recuperação de senha</td>
+              <td>Execução de contrato (Art. 7º, V)</td>
+            </tr>
+            <tr>
+              <td>Senha</td>
+              <td>Autenticação e segurança da conta</td>
+              <td>Execução de contrato (Art. 7º, V)</td>
+            </tr>
+            <tr>
+              <td>Data e hora de cadastro</td>
+              <td>Auditoria, segurança e gestão</td>
+              <td>Legítimo interesse (Art. 7º, IX)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>🔒 Observação:</strong> As senhas são armazenadas exclusivamente em formato criptografado utilizando algoritmos de hash seguros (bcrypt, Argon2 ou similar) com salt único. O DevComply jamais armazena ou tem acesso às senhas em texto simples.
+      </div>
+
+      <h3>2.3. Respostas ao Checklist de Conformidade</h3>
+      
+      <div class="alert alert-warning">
+        <strong>⚠️ DADOS MAIS SENSÍVEIS:</strong> As respostas ao checklist podem conter informações técnicas proprietárias, confidenciais ou estratégicas sobre seus projetos. <strong>ESTES DADOS SÃO ENVIADOS E PROCESSADOS PELA API DO GOOGLE GEMINI</strong>.
+      </div>
+
+      <h3>2.6. Dados que NÃO Coletamos</h3>
+      <p>O DevComply <strong>NÃO coleta intencionalmente</strong>:</p>
+      <ul>
+        <li>Dados sensíveis conforme Art. 5º, II da LGPD</li>
+        <li>Dados de menores de 18 anos</li>
+        <li>Informações financeiras ou de pagamento</li>
+        <li>Dados de localização precisa (GPS)</li>
+        <li>Listas de contatos ou dados de terceiros</li>
+      </ul>
+    </section>
+
+    <!-- Section 3: Finalidades -->
+    <section id="finalidades" class="section">
+      <h2>3. FINALIDADES DO TRATAMENTO DE DADOS</h2>
+      
+      <p>Tratamos seus dados pessoais exclusivamente para as seguintes finalidades:</p>
+
+      <h3>3.1. Fornecimento do Serviço (Finalidade Principal)</h3>
+      <ul>
+        <li>Criar e gerenciar sua conta de usuário</li>
+        <li>Autenticar e controlar acesso à plataforma</li>
+        <li>Permitir o cadastro e gestão de projetos</li>
+        <li>Processar respostas do checklist através da API do Google Gemini</li>
+        <li>Gerar análises de conformidade automatizadas</li>
+        <li>Criar relatórios personalizados com diagnósticos e recomendações</li>
+      </ul>
+      <p><strong>Base Legal:</strong> Execução de contrato (Art. 7º, V, LGPD)</p>
+
+      <h3>3.2. Comunicação com o Usuário</h3>
+      <ul>
+        <li>Enviar notificações importantes sobre sua conta</li>
+        <li>Informar sobre atualizações nos Termos ou Política de Privacidade</li>
+        <li>Responder a solicitações, dúvidas e suporte técnico</li>
+      </ul>
+
+      <h3>3.3. Segurança e Prevenção de Fraudes</h3>
+      <ul>
+        <li>Detectar, prevenir e investigar atividades suspeitas</li>
+        <li>Proteger contra acesso não autorizado</li>
+        <li>Monitorar uso para detectar violações dos Termos</li>
+      </ul>
+    </section>
+
+    <!-- Section 4: Bases Legais -->
+    <section id="bases-legais" class="section">
+      <h2>4. BASES LEGAIS PARA O TRATAMENTO DE DADOS</h2>
+      
+      <h3>4.1. Execução de Contrato (Art. 7º, V)</h3>
+      <p>A maioria dos dados são tratados porque são <strong>estritamente necessários</strong> para executar o contrato estabelecido nos Termos de Uso.</p>
+
+      <h3>4.2. Legítimo Interesse (Art. 7º, IX)</h3>
+      <p>Tratamos alguns dados com base no nosso <strong>legítimo interesse</strong> em garantir segurança, prevenir fraudes e melhorar nossos serviços.</p>
+
+      <h3>4.3. Cumprimento de Obrigação Legal (Art. 7º, II)</h3>
+      <p>Alguns dados são tratados porque somos <strong>legalmente obrigados</strong> a fazê-lo.</p>
+    </section>
+
+    <!-- Section 5: Compartilhamento -->
+    <section id="compartilhamento" class="section">
+      <h2>5. COMPARTILHAMENTO DE DADOS COM TERCEIROS</h2>
+      
+      <p>O DevComply <strong>não vende, aluga ou comercializa</strong> seus dados pessoais.</p>
+
+      <h3>5.1. Google Gemini (Operador de Dados) - COMPARTILHAMENTO CRÍTICO</h3>
+      
+      <div class="alert alert-warning">
+        <strong>⚠️ ATENÇÃO: ESTE É O COMPARTILHAMENTO MAIS IMPORTANTE</strong>
+        <br><br>
+        As <strong>respostas detalhadas do checklist</strong> são enviadas para a API do <strong>Google Gemini</strong> para processamento e análise automatizada.
+      </div>
+
+      <h4>Como funciona:</h4>
+      <ol>
+        <li>Você preenche o checklist com descrições técnicas</li>
+        <li>O DevComply envia via API para servidores do Google</li>
+        <li>O Google Gemini processa e retorna uma análise</li>
+        <li>O DevComply apresenta o relatório para você</li>
+      </ol>
+
+      <div class="alert alert-info">
+        <strong>📚 Importante:</strong> Recomendamos que você leia as políticas do Google. O DevComply <strong>não controla</strong> as práticas internas de processamento do Google.
+      </div>
+
+      <h3>5.4. Dados que NUNCA Compartilhamos</h3>
+      <ul>
+        <li>Empresas para fins de marketing direto</li>
+        <li>Corretores de dados (data brokers)</li>
+        <li>Redes de publicidade</li>
+        <li>Qualquer entidade para fins não relacionados</li>
+      </ul>
+    </section>
+
+    <!-- Section 6: Transferência Internacional -->
+    <section id="transferencia" class="section">
+      <h2>6. TRANSFERÊNCIA INTERNACIONAL DE DADOS</h2>
+      
+      <p>Seus dados pessoais podem ser transferidos para servidores fora do Brasil, incluindo Estados Unidos, devido ao uso da API do Google Gemini.</p>
+
+      <h3>6.2. Conformidade com a LGPD (Art. 33)</h3>
+      <p>Qualquer transferência internacional será realizada em conformidade com a LGPD, fundamentada em:</p>
+      <ul>
+        <li>Cláusulas contratuais padrão</li>
+        <li>Necessidade para execução do contrato</li>
+        <li>Medidas de proteção adequadas</li>
+      </ul>
+    </section>
+
+    <!-- Section 7: Segurança -->
+    <section id="seguranca" class="section">
+      <h2>7. SEGURANÇA DOS DADOS</h2>
+      
+      <h3>7.1. Compromisso com a Segurança</h3>
+      <p>A segurança de seus dados é prioridade fundamental. Implementamos medidas técnicas e organizacionais adequadas.</p>
+
+      <h3>7.2. Medidas Técnicas</h3>
+      <ul>
+        <li><strong>Criptografia:</strong> TLS/SSL em trânsito, criptografia em repouso</li>
+        <li><strong>Senhas:</strong> Hash criptográfico (bcrypt/Argon2) com salt</li>
+        <li><strong>Controles de Acesso:</strong> Autenticação obrigatória, logs de auditoria</li>
+        <li><strong>Infraestrutura:</strong> Firewalls, monitoramento 24/7</li>
+      </ul>
+
+      <div class="alert alert-warning">
+        <strong>⚠️ Responsabilidade Compartilhada:</strong> Você também deve escolher senhas fortes, não compartilhar credenciais e manter dispositivos atualizados.
+      </div>
+    </section>
+
+    <!-- Section 8: Retenção -->
+    <section id="retencao" class="section">
+      <h2>8. RETENÇÃO E EXCLUSÃO DE DADOS</h2>
+      
+      <h3>8.1. Períodos de Retenção</h3>
+      <ul>
+        <li><strong>Conta ativa:</strong> Dados mantidos enquanto conta existir</li>
+        <li><strong>Após encerramento:</strong> 30 dias para recuperação, depois exclusão definitiva</li>
+        <li><strong>Obrigações legais:</strong> Registros fiscais (5 anos), acesso à internet (6 meses)</li>
+      </ul>
+
+      <h3>8.2. Como Solicitar Exclusão</h3>
+      <ol>
+        <li>Através da plataforma: Configurações > Excluir Conta</li>
+        <li>Por e-mail para o DPO</li>
+      </ol>
+
+      <div class="alert alert-warning">
+        <strong>⚠️ Faça backup:</strong> Exporte seus dados antes de excluir a conta.
+      </div>
+    </section>
+
+    <!-- Section 9: Cookies -->
+    <section id="cookies" class="section">
+      <h2>9. COOKIES E TECNOLOGIAS DE RASTREAMENTO</h2>
+      
+      <h3>9.1. Cookies Utilizados</h3>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Cookie</th>
+              <th>Finalidade</th>
+              <th>Duração</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>session_id</td>
+              <td>Manter sessão autenticada</td>
+              <td>Até logout</td>
+            </tr>
+            <tr>
+              <td>csrf_token</td>
+              <td>Proteção CSRF</td>
+              <td>Sessão</td>
+            </tr>
+            <tr>
+              <td>auth_token</td>
+              <td>Token de autenticação</td>
+              <td>7 dias</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>9.3. Gerenciamento</h3>
+      <p>Você pode controlar cookies através das configurações do navegador. Desabilitar cookies essenciais impedirá o funcionamento do DevComply.</p>
+    </section>
+
+    <!-- Section 10: Direitos -->
+    <section id="direitos" class="section">
+      <h2>10. DIREITOS DOS TITULARES DE DADOS</h2>
+      
+      <div class="summary-box">
+        <h3>🛡️ Seus Direitos Sob a LGPD</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <h4>✓ Acesso</h4>
+            <ul>
+              <li>Confirmar tratamento</li>
+              <li>Acessar dados</li>
+            </ul>
+          </div>
+          <div class="summary-item">
+            <h4>✓ Correção</h4>
+            <ul>
+              <li>Corrigir dados</li>
+              <li>Atualizar informações</li>
+            </ul>
+          </div>
+          <div class="summary-item">
+            <h4>✓ Eliminação</h4>
+            <ul>
+              <li>Solicitar exclusão</li>
+              <li>Encerrar conta</li>
+            </ul>
+          </div>
+          <div class="summary-item">
+            <h4>✓ Portabilidade</h4>
+            <ul>
+              <li>Exportar dados</li>
+              <li>Formato estruturado</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h3>10.1. Como Exercer</h3>
+      <ul>
+        <li>Através da plataforma (Configurações)</li>
+        <li>E-mail do DPO: [E-MAIL]</li>
+        <li>Resposta em até 15 dias</li>
+      </ul>
+
+      <h3>10.2. Reclamar à ANPD</h3>
+      <p>Se insatisfeito, você pode reclamar à ANPD: <a href="https://www.gov.br/anpd" target="_blank">www.gov.br/anpd</a></p>
+    </section>
+
+    <!-- Section 11: Menores -->
+    <section id="menores" class="section">
+      <h2>11. DADOS DE MENORES DE IDADE</h2>
+      
+      <p>O DevComply <strong>não é destinado a menores de 18 anos</strong>. Se detectarmos dados de menores, excluiremos imediatamente.</p>
+    </section>
+
+    <!-- Section 12: Alterações -->
+    <section id="alteracoes" class="section">
+      <h2>12. ALTERAÇÕES NESTA POLÍTICA</h2>
+      
+      <p>Podemos modificar esta Política a qualquer momento. Alterações substanciais serão comunicadas por e-mail com 15 dias de antecedência.</p>
+    </section>
+
+    <!-- Section 13: DPO -->
+    <section id="dpo" class="section">
+      <h2>13. ENCARREGADO DE PROTEÇÃO DE DADOS (DPO)</h2>
+      
+      <div class="alert alert-info">
+        <strong>Nome:</strong> [NOME DO DPO]<br>
+        <strong>E-mail:</strong> [E-MAIL DO DPO]<br>
+        <strong>Resposta:</strong> Até 48h (confirmação) / 15 dias (substantiva)
+      </div>
+    </section>
+
+    <!-- Section 14: Contato -->
+    <section id="contato" class="section">
+      <h2>14. INFORMAÇÕES DE CONTATO</h2>
+      
+      <div class="alert alert-info">
+        <strong>Razão Social:</strong> [NOME DA EMPRESA]<br>
+        <strong>CNPJ:</strong> [CNPJ]<br>
+        <strong>Endereço:</strong> [ENDEREÇO COMPLETO]<br>
+        <strong>E-mail:</strong> [E-MAIL]
+      </div>
+    </section>
+
+    <!-- Section 15: Disposições Finais -->
+    <section id="disposicoes" class="section">
+      <h2>15. DISPOSIÇÕES FINAIS</h2>
+      
+      <h3>15.1. Legislação Aplicável</h3>
+      <ul>
+        <li>Lei nº 13.709/2018 (LGPD)</li>
+        <li>Lei nº 12.965/2014 (Marco Civil da Internet)</li>
+        <li>Lei nº 8.078/1990 (CDC, quando aplicável)</li>
+      </ul>
+    </section>
+
+    <!-- Section: Resumo -->
+    <section id="resumo" class="section">
+      <h2>📌 RESUMO EXECUTIVO</h2>
+      
+      <div class="summary-box">
+        <div class="summary-grid">
+          <div class="summary-item">
+            <h4>✅ Coletamos</h4>
+            <ul>
+              <li>Nome, e-mail, senha</li>
+              <li>Dados de projetos</li>
+              <li>Respostas do checklist</li>
+            </ul>
+          </div>
+
+          <div class="summary-item">
+            <h4>🔄 Usamos para</h4>
+            <ul>
+              <li>Fornecer o serviço</li>
+              <li>Análise via Gemini</li>
+              <li>Gerar relatórios</li>
+            </ul>
+          </div>
+
+          <div class="summary-item">
+            <h4>🤝 Compartilhamos</h4>
+            <ul>
+              <li>Google Gemini (IA)</li>
+              <li>Infraestrutura</li>
+              <li>NÃO vendemos</li>
+            </ul>
+          </div>
+
+          <div class="summary-item">
+            <h4>🔒 Protegemos</h4>
+            <ul>
+              <li>Criptografia TLS</li>
+              <li>Hash de senhas</li>
+              <li>Monitoramento 24/7</li>
+            </ul>
+          </div>
+
+          <div class="summary-item">
+            <h4>👤 Seus Direitos</h4>
+            <ul>
+              <li>Acessar dados</li>
+              <li>Corrigir/Excluir</li>
+              <li>Exportar (portabilidade)</li>
+            </ul>
+          </div>
+
+          <div class="summary-item">
+            <h4>📧 Contato</h4>
+            <ul>
+              <li>DPO: [E-MAIL]</li>
+              <li>ANPD: gov.br/anpd</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Declaration -->
+    <section class="section">
+      <div class="alert alert-warning">
+        <h3 style="margin-top: 0;">📋 DECLARAÇÃO</h3>
+        <p><strong>AO UTILIZAR O DEVCOMPLY, VOCÊ CONFIRMA:</strong></p>
+        <ul>
+          <li>✓ Leu e compreendeu esta Política</li>
+          <li>✓ Entende o processamento pelo Google Gemini</li>
+          <li>✓ Conhece seus direitos sob a LGPD</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Footer info -->
+    <section class="section document-info">
+      <p><strong>Versão:</strong> 1.0 | <strong>Data:</strong> 28/10/2025</p>
+      <p>© 2025 [NOME DA EMPRESA]. Todos os direitos reservados.</p>
+    </section>
+  </main>
+</div>
+
+<!-- Floating Buttons -->
+<button *ngIf="showBackToTop" class="back-to-top" (click)="scrollToTop()" aria-label="Voltar ao topo">
+  ↑
+</button>
+
+<button class="print-button" (click)="printPolicy()" aria-label="Imprimir política">
+  🖨️
+</button>

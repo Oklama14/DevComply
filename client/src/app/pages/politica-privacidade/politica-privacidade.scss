@@ -1,0 +1,501 @@
+/* =========================================
+   ARQUIVO: politica-privacidade.scss (AJUSTADO)
+   ========================================= */
+
+// Variáveis unificadas, priorizando o dashboard.scss
+$primary-color: #3b82f6; // NOVO: Cor "Azuleta" do dashboard
+$text-color: #1f2937;
+$text-light: #6b7280;
+$card-background: #ffffff;
+$border-color: #e5e7eb;
+
+// Variáveis mantidas da política de privacidade (algumas com alias)
+$secondary-color: #1e40af; // Mantido para o gradiente do header
+$accent-color: $primary-color; // ALTERADO: Vinculado à nova cor primária
+$text-dark: $text-color; // Alias
+$text-medium: #4b5563;
+$bg-light: #f9fafb;
+$bg-white: $card-background; // Alias
+
+// Cores de Alerta (Mantidas)
+$warning-bg: #fef3c7;
+$warning-border: #f59e0b;
+$success-bg: #d1fae5;
+$success-border: #10b981;
+$info-bg: #dbeafe;
+
+// Estilos globais para o componente
+:host {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  line-height: 1.7;
+  color: $text-dark;
+  background-color: $bg-light; // Fundo da página, igual ao dashboard
+}
+
+// Header
+.header {
+  // O gradiente usará a nova $primary-color, ajustando-se automaticamente
+  background: linear-gradient(135deg, $primary-color, $secondary-color);
+  color: white;
+  padding: 2rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 0.95rem;
+    opacity: 0.95;
+  }
+
+  .last-update {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+}
+
+// Navigation
+.nav-container {
+  background-color: $bg-white;
+  border-bottom: 2px solid $border-color;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.nav-menu {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg-light;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $primary-color; // Cor do dashboard
+    border-radius: 3px;
+  }
+
+  a {
+    color: $text-medium;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: $bg-light;
+      color: $primary-color; // Cor do dashboard
+    }
+  }
+}
+
+// Main Container
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+}
+
+// Sidebar TOC
+.sidebar {
+  position: sticky;
+  top: 80px;
+  align-self: start;
+  background: $bg-white;
+  padding: 1.5rem;
+  border-radius: 12px; // 0.75rem - Consistente com dashboard
+
+  // ALTERADO: Trocando shadow por border, como no dashboard.scss
+  border: 1px solid $border-color;
+  // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); // Removido
+
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+
+  h3 {
+    font-size: 0.9rem;
+    color: $text-medium;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+}
+
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  a {
+    color: $text-medium;
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: block;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $bg-light;
+      color: $primary-color; // Cor do dashboard
+      padding-left: 0.8rem;
+    }
+
+    &.active {
+      background-color: $bg-light;
+      color: $primary-color; // Cor do dashboard
+      font-weight: 600;
+      padding-left: 0.8rem;
+    }
+  }
+}
+
+// Content
+.content {
+  background-color: $bg-white;
+  padding: 2.5rem; // Consistente com dashboard.scss
+  border-radius: 12px; // 0.75rem - Consistente com dashboard
+
+  // ALTERADO: Trocando shadow por border, como no dashboard.scss
+  border: 1px solid $border-color;
+  // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); // Removido
+}
+
+.section {
+  margin-bottom: 3rem;
+  scroll-margin-top: 100px;
+
+  h2 {
+    color: $primary-color; // Cor do dashboard
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid $accent-color; // Usará a $primary-color
+    font-weight: 700;
+  }
+
+  h3 {
+    color: $secondary-color; // Mantido
+    font-size: 1.3rem;
+    margin: 1.5rem 0 0.8rem;
+    font-weight: 600;
+  }
+
+  h4 {
+    color: $text-dark;
+    font-size: 1.1rem;
+    margin: 1.2rem 0 0.6rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 1rem;
+    color: $text-medium;
+  }
+
+  ul,
+  ol {
+    margin: 1rem 0 1rem 1.5rem;
+    color: $text-medium;
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+// Alert Boxes (Estilo já é consistente)
+.alert {
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border-left: 4px solid;
+
+  &-warning {
+    background-color: $warning-bg;
+    border-color: $warning-border;
+
+    strong {
+      color: #b45309;
+    }
+  }
+
+  &-info {
+    background-color: $info-bg;
+    border-color: $primary-color; // Cor do dashboard
+  }
+
+  &-success {
+    background-color: $success-bg;
+    border-color: $success-border;
+  }
+
+  ul {
+    margin: 0.5rem 0 0 1.5rem;
+  }
+
+  a {
+    color: $primary-color; // Cor do dashboard
+    font-weight: 600;
+    text-decoration: underline;
+
+    &:hover {
+      color: $secondary-color;
+    }
+  }
+}
+
+// Tables (Estilo já é consistente)
+.table-container {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+
+    thead {
+      background-color: $primary-color; // Cor do dashboard
+      color: white;
+
+      th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+    }
+
+    tbody {
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid $border-color;
+        font-size: 0.9rem;
+        color: $text-medium;
+      }
+
+      tr:hover {
+        background-color: $bg-light;
+      }
+    }
+  }
+}
+
+// Summary Box
+.summary-box {
+  background: linear-gradient(135deg, #e0e7ff, #dbeafe); // Fundo azul claro, combina com dashboard
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+  border: 2px solid $primary-color; // Cor do dashboard
+
+  h3 {
+    color: $primary-color; // Cor do dashboard
+    margin-bottom: 1rem;
+  }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.summary-item {
+  h4 {
+    color: $secondary-color;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  ul {
+    list-style: none;
+    margin-left: 0;
+
+    li {
+      &::before {
+        content: "✓ ";
+        color: $success-border;
+        font-weight: bold;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+// Document Info
+.document-info {
+  text-align: center;
+  padding: 2rem 0;
+  border-top: 2px solid $border-color;
+
+  p {
+    color: $text-light;
+  }
+}
+
+// Floating Buttons
+.back-to-top,
+.print-button {
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  transition: all 0.3s;
+  font-size: 1.2rem;
+  z-index: 100;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+  }
+}
+
+.back-to-top {
+  bottom: 2rem;
+  right: 2rem;
+  background-color: $primary-color; // Cor do dashboard
+  color: white;
+}
+
+.print-button {
+  bottom: 5rem;
+  right: 2rem;
+  background-color: $secondary-color;
+  color: white;
+}
+
+// Responsive Design (Sem alterações)
+@media (max-width: 968px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
+  }
+
+  .nav-container {
+    position: static;
+  }
+
+  .content {
+    padding: 1.5rem;
+  }
+
+  .section h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .header h1 {
+    font-size: 1.4rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-container {
+    font-size: 0.85rem;
+
+    table {
+      th,
+      td {
+        padding: 0.7rem;
+      }
+    }
+  }
+
+  .back-to-top,
+  .print-button {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+
+  .print-button {
+    bottom: 7rem;
+    right: 1rem;
+  }
+
+  .back-to-top {
+    bottom: 2rem;
+    right: 1rem;
+  }
+}
+
+// Print Styles (Sem alterações)
+@media print {
+  .header,
+  .nav-container,
+  .sidebar,
+  .back-to-top,
+  .print-button {
+    display: none !important;
+  }
+
+  .container {
+    grid-template-columns: 1fr;
+    margin: 0;
+  }
+
+  .content {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .section {
+    page-break-inside: avoid;
+  }
+
+  .alert {
+    border: 1px solid #ccc;
+  }
+}

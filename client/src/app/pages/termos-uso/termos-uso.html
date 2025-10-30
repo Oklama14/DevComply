@@ -1,0 +1,428 @@
+<header class="header">
+  <div class="header-content">
+    <h1>Termos de Uso - DevComply</h1>
+    <p>Condições legais para o uso da ferramenta de apoio à conformidade LGPD</p>
+    <div class="last-update">
+      <strong>Última atualização:</strong> 28 de outubro de 2025 | <strong>Versão:</strong> 1.0
+    </div>
+  </div>
+</header>
+
+<nav class="nav-container">
+  <div class="nav-menu">
+    <a (click)="scrollToSection('introducao', $event)">Introdução</a>
+    <a (click)="scrollToSection('descricao-servico', $event)">O Serviço</a>
+    <a (click)="scrollToSection('uso-aceitavel', $event)">Uso Aceitável</a>
+    <a (click)="scrollToSection('privacidade-dados', $event)">Privacidade</a>
+    <a (click)="scrollToSection('uso-api-terceiros', $event)">Google Gemini</a>
+    <a (click)="scrollToSection('isencao-garantias', $event)">Garantias</a>
+    <a (click)="scrollToSection('limitacao-responsabilidade', $event)">Responsabilidade</a>
+  </div>
+</nav>
+
+<div class="container">
+  <aside class="sidebar">
+    <h3>Índice dos Termos</h3>
+    <ul class="toc-list">
+      <li><a (click)="scrollToSection('introducao', $event)" 
+             [class.active]="isActiveSection('introducao')">1. Introdução</a></li>
+      <li><a (click)="scrollToSection('aceitacao-termos', $event)"
+             [class.active]="isActiveSection('aceitacao-termos')">2. Aceitação dos Termos</a></li>
+      <li><a (click)="scrollToSection('descricao-servico', $event)"
+             [class.active]="isActiveSection('descricao-servico')">3. Descrição do Serviço</a></li>
+      <li><a (click)="scrollToSection('cadastro-conta', $event)"
+             [class.active]="isActiveSection('cadastro-conta')">4. Cadastro e Conta</a></li>
+      <li><a (click)="scrollToSection('uso-aceitavel', $event)"
+             [class.active]="isActiveSection('uso-aceitavel')">5. Uso Aceitável</a></li>
+      <li><a (click)="scrollToSection('privacidade-dados', $event)"
+             [class.active]="isActiveSection('privacidade-dados')">6. Privacidade e Dados</a></li>
+      <li><a (click)="scrollToSection('propriedade-intelectual', $event)"
+             [class.active]="isActiveSection('propriedade-intelectual')">7. Propriedade Intelectual</a></li>
+      <li><a (click)="scrollToSection('uso-api-terceiros', $event)"
+             [class.active]="isActiveSection('uso-api-terceiros')">8. Uso da API (Google Gemini)</a></li>
+      <li><a (click)="scrollToSection('isencao-garantias', $event)"
+             [class.active]="isActiveSection('isencao-garantias')">9. Isenção de Garantias</a></li>
+      <li><a (click)="scrollToSection('limitacao-responsabilidade', $event)"
+             [class.active]="isActiveSection('limitacao-responsabilidade')">10. Limitação de Responsabilidade</a></li>
+      <li><a (click)="scrollToSection('modificacoes-termos', $event)"
+             [class.active]="isActiveSection('modificacoes-termos')">11. Modificações</a></li>
+      <li><a (click)="scrollToSection('rescisao', $event)"
+             [class.active]="isActiveSection('rescisao')">12. Rescisão</a></li>
+      <li><a (click)="scrollToSection('legislacao-foro', $event)"
+             [class.active]="isActiveSection('legislacao-foro')">13. Legislação e Foro</a></li>
+      <li><a (click)="scrollToSection('disposicoes-gerais', $event)"
+             [class.active]="isActiveSection('disposicoes-gerais')">14. Disposições Gerais</a></li>
+      <li><a (click)="scrollToSection('informacoes-contato', $event)"
+             [class.active]="isActiveSection('informacoes-contato')">15. Informações de Contato</a></li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    
+    <section id="introducao" class="section">
+      <h2>1. INTRODUÇÃO</h2>
+      
+      <p>Bem-vindo ao DevComply, uma ferramenta online desenvolvida para auxiliar desenvolvedores de software na avaliação e melhoria da conformidade de seus projetos com a Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 - LGPD).</p>
+      
+      <p>Estes Termos de Uso ("Termos") estabelecem as condições legais entre [NOME DA EMPRESA/ENTIDADE PROVEDORA], pessoa jurídica de direito privado, inscrita no CNPJ sob o nº [NÚMERO], com sede em [ENDEREÇO COMPLETO] (doravante denominado "Provedor", "nós" ou "nosso"), e você, usuário do serviço DevComply (doravante denominado "Usuário", "você" ou "Desenvolvedor").</p>
+      
+      <p>O DevComply é uma plataforma que oferece recursos de análise técnica baseada em inteligência artificial para apoiar desenvolvedores na identificação de pontos de conformidade e não conformidade com a LGPD em seus projetos de software.</p>
+
+      <div class="alert alert-warning">
+        <strong>⚠️ IMPORTANTE:</strong>
+        <p>AO CRIAR UMA CONTA, ACESSAR OU UTILIZAR O DEVCOMPLY, VOCÊ DECLARA TER LIDO, COMPREENDIDO E CONCORDADO COM ESTES TERMOS DE USO E COM NOSSA POLÍTICA DE PRIVACIDADE.</p>
+        <p>SE VOCÊ NÃO CONCORDA COM ESTES TERMOS, NÃO UTILIZE ESTE SERVIÇO.</p>
+      </div>
+    </section>
+
+    <section id="aceitacao-termos" class="section">
+      <h2>2. ACEITAÇÃO DOS TERMOS</h2>
+      <p>A aceitação destes Termos ocorre no momento em que você:</p>
+      <ul>
+        <li>Cria uma conta no DevComply, ao marcar a caixa de confirmação de leitura e concordância;</li>
+        <li>Acessa e utiliza qualquer funcionalidade da plataforma;</li>
+        <li>Continua utilizing o serviço após modificações nestes Termos devidamente notificadas.</li>
+      </ul>
+      <p>Ao aceitar estes Termos, você confirma possuir capacidade jurídica plena para celebrar este acordo vinculativo. Caso você esteja representando uma pessoa jurídica, declara possuir poderes suficientes para vinculá-la a estes Termos.</p>
+    </section>
+
+    <section id="descricao-servico" class="section">
+      <h2>3. DESCRIÇÃO DO SERVIÇO</h2>
+      <p>O DevComply oferece as seguintes funcionalidades:</p>
+      
+      <h3>3.1. Cadastro e Gerenciamento de Projetos</h3>
+      <p>Permite que você cadastre e gerencie informações sobre os projetos de software que deseja avaliar quanto à conformidade com a LGPD.</p>
+
+      <h3>3.2. Checklist Interativo de Conformidade</h3>
+      <p>Disponibiliza um checklist estruturado baseado em requisitos da LGPD e em boas práticas de desenvolvimento, fundamentado em pesquisas acadêmicas reconhecidas. Você deverá fornecer descrições detalhadas sobre suas implementações técnicas, práticas de codificação, arquitetura de sistemas e configurações.</p>
+
+      <h3>3.3. Análise Automatizada por Inteligência Artificial</h3>
+      <p>As respostas fornecidas por você no checklist são processadas utilizando a API de Inteligência Artificial do Google Gemini. Esta análise gera diagnósticos sobre o nível de conformidade do seu projeto e identifica potenciais áreas de risco.</p>
+
+      <h3>3.4. Relatórios Personalizados</h3>
+      <p>Gera relatórios de conformidade contendo diagnósticos, pontuações e recomendações técnicas práticas para auxiliar na adequação do seu projeto à LGPD.</p>
+
+      <h3>3.5. LIMITAÇÕES IMPORTANTES</h3>
+      <div class="alert alert-info">
+        <p><strong>O DevComply é uma ferramenta de apoio técnico e NÃO substitui:</strong></p>
+        <ul>
+          <li>Consultoria jurídica especializada em direito digital ou proteção de dados;</li>
+          <li>A análise de um Data Protection Officer (DPO) ou encarregado de dados;</li>
+          <li>Auditorias formais de conformidade realizadas por profissionais certificados;</li>
+          <li>A responsabilidade final do desenvolvedor, empresa ou organização pela conformidade legal de seus sistemas.</li>
+        </ul>
+        <p>As análises e recomendações fornecidas têm caráter informativo e educacional. Você permanece integralmente responsável por garantir que seu projeto atenda a todos os requisitos legais aplicáveis.</p>
+      </div>
+    </section>
+
+    <section id="cadastro-conta" class="section">
+      <h2>4. CADASTRO E CONTA DO USUÁRIO</h2>
+      
+      <h3>4.1. Requisitos para Cadastro</h3>
+      <p>Para criar uma conta no DevComply, você deve:</p>
+      <ul>
+        <li>Ser maior de 18 (dezoito) anos;</li>
+        <li>Fornecer informações verdadeiras, precisas, atualizadas e completas;</li>
+        <li>Manter suas informações cadastrais sempre atualizadas.</li>
+      </ul>
+
+      <h3>4.2. Segurança da Conta</h3>
+      <p>Você é integralmente responsável por:</p>
+      <ul>
+        <li>Manter a confidencialidade de suas credenciais de acesso (e-mail e senha);</li>
+        <li>Todas as atividades realizadas através de sua conta;</li>
+        <li>Notificar imediatamente o Provedor sobre qualquer uso não autorizado.</li>
+      </ul>
+
+      <h3>4.3. Uso Pessoal e Intransferível</h3>
+      <p>Sua conta é pessoal e intransferível. É expressamente proibido:</p>
+      <ul>
+        <li>Compartilhar suas credenciais com terceiros;</li>
+        <li>Permitir que terceiros utilizem sua conta;</li>
+        <li>Vender, transferir ou ceder sua conta.</li>
+      </ul>
+    </section>
+
+    <section id="uso-aceitavel" class="section">
+      <h2>5. USO ACEITÁVEL DO SERVIÇO</h2>
+      
+      <h3>5.1. Condutas Proibidas</h3>
+      <p>Ao utilizar o DevComply, você se compromete a NÃO:</p>
+      <ul>
+        <li>Violar qualquer lei, regulamento ou direito de terceiros;</li>
+        <li>Utilizar o serviço para fins ilícitos, fraudulentos ou não autorizados;</li>
+        <li>Fazer engenharia reversa, descompilar, ou tentar descobrir o código-fonte;</li>
+        <li>Utilizar técnicas de web scraping, bots ou qualquer método automatizado para extrair dados;</li>
+        <li>Sobrecarregar, comprometer ou prejudicar a infraestrutura;</li>
+        <li>Transmitir vírus, malware ou qualquer código malicioso;</li>
+        <li>Tentar obter acesso não autorizado a qualquer parte do serviço.</li>
+      </ul>
+
+      <h3>5.2. Responsabilidade pelas Informações Fornecidas</h3>
+      <p>Você é integralmente responsável por:</p>
+      <ul>
+        <li>A veracidade, precisão e completude de todas as informações inseridas;</li>
+        <li>Garantir que possui autorização para compartilhar qualquer informação técnica inserida.</li>
+      </ul>
+      <p>O Provedor não valida, verifica ou confirma a precisão das informações fornecidas pelos Usuários.</p>
+    </section>
+
+    <section id="privacidade-dados" class="section">
+      <h2>6. PRIVACIDADE E TRATAMENTO DE DADOS</h2>
+      
+      <h3>6.1. Tipos de Dados Coletados</h3>
+      <p>O DevComply coleta e processa os seguintes dados:</p>
+      <h4>a) Dados de Conta:</h4>
+      <ul>
+        <li>Nome completo</li>
+        <li>Endereço de e-mail</li>
+        <li>Senha (armazenada exclusivamente em formato criptografado com hash seguro)</li>
+      </ul>
+      <h4>b) Dados de Projeto:</h4>
+      <ul>
+        <li>Nome do projeto</li>
+        <li>Descrição do projeto</li>
+        <li>Informações técnicas sobre arquitetura e implementação</li>
+      </ul>
+      <h4>c) Respostas ao Checklist:</h4>
+      <ul>
+        <li>Textos descritivos detalhados sobre práticas de desenvolvimento, codificação, configurações técnicas, medidas de segurança e tratamento de dados pessoais.</li>
+      </ul>
+      <div class="alert alert-warning">
+        <strong>⚠️ ATENÇÃO:</strong> As respostas ao checklist podem conter informações sensíveis do ponto de vista técnico, comercial ou estratégico sobre seus projetos. Avalie cuidadosamente quais informações você deseja compartilhar.
+      </div>
+
+      <h3>6.2. Política de Privacidade</h3>
+      <p>O tratamento detalhado de todos os dados pessoais coletados está descrito em nossa Política de Privacidade, que constitui parte integrante destes Termos.</p>
+
+      <h3>6.3. PROCESSAMENTO POR TERCEIROS - GOOGLE GEMINI</h3>
+      <div class="alert alert-warning">
+        <strong>DECLARAÇÃO IMPORTANTE:</strong>
+        <p>As respostas fornecidas por você no checklist de conformidade SÃO ENVIADAS E PROCESSADAS pela API de Inteligência Artificial do Google Gemini para fins de análise automatizada e geração dos relatórios.</p>
+        <p>Isso significa que:</p>
+        <ul>
+          <li>Seus dados serão transmitidos aos servidores do Google;</li>
+          <li>O processamento é realizado de acordo com os Termos de Serviço e Política de Privacidade do Google Gemini/Google Cloud AI;</li>
+          <li>O Provedor do DevComply não tem controle sobre as práticas de processamento de dados do Google;</li>
+          <li>Evite incluir informações extremamente sensíveis ou confidenciais.</li>
+        </ul>
+      </div>
+
+      <h3>6.4. Segurança e Confidencialidade</h3>
+      <p>Implementamos medidas técnicas e organizacionais de segurança, incluindo:</p>
+      <ul>
+        <li>Criptografia de dados em trânsito (HTTPS/TLS);</li>
+        <li>Armazenamento seguro de senhas com hash e salt;</li>
+        <li>Controles de acesso baseados em autenticação.</li>
+      </ul>
+
+      <h3>6.5. Retenção de Dados</h3>
+      <p>Seus dados serão mantidos enquanto sua conta estiver ativa. Você pode solicitar a exclusão de sua conta e dados a qualquer momento.</p>
+    </section>
+
+    <section id="propriedade-intelectual" class="section">
+      <h2>7. PROPRIEDADE INTELECTUAL</h2>
+      
+      <h3>7.1. Direitos do Provedor</h3>
+      <p>O DevComply, incluindo software, interface, design, marca "DevComply", logotipos e metodologias, é de propriedade exclusiva do Provedor e está protegido por leis de propriedade intelectual.</p>
+
+      <h3>7.2. Direitos do Usuário sobre Seu Conteúdo</h3>
+      <p>Você retém todos os direitos de propriedade intelectual sobre os dados de projeto que você cadastra e as informações que insere nas respostas.</p>
+
+      <h3>7.3. Licença Concedida ao Provedor</h3>
+      <p>Ao inserir conteúdo, você concede ao Provedor uma licença mundial, não exclusiva e isenta de royalties para usar e processar seu conteúdo, exclusivamente para os fins de operar o serviço DevComply, processar via Google Gemini e gerar seus relatórios.</p>
+
+      <h3>7.4. Uso de Dados Agregados e Anonimizados</h3>
+      <p>O Provedor pode utilizar dados agregados e anonimizados (que não permitem a identificação de usuários ou projetos) para fins de pesquisa, desenvolvimento e estatísticas.</p>
+    </section>
+
+    <section id="uso-api-terceiros" class="section">
+      <h2>8. USO DA API DE TERCEIROS (GOOGLE GEMINI)</h2>
+      
+      <h3>8.1. Dependência Tecnológica</h3>
+      <p>O funcionamento da análise automatizada depende essencialmente da disponibilidade e do desempenho da API do Google Gemini.</p>
+
+      <h3>8.2. Isenção de Responsabilidade por Serviços de Terceiros</h3>
+      <p>O Provedor NÃO será responsável por:</p>
+      <ul>
+        <li>Indisponibilidade, instabilidade ou falhas na API do Google Gemini;</li>
+        <li>Mudanças nos termos de serviço ou políticas do Google;</li>
+        <li>Qualidade, precisão ou adequação das respostas geradas pela IA do Google.</li>
+      </ul>
+    </section>
+
+    <section id="isencao-garantias" class="section">
+      <h2>9. ISENÇÃO DE GARANTIAS</h2>
+      
+      <div class="alert alert-warning">
+        <h3>9.1. Serviço "No Estado em que se Encontra"</h3>
+        <p>O DEVCOMPLY É FORNECIDO "NO ESTADO EM QUE SE ENCONTRA" (AS IS) E "CONFORME DISPONÍVEL" (AS AVAILABLE), SEM GARANTIAS DE QUALQUER NATUREZA, EXPRESSAS OU IMPLÍCITAS.</p>
+        
+        <h3>9.2. Sem Garantia de Conformidade Legal</h3>
+        <p>O PROVEDOR NÃO GARANTE QUE:</p>
+        <ul>
+          <li>As recomendações geradas assegurarão 100% de conformidade com a LGPD;</li>
+          <li>As análises identificarão todas as não conformidades existentes;</li>
+          <li>A implementação das recomendações será suficiente para evitar sanções.</li>
+        </ul>
+
+        <h3>9.3. Sem Garantia de Precisão Absoluta</h3>
+        <p>A qualidade das análises depende da precisão das informações fornecidas por você e das limitações inerentes à IA. O Provedor não garante que as análises estarão livres de erros ou imprecisões.</p>
+
+        <h3>9.4. Sem Garantia de Disponibilidade</h3>
+        <p>O Provedor não garante que o DevComply operará de forma ininterrupta ou livre de erros.</p>
+      </div>
+    </section>
+
+    <section id="limitacao-responsabilidade" class="section">
+      <h2>10. LIMITAÇÃO DE RESPONSABILIDADE</h2>
+      
+      <div class="alert alert-warning">
+        <h3>10.1. Exclusão de Responsabilidade por Conformidade Legal</h3>
+        <p>O PROVEDOR NÃO SERÁ RESPONSÁVEL, EM HIPÓTESE ALGUMA, POR:</p>
+        <ul>
+          <li>Falhas, não conformidades ou violações à LGPD em seus projetos;</li>
+          <li>Sanções administrativas, multas ou penalidades impostas a você;</li>
+          <li>Demandas judiciais ou reclamações de titulares de dados;</li>
+          <li>Decisões técnicas tomadas com base nas recomendações do DevComply.</li>
+        </ul>
+
+        <h3>10.2. Exclusão de Danos</h3>
+        <p>NA MÁXIMA EXTENSÃO PERMITIDA PELA LEI, O PROVEDOR NÃO SERÁ RESPONSÁVEL POR DANOS DIRETOS, INDIRETOS, LUCROS CESSANTES, PERDA DE DADOS OU DANOS CONSEQUENCIAIS.</p>
+      </div>
+
+      <h3>10.3. Limite Máximo de Responsabilidade</h3>
+      <p>Caso qualquer limitação seja considerada inválida, a responsabilidade total do Provedor não excederá R$ 100,00 (cem reais) ou o valor total pago por você nos últimos 12 meses, o que for maior.</p>
+    </section>
+
+    <section id="modificacoes-termos" class="section">
+      <h2>11. MODIFICAÇÕES NOS TERMOS E NO SERVIÇO</h2>
+      
+      <h3>11.1. Direito de Modificar os Termos</h3>
+      <p>O Provedor se reserva o direito de modificar estes Termos a qualquer momento para adequações legais ou implementação de novas funcionalidades.</p>
+
+      <h3>11.2. Notificação de Modificações</h3>
+      <p>Modificações substanciais serão comunicadas por notificação na plataforma ou por e-mail.</p>
+
+      <h3>11.3. Aceitação das Modificações</h3>
+      <p>O uso continuado do DevComply após a notificação constituirá sua aceitação dos novos Termos. Se você não concordar, deverá cessar o uso do serviço.</p>
+
+      <h3>11.4. Modificações no Serviço</h3>
+      <p>O Provedor se reserva o direito de modificar, suspender ou descontinuar qualquer funcionalidade ou o serviço completamente, a qualquer momento.</p>
+    </section>
+
+    <section id="rescisao" class="section">
+      <h2>12. RESCISÃO</h2>
+      
+      <h3>12.1. Rescisão pelo Usuário</h3>
+      <p>Você pode encerrar sua conta a qualquer momento através das configurações de perfil ou por solicitação via e-mail. Recomendamos que você exporte seus dados antes de encerrar, pois eles poderão ser permanentemente excluídos.</p>
+
+      <h3>12.2. Rescisão pelo Provedor</h3>
+      <p>O Provedor se reserva o direito de suspender ou encerrar sua conta, imediatamente, nas seguintes situações:</p>
+      <ul>
+        <li>Violação destes Termos de Uso;</li>
+        <li>Suspeita de uso fraudulento ou ilegal;</li>
+        <li>Comprometimento da segurança ou estabilidade da plataforma;</li>
+        <li>Inatividade prolongada da conta.</li>
+      </ul>
+
+      <h3>12.3. Efeitos da Rescisão</h3>
+      <p>Após a rescisão, seu direito de acessar o DevComply cessará imediatamente. As seções sobre Propriedade Intelectual, Isenção de Garantias e Limitação de Responsabilidade sobreviverão à rescisão.</p>
+    </section>
+
+    <section id="legislacao-foro" class="section">
+      <h2>13. LEGISLAÇÃO APLICÁVEL E FORO</h2>
+      
+      <h3>13.1. Lei Aplicável</h3>
+      <p>Estes Termos serão regidos pelas leis da República Federativa do Brasil, especialmente a LGPD, o Marco Civil da Internet e o Código de Defesa do Consumidor (quando aplicável).</p>
+
+      <h3>13.2. Foro Eleito</h3>
+      <p>Fica eleito o foro da Comarca de [CIDADE/COMARCA DA SEDE DO PROVEDOR], Estado de [ESTADO], Brasil, para dirimir controvérsias, com renúncia a qualquer outro.</p>
+
+      <h3>13.3. Exceção para Relações de Consumo</h3>
+      <p>Caso a relação seja caracterizada como de consumo, você poderá optar pelo foro de seu domicílio.</p>
+    </section>
+
+    <section id="disposicoes-gerais" class="section">
+      <h2>14. DISPOSIÇÕES GERAIS</h2>
+      
+      <h3>14.1. Acordo Integral</h3>
+      <p>Estes Termos, juntamente com a Política de Privacidade, constituem o acordo integral entre você e o Provedor.</p>
+
+      <h3>14.2. Divisibilidade</h3>
+      <p>Se qualquer disposição for considerada inválida, as demais permanecerão em pleno vigor.</p>
+
+      <h3>14.3. Cessão</h3>
+      <p>Você não pode ceder seus direitos sob estes Termos sem consentimento. O Provedor pode ceder livremente seus direitos e obrigações.</p>
+
+      <h3>14.4. Ausência de Vínculo</h3>
+      <p>Nada nestes Termos cria relação de sociedade, joint venture ou relação empregatícia entre você e o Provedor.</p>
+
+      <h3>14.5. Links para Terceiros</h3>
+      <p>O DevComply pode conter links para sites de terceiros (ex: Google). O Provedor não controla ou endossa estes sites e você os acessa por sua conta e risco.</p>
+
+      <h3>14.6. Feedback e Sugestões</h3>
+      <p>Caso você envie feedback ou sugestões, você concede ao Provedor uma licença perpétua, irrevogável e gratuita para usar, modificar e distribuir tal feedback, sem direito a compensação.</p>
+
+      <h3>14.7. Notificações</h3>
+      <p>Notificações do Provedor para você serão feitas por e-mail ou aviso na plataforma. Notificações suas para o Provedor devem ser feitas pelo e-mail de contato.</p>
+    </section>
+
+    <section id="informacoes-contato" class="section">
+      <h2>15. INFORMAÇÕES DE CONTATO</h2>
+      
+      <p>Para dúvidas, esclarecimentos, solicitações ou reclamações relacionadas a estes Termos de Uso ou ao serviço DevComply, você pode entrar em contato conosco através de:</p>
+
+      <div class="alert alert-info">
+        <strong>Canais de Contato:</strong>
+        <ul>
+          <li><strong>E-mail:</strong> [INSERIR E-MAIL DE CONTATO]</li>
+          <li><strong>Endereço Postal:</strong> [NOME DA EMPRESA/ENTIDADE] [ENDEREÇO COMPLETO] [CEP] - [CIDADE] - [ESTADO] [PAÍS]</li>
+          <li><strong>Horário de Atendimento:</strong> [Segunda a Sexta, das 9h às 18h]</li>
+          <li><strong>Prazo de Resposta:</strong> Nos comprometemos a responder em até [5 dias úteis].</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="alert alert-warning">
+        <h3 style="margin-top: 0;">📋 DECLARAÇÃO DE LEITURA E ACEITAÇÃO</h3>
+        <p><strong>AO MARCAR A CAIXA DE CONFIRMAÇÃO E CLICAR EM "ACEITO", OU AO CRIAR UMA CONTA E UTILIZAR O DEVCOMPLY, VOCÊ DECLARA QUE:</strong></p>
+        <ul>
+          <li>✓ Leu integralmente estes Termos de Uso;</li>
+          <li>✓ Compreendeu todas as disposições, direitos e obrigações;</li>
+          <li>✓ Leu e compreendeu a Política de Privacidade;</li>
+          <li>✓ Concorda em ficar vinculado(a) a estes Termos e à Política de Privacidade;</li>
+          <li>✓ Possui capacidade jurídica para celebrar este acordo;</li>
+          <li>✓ Compreende que o DevComply é uma ferramenta de apoio e não substitui consultoria jurídica;</li>
+          <li>✓ Compreende que suas respostas serão processadas pela API do Google Gemini;</li>
+          <li>✓ Aceita os riscos e limitações da ferramenta;</li>
+          <li>✓ Assume integral responsabilidade pela conformidade legal de seus projetos.</li>
+        </ul>
+        <p><strong>SE VOCÊ NÃO CONCORDA COM ESTES TERMOS, NÃO UTILIZE O DEVCOMPLY.</strong></p>
+      </div>
+    </section>
+
+    <section class="section document-info">
+      <p><strong>Data da Última Atualização:</strong> 28 de outubro de 2025</p>
+      <p><strong>Versão:</strong> 1.0</p>
+      <p style="margin-top: 1rem; color: var(--text-light);">
+        <strong>DevComply</strong> - Ferramenta de Apoio à Conformidade com a LGPD para Desenvolvedores
+      </p>
+      <p style="margin-top: 1rem; font-size: 0.9rem;">
+        © 2025 [NOME DA EMPRESA/ENTIDADE PROVEDORA]. Todos os direitos reservados.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+@if (showBackToTop) {
+  <button class="back-to-top" (click)="scrollToTop()" aria-label="Voltar ao topo">
+    ↑
+  </button>
+}
+
+<button class="print-button" (click)="printTerms()" aria-label="Imprimir termos">
+  🖨️
+</button>

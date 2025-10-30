@@ -17,6 +17,10 @@ function passwordMatch(c: AbstractControl): ValidationErrors | null {
   return p && cp && p !== cp ? { passwordMismatch: true } : null;
 }
 
+function mustBeTrue(c: AbstractControl): ValidationErrors | null {
+  return c.value === true ? null : { required: true };
+}
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -28,10 +32,13 @@ export class Register implements OnInit {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  showPoliticaPopup = false; 
+  showTermosPopup = false; 
+  private popupTimeout: any;
+
 
   form!: FormGroup;
 
-  // ✅ injeta fb/auth/router
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
@@ -43,9 +50,11 @@ export class Register implements OnInit {
       {
         nome: ['', [Validators.required, Validators.minLength(3)]],
         email: ['', [Validators.required, Validators.email]],
-        perfil: ['desenvolvedor', [Validators.required]], // obrigatório p/ backend
+        perfil: ['desenvolvedor', [Validators.required]],
         senha: ['', [Validators.required, Validators.minLength(6)]],
         confirmSenha: ['', [Validators.required]],
+        aceitaPolitica: [false, [mustBeTrue]],
+        aceitaTermos: [false, [mustBeTrue]]
       },
       { validators: passwordMatch }
     );
@@ -67,7 +76,7 @@ export class Register implements OnInit {
 
     this.auth.register(
       { nome: nome!.trim(), email: email!.trim(), senha: senha!, perfil: perfil! },
-      { autoLogin: false } // se o backend retornar token, pode usar autoLogin:true
+      { autoLogin: false }
     ).subscribe({
       next: () => {
         this.successMessage = 'Conta criada com sucesso! Você já pode entrar.';
@@ -79,5 +88,24 @@ export class Register implements OnInit {
       },
       complete: () => this.loading = false
     });
+  }
+  hidePoliticaPopup(): void {
+    this.popupTimeout = setTimeout(() => {
+      this.showPoliticaPopup = false;
+    }, 300); // 300ms de delay
+  }
+
+  hideTermosPopup(): void {
+    this.popupTimeout = setTimeout(() => {
+      this.showTermosPopup = false;
+    }, 300); // 300ms de delay
+  }
+
+  keepPoliticaPopup(): void {
+    clearTimeout(this.popupTimeout);
+  }
+
+  keepTermosPopup(): void {
+    clearTimeout(this.popupTimeout);
   }
 }

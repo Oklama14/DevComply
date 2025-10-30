@@ -6,15 +6,21 @@ import { Projects } from './pages/projects/projects';
 import { Checklist } from './pages/checklist/checklist';
 import { authGuard } from './guards/auth-guard';
 import { Settings } from './pages/settings/settings';
+import { PoliticaPrivacidade } from './pages/politica-privacidade/politica-privacidade';
+import { TermosUso } from './pages/termos-uso/termos-uso';
 
 export const routes: Routes = [
-  // === PÚBLICAS ===
+  // === PÁGINAS PÚBLICAS (acesso sem login) ===
   { path: 'login', component: LoginComponent },
-  // Register como standalone lazy
-  { path: 'register', loadComponent: () =>
-      import('./pages/login/register/register').then(m => m.Register) },
+  { 
+    path: 'register', 
+    loadComponent: () => import('./pages/login/register/register').then(m => m.Register) 
+  },
+  // Termos e Política devem ser PÚBLICOS
+  { path: 'termos-uso', component: TermosUso },
+  { path: 'politica-privacidade', component: PoliticaPrivacidade },
 
-  // === ÁREA PROTEGIDA (usa MainLayout) ===
+  // === ÁREA PROTEGIDA (requer login) ===
   {
     path: '',
     component: MainLayout,
@@ -25,10 +31,10 @@ export const routes: Routes = [
       { path: 'checklist/:id', component: Checklist },
       { path: 'checklist', redirectTo: 'projects', pathMatch: 'full' },
       { path: 'settings', component: Settings },
-
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]
   },
+
 
   { path: '**', redirectTo: 'login' }
 ];
