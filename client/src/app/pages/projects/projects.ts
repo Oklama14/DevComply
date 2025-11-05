@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProjectsService, Project } from '../../services/projects';
 import { NewProjectModal } from '../../components/new-project-modal/new-project-modal';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-projects',
@@ -18,9 +19,14 @@ export class Projects implements OnInit {
 
   constructor(
     private projectsService: ProjectsService,
-    private router: Router
+    private router: Router,
+    private location: Location
+
   ) {}
 
+  goBack(): void {
+  this.location.back();
+}
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.loadProjects();

@@ -1,11 +1,13 @@
 import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, timeout } from 'rxjs/operators';
 import { ChecklistService, ChecklistCategory, ChecklistItem } from '../../services/checklist';
-import { Project } from '../../services/projects';
+import { Project, ProjectsService } from '../../services/projects'
+import { Location } from '@angular/common';
+
 
 type DisplayableChecklistItem = ChecklistItem & {
   expanded: boolean;
@@ -35,9 +37,16 @@ export class Checklist implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private checklistService: ChecklistService
+    private checklistService: ChecklistService,
+    private projectsService: ProjectsService,
+    private router: Router,
+    private location: Location
   ) {}
 
+
+  goBack(): void {
+  this.location.back();
+}
   ngOnInit(): void {
     this.isLoading = true;
 
@@ -198,7 +207,7 @@ export class Checklist implements OnInit {
   if (this.projectId) form.append('projectId', String(this.projectId));
   if (this.project?.nome) form.append('projectName', this.project.nome);
 
-  this.isGeneratingReport = true; // 🔥 ativa estado
+  this.isGeneratingReport = true; 
 
   this.checklistService.sendChecklistReportFile(form).subscribe({
     next: (pdfBlob: Blob) => {
@@ -209,14 +218,14 @@ export class Checklist implements OnInit {
       a.download = `relatorio-lgpd-${this.project?.id ?? 'sem-projeto'}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
-      this.isGeneratingReport = false; // 🔥 IMPORTANTE: resetar aqui também
+      this.isGeneratingReport = false; 
     },
     error: (err: any) => {
       console.error('[Relatório] Falha ao enviar', err);
-      this.isGeneratingReport = false; // 🔥 resetar no erro
+      this.isGeneratingReport = false; 
     },
     complete: () => {
-      this.isGeneratingReport = false; // 🔥 redundante, mas seguro
+      this.isGeneratingReport = false; 
     }
   });
 }
