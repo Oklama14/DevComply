@@ -124,3 +124,40 @@ $border-color: #e5e7eb;
     margin-bottom: 1.5rem;
   }
 }
+
+
+.back-button-container {
+  margin-top: 32px; // Adiciona espaçamento acima do botão
+  padding-top: 24px;
+  border-top: 1px solid $border-color; // Linha separadora opcional
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    color: #212529;
+  }
+
+  &:active {
+    background: #dee2e6;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}

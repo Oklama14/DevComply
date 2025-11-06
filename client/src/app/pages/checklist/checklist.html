@@ -103,11 +103,22 @@
     </div>
   </section>
 
-    <!-- Rodapé -->
-  <div class="footer-actions" *ngIf="!isLoading && checklistData?.length">
+    <!-- Rodapé - MODIFICADO -->
+<div class="footer-actions" *ngIf="!isLoading && checklistData?.length">
+  <div class="left-actions">
+    <button class="btn-back" (click)="goBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Voltar para Projetos
+    </button>
+  </div>
+  
+  <div class="right-actions">
     <button class="btn btn-primary" (click)="generateReport()">Gerar Relatório</button>
     <button class="btn btn-secondary" (click)="saveProgress()">Salvar Progresso</button>
   </div>
+</div>
 
   <!-- Disclaimer sobre IA -->
   <div class="ai-disclaimer" *ngIf="!isLoading && checklistData?.length">
