@@ -9,6 +9,8 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 
+
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -56,4 +58,5 @@ export class UsersService {
     const { senha, ...result } = user;
     return result;
   }
+
 }
