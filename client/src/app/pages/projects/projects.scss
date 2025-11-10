@@ -63,6 +63,21 @@ $border-color: #e5e7eb;
     border-radius: 9999px;
     background-color: $light-gray;
     color: $secondary-color;
+  
+  &.status-pending {
+    background-color: $light-gray;
+    color: $secondary-color;
+  }
+
+  &.status-in-progress {
+    background-color: rgba(251, 192, 45, 0.3);
+    color: #fbc02d;
+  }
+
+  &.status-completed {
+    background-color: rgba(67, 160, 71, 0.3);
+    color: #43a047;
+  }
   }
 
   .card-body {
@@ -97,6 +112,7 @@ $border-color: #e5e7eb;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    margin-right:0.5rem;
 
     &:hover {
       background-color: $primary-color;
@@ -160,4 +176,8 @@ $border-color: #e5e7eb;
   svg {
     flex-shrink: 0;
   }
+}
+.no-projects-icon {
+    max-width: 5rem;
+    max-height: 5rem;
 }

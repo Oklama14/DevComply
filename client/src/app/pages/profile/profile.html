@@ -1,0 +1,76 @@
+<h1>ESSE CSS FICOU BALA KKKKKKKKKKK</h1>
+
+<div class="profile-page" *ngIf="!isLoading(); else loadingTpl">
+  <header class="profile-header">
+    <h1>Meu Perfil</h1>
+  </header>
+
+  <div class="alerts">
+    <p class="alert success" *ngIf="msg()">{{ msg() }}</p>
+    <p class="alert error" *ngIf="err()">{{ err() }}</p>
+  </div>
+
+  <section class="card">
+    <h2>Informações</h2>
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+      <div class="grid">
+        <label>
+          <span>Nome</span>
+          <input type="text" formControlName="nome" />
+          <small class="hint" *ngIf="profileForm.get('nome')?.invalid && profileForm.get('nome')?.touched">
+            Nome é obrigatório.
+          </small>
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input type="email" formControlName="email" />
+        </label>
+
+        <label>
+          <span>Perfil (Ocupação)</span>
+          <input type="text" formControlName="perfil" placeholder="Ex: Professor(a), Engenheiro(a)..." />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary" [disabled]="isSaving() || profileForm.invalid">
+          Salvar alterações
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Alterar Senha</h2>
+    <form [formGroup]="passwordForm" (ngSubmit)="requestPasswordChange()">
+      <div class="grid">
+        <label>
+          <span>Senha atual</span>
+          <input type="password" formControlName="currentPassword" />
+        </label>
+
+        <label>
+          <span>Nova senha</span>
+          <input type="password" formControlName="newPassword" />
+          <small class="hint">Mínimo de 8 caracteres.</small>
+        </label>
+
+        <label>
+          <span>Confirmar nova senha</span>
+          <input type="password" formControlName="confirmPassword" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-secondary" [disabled]="passwordForm.invalid">
+          Atualizar senha
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading">Carregando…</div>
+</ng-template>

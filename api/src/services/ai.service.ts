@@ -9,7 +9,7 @@ const logoPath = path.join(__dirname, '..', '..', 'logo.png');
 @Injectable()
 export class AiService {
   private readonly genAI = new GoogleGenerativeAI(
-    process.env.GOOGLE_API_KEY ?? 'xxxxx'
+    process.env.GOOGLE_API_KEY ?? 'AIzaSyD9AQZ8ugb04uG58tjBnlLC65H1gjJfnXQn'
   );
 
   async gerarJSON(dto: GerarRelatorioDto): Promise<Resposta[]> {
@@ -19,7 +19,7 @@ export class AiService {
       `Baseando-se na LGPD (Lei Geral de Proteção de Dados) e na categoria "${dto.categoria}", ` +
       `o usuário implementou sua ferramenta desta forma: ${dto.resposta_implementacao}. ` +
       `Usando as seguintes tecnologias: ${dto.resposta_tecnica}. ` +
-      `Gere um relatório de conformidade, destacando pontos fortes e possíveis lacunas.`;
+      `Gere um relatório de conformidade, destacando pontos fortes e possíveis lacunas. Para cada possível lacuna, informe uma sugestão de melhoria relacionada ao gap. `;
 
     const model = this.genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',

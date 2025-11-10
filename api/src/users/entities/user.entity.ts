@@ -12,8 +12,9 @@ export class User {
   @Column({ length: 120, unique: true })
   email: string;
 
-  @Column({ select: false })
-  senha: string;
+  // Mapeando a coluna 'senha' do banco para propriedade 'senhaHash'
+  @Column({ name: 'senha', select: false })
+  senhaHash: string;
 
   @Column({ length: 20 })
   perfil: string;

@@ -1,4 +1,6 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
+import { LandingComponent } from './pages/landing/landing.component';
 import { LoginComponent } from './pages/login/login';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { Dashboard } from './pages/dashboard/dashboard';
@@ -8,8 +10,12 @@ import { authGuard } from './guards/auth-guard';
 import { Settings } from './pages/settings/settings';
 import { PoliticaPrivacidade } from './pages/politica-privacidade/politica-privacidade';
 import { TermosUso } from './pages/termos-uso/termos-uso';
+import { ProfileComponent } from './pages/profile/profile';
 
 export const routes: Routes = [
+  // === LANDING PAGE (pública) ===
+  { path: '', component: LandingComponent },
+  
   // === PÁGINAS PÚBLICAS (acesso sem login) ===
   { path: 'login', component: LoginComponent },
   { 
@@ -20,7 +26,7 @@ export const routes: Routes = [
   { path: 'termos-uso', component: TermosUso },
   { path: 'politica-privacidade', component: PoliticaPrivacidade },
 
-  // === ÁREA PROTEGIDA (requer login) ===
+  // === ÁREA PROTEGIDA (requer login) - SEM prefixo /app ===
   {
     path: '',
     component: MainLayout,
@@ -31,10 +37,12 @@ export const routes: Routes = [
       { path: 'checklist/:id', component: Checklist },
       { path: 'checklist', redirectTo: 'projects', pathMatch: 'full' },
       { path: 'settings', component: Settings },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'profile', component: ProfileComponent },
     ]
   },
 
+  // Redirecionamento padrão para dashboard após login
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'dashboard' }
 ];

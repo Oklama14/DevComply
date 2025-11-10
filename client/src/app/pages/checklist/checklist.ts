@@ -2,7 +2,7 @@ import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, switchMap } from 'rxjs';
 import { catchError, finalize, timeout } from 'rxjs/operators';
 import { ChecklistService, ChecklistCategory, ChecklistItem } from '../../services/checklist';
 import { Project, ProjectsService } from '../../services/projects'
@@ -153,23 +153,32 @@ export class Checklist implements OnInit {
     item.expanded = !item.expanded;
   }
 
-  saveProgress(): void {
-    if (!this.projectId) return;
+saveProgress(): void {
+  if (!this.projectId) return;
 
-    const responsesToSave = this.checklistData.flatMap(category =>
-      category.items.map(item => ({
-        perguntaId: item.id,
-        resposta: item.answer ?? '',
-        detalhesTecnicos: item.technicalDetails ?? '',
-        conformidade: !!item.completed
-      }))
-    );
+  const responsesToSave = this.checklistData.flatMap(category =>
+    category.items.map(item => ({
+      perguntaId: item.id,
+      resposta: item.answer ?? '',
+      detalhesTecnicos: item.technicalDetails ?? '',
+      conformidade: !!item.completed
+    }))
+  );
 
-    this.checklistService.saveChecklistResponses(this.projectId, responsesToSave).subscribe({
-      next: () => console.log('Progresso salvo com sucesso!'),
-      error: (err) => console.error('Erro ao salvar progresso:', err)
+  const progresso = Number(this.overallProgress) || 0;
+
+
+  this.checklistService.saveChecklistResponses(this.projectId, responsesToSave)
+    .pipe(
+      switchMap(() =>
+        this.projectsService.update(this.projectId!, { progresso })
+      )
+    )
+    .subscribe({
+      next: () => console.log('Respostas salvas e progresso do projeto atualizado!'),
+      error: (err) => console.error('Falha ao salvar respostas/atualizar progresso:', err),
     });
-  }
+}
 
   showTip(item: DisplayableChecklistItem): void {
     if (item.tipText) console.log('[Checklist] Dica:', item.tipText);

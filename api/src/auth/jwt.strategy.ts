@@ -8,7 +8,7 @@
         super({
           jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
           ignoreExpiration: false,
-          secretOrKey: 'SEU_SEGREDO_SUPER_SECRETO', // Deve ser o mesmo segredo do JwtModule
+          secretOrKey: 'Direto00', // Deve ser o mesmo segredo do JwtModule
         });
       }
 

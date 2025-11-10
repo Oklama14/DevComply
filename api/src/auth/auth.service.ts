@@ -23,7 +23,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas.');
     }
 
-    const isMatch = await bcrypt.compare(pass, user.senha);
+    const isMatch = await bcrypt.compare(pass, user.senhaHash);
     if (!isMatch) {
       throw new UnauthorizedException('Credenciais inválidas.');
     }

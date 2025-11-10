@@ -58,9 +58,9 @@ export class Dashboard implements OnInit {
     this.projectsService.getProjects().subscribe({
       next: (projects: Project[]) => {
         this.totalProjects = projects.length;
-        this.completedProjects = projects.filter(p => p.status?.toLowerCase() === 'completo').length;
-        this.inProgressProjects = projects.filter(p => p.status?.toLowerCase() === 'em progresso').length;
-        this.pendingProjects = projects.filter(p => !p.status || p.status.toLowerCase() === 'pendente').length;
+        this.completedProjects = projects.filter(p => p.progresso == 100).length;
+        this.inProgressProjects = projects.filter(p => p.progresso > 0).length;
+        this.pendingProjects = projects.filter(p => p.progresso < 1).length;
       },
       error: (err) => {
         console.error('Erro ao carregar projetos no dashboard:', err);

@@ -30,21 +30,12 @@ export class ProjectsService {
   }
 
   // 2. Adicione o método para ATUALIZAR um projeto
-  async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
-    // O método 'preload' busca o projeto pelo ID e mescla os novos dados do DTO.
-    // Se o projeto não existir, ele retorna undefined.
-    const project = await this.projectRepository.preload({
-      id: id,
-      ...updateProjectDto,
-    });
+async update(id: number, dto: UpdateProjectDto) {
+  const project = await this.projectRepository.preload({ id, ...dto });
+  if (!project) throw new NotFoundException(`Projeto com ID #${id} não encontrado para atualização.`);
+  return this.projectRepository.save(project);
+}
 
-    if (!project) {
-      throw new NotFoundException(`Projeto com ID #${id} não encontrado para atualização.`);
-    }
-
-    // Salva a entidade atualizada no banco de dados.
-    return this.projectRepository.save(project);
-  }
 
   async remove(id: number): Promise<void> {
     const project = await this.findOne(id);

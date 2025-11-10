@@ -23,4 +23,11 @@ export class Project {
   @OneToMany(() => ChecklistResponse, response => response.projeto)
   respostasChecklist: ChecklistResponse[];
   respostas: any;
+  
+  @Column({
+    type: 'smallint',
+    default: 0,
+  })
+  progresso: number;
+
 }
