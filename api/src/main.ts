@@ -1,8 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import * as compression from 'compression';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Segurança de Cabeçalhos HTTP
+  app.use(helmet());
+
+  // Compressão (GZIP) das respostas para melhorar performance
+  app.use(compression());
 
   // Habilitar CORS dinamicamente
   const allowedOrigins = ['http://localhost:4200', 'http://client:4200'];
