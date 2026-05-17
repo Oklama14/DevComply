@@ -3,14 +3,19 @@ import { GoogleGenerativeAI, SchemaType, type Schema } from '@google/generative-
 import * as PDFKit from 'pdfkit';
 import { Conformidade, Resposta, GerarRelatorioDto } from '../types/ai.types';
 import * as path from 'path';
+import { ConfigService } from '@nestjs/config';
 
 const logoPath = path.join(__dirname, '..', '..', 'logo.png');
 
 @Injectable()
 export class AiService {
-  private readonly genAI = new GoogleGenerativeAI(
-    process.env.GOOGLE_API_KEY ?? 'xxxxxx'
-  );
+  private readonly genAI: GoogleGenerativeAI;
+
+  constructor(private configService: ConfigService) {
+    this.genAI = new GoogleGenerativeAI(
+      this.configService.get<string>('GOOGLE_API_KEY', 'xxxxxx')
+    );
+  }
 
   async gerarJSON(dto: GerarRelatorioDto): Promise<Resposta[]> {
     const instrucao = dto.instrucao ?? 'Escreva no máximo um único parágrafo.';

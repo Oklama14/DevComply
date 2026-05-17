@@ -9,5 +9,6 @@ import { Project } from './entities/project.entity'; // Importe a entidade Proje
   imports: [TypeOrmModule.forFeature([Project])], // Registre a entidade Project aqui
   controllers: [ProjectsController],
   providers: [ProjectsService],
+  exports: [ProjectsService],
 })
 export class ProjectsModule {}

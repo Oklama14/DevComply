@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from './entities/project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto'; // 1. Importe o DTO de update
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -12,33 +12,40 @@ export class ProjectsService {
     private readonly projectRepository: Repository<Project>,
   ) {}
 
-  async create(createProjectDto: CreateProjectDto): Promise<Project> {
-    const project = this.projectRepository.create(createProjectDto);
+  async create(userId: number, createProjectDto: CreateProjectDto): Promise<Project> {
+    const project = this.projectRepository.create({
+      ...createProjectDto,
+      usuario: { id: userId },
+    });
     return this.projectRepository.save(project);
   }
 
-  async findAll(): Promise<Project[]> {
-    return this.projectRepository.find();
+  async findAll(userId: number): Promise<Project[]> {
+    return this.projectRepository.find({
+      where: { usuario: { id: userId } },
+    });
   }
 
-  async findOne(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOneBy({ id });
+  async findOne(id: number, userId: number): Promise<Project> {
+    const project = await this.projectRepository.findOne({
+      where: { id, usuario: { id: userId } },
+    });
     if (!project) {
-      throw new NotFoundException(`Projeto com ID #${id} não encontrado.`);
+      throw new NotFoundException(`Projeto com ID #${id} não encontrado ou não pertence a este usuário.`);
     }
     return project;
   }
 
-  // 2. Adicione o método para ATUALIZAR um projeto
-async update(id: number, dto: UpdateProjectDto) {
-  const project = await this.projectRepository.preload({ id, ...dto });
-  if (!project) throw new NotFoundException(`Projeto com ID #${id} não encontrado para atualização.`);
-  return this.projectRepository.save(project);
-}
+  async update(id: number, userId: number, dto: UpdateProjectDto) {
+    const existing = await this.findOne(id, userId); // Garante que pertence ao usuário
+    
+    const project = await this.projectRepository.preload({ id: existing.id, ...dto });
+    if (!project) throw new NotFoundException(`Projeto com ID #${id} não encontrado para atualização.`);
+    return this.projectRepository.save(project);
+  }
 
-
-  async remove(id: number): Promise<void> {
-    const project = await this.findOne(id);
+  async remove(id: number, userId: number): Promise<void> {
+    const project = await this.findOne(id, userId); // Garante que pertence ao usuário
     await this.projectRepository.remove(project);
   }
 }

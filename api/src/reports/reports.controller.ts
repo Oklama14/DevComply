@@ -6,26 +6,40 @@ import {
   UseInterceptors,
   Res,
   BadRequestException,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { AiService } from '@/services/ai.service';
 import { Resposta, GerarRelatorioDto, FrontCategory } from '@/types/ai.types';
+import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
+import { ProjectsService } from '@/projects/projects.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('reports')
 export class ReportsController {
-  constructor(private readonly ai: AiService) {}
+  constructor(
+    private readonly ai: AiService,
+    private readonly projectsService: ProjectsService,
+  ) {}
 
   // ====== 1) multipart/form-data: arquivo JSON ======
   @Post('checklist')
   @UseInterceptors(FileInterceptor('file'))
   async uploadChecklist(
+    @Request() req,
     @UploadedFile() file: any,
     @Body() body: any,
     @Res() res: Response,
   ) {
     if (!file?.buffer) {
       throw new BadRequestException('Arquivo ausente (campo "file").');
+    }
+
+    if (body?.projectId) {
+      // Verifica se o projeto existe e pertence ao usuário autenticado
+      await this.projectsService.findOne(Number(body.projectId), req.user.userId);
     }
 
     let payload: FrontCategory[];
@@ -38,6 +52,7 @@ export class ReportsController {
 
     return this.generateAndSendPdf(payload, res, body?.projectId, body?.projectName);
   }
+
 
   // ====== 2) application/json: JSON direto ======
   @Post('checklist-json')

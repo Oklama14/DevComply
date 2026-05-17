@@ -5,6 +5,7 @@ import { ChecklistService } from './checklist.service';
 import { LgpdArticle } from './entities/lgpd-article.entity';
 import { ChecklistQuestion } from './entities/checklist-question.entity';
 import { ChecklistResponse } from './entities/checklist-response.entity';
+import { ProjectsModule } from '../projects/projects.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ChecklistResponse } from './entities/checklist-response.entity';
       ChecklistQuestion,
       ChecklistResponse,
     ]), // Registre todas as entidades do checklist aqui
+    ProjectsModule,
   ],
   controllers: [ChecklistController],
   providers: [ChecklistService],

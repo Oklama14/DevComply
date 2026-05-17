@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 export interface RegisterDto { nome: string; email: string; senha: string; perfil: string; }
 export interface LoginDto { email: string; senha: string; }
@@ -11,7 +12,7 @@ export interface ApiOk { ok: boolean; message?: string }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   private platformId = inject(PLATFORM_ID);
 
   constructor(private http: HttpClient, private router: Router) {}

@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Param, ParseIntPipe, Patch, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, ParseIntPipe, Patch, Get, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -14,11 +15,13 @@ export class UsersController {
     return this.users.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.users.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/profile')
   updateProfile(
     @Param('id', ParseIntPipe) id: number,
@@ -27,6 +30,7 @@ export class UsersController {
     return this.users.updateProfile(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/password')
   changePassword(
     @Param('id', ParseIntPipe) id: number,
@@ -35,3 +39,4 @@ export class UsersController {
     return this.users.changePassword(id, dto);
   }
 }
+

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 // 1. Adicione a propriedade 'status' à interface Project
 export interface Project {
@@ -14,7 +15,7 @@ export interface Project {
   providedIn: 'root'
 })
 export class ProjectsService {
-  private apiUrl = 'http://localhost:3000/projects';
+  private apiUrl = `${environment.apiUrl}/projects`;
   private http = inject(HttpClient);
 
   getProjects(): Observable<Project[]> {
