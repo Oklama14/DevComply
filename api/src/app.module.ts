@@ -25,16 +25,25 @@ import { ReportsModule } from './reports/reports.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASS'),
-        database: configService.get<string>('DB_NAME'),
-        autoLoadEntities: true,
-        synchronize: configService.get<string>('NODE_ENV') !== 'production',
-      }),
+      useFactory: (configService: ConfigService) => {
+        const url = configService.get<string>('DATABASE_URL');
+        
+        return {
+          type: 'postgres',
+          ...(url 
+            ? { url } 
+            : {
+                host: configService.get<string>('DB_HOST', 'localhost'),
+                port: configService.get<number>('DB_PORT', 5432),
+                username: configService.get<string>('DB_USER'),
+                password: configService.get<string>('DB_PASS'),
+                database: configService.get<string>('DB_NAME'),
+              }),
+          autoLoadEntities: true,
+          synchronize: configService.get<string>('NODE_ENV') !== 'production',
+          ssl: url ? { rejectUnauthorized: false } : false, // Many cloud providers (like Railway) require SSL
+        };
+      },
     }),
     // Registro de todos os módulos da aplicação
     AuthModule,
