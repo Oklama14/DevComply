@@ -13,7 +13,7 @@ export class AiService {
 
   constructor(private configService: ConfigService) {
     this.genAI = new GoogleGenerativeAI(
-      this.configService.get<string>('GOOGLE_API_KEY', 'xxxxxx')
+      this.configService.get<string>('GOOGLE_API_KEY') ?? '',
     );
   }
 

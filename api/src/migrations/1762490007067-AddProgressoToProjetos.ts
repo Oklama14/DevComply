@@ -1,35 +1,20 @@
-import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddProgressoToProjetos1710000000000 implements MigrationInterface {
+/**
+ * Mantida por compatibilidade historica. O baseline (InitialSchema) ja cria a
+ * coluna "progresso"; aqui usamos IF NOT EXISTS para ser idempotente e nao
+ * conflitar em bancos novos.
+ */
+export class AddProgressoToProjetos1762490007067 implements MigrationInterface {
+  name = 'AddProgressoToProjetos1762490007067';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Step 1: Add the column (nullable at first)
-    await queryRunner.addColumn(
-      "projetos",
-      new TableColumn({
-        name: "progresso",
-        type: "smallint",
-        isNullable: true,
-        default: 0,
-      })
-    );
-
-    // Step 2: Update existing rows to 0 (backfill)
-    await queryRunner.query(`UPDATE projetos SET progresso = 0 WHERE progresso IS NULL`);
-
-    // Step 3: Make column NOT NULL
-    await queryRunner.changeColumn(
-      "projetos",
-      "progresso",
-      new TableColumn({
-        name: "progresso",
-        type: "smallint",
-        isNullable: false,
-        default: 0,
-      })
+    await queryRunner.query(
+      `ALTER TABLE "projetos" ADD COLUMN IF NOT EXISTS "progresso" smallint NOT NULL DEFAULT 0`,
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropColumn("projetos", "progresso");
+    await queryRunner.query(`ALTER TABLE "projetos" DROP COLUMN IF EXISTS "progresso"`);
   }
 }

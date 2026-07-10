@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { validateEnv } from './config/env.validation';
 
 // Importacao dos Modulos
 import { AuthModule } from './auth/auth.module';
@@ -17,6 +18,7 @@ import { ReportsModule } from './reports/reports.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: validateEnv,
     }),
     ThrottlerModule.forRoot([{
       ttl: 60000,
@@ -27,6 +29,7 @@ import { ReportsModule } from './reports/reports.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const url = configService.get<string>('DATABASE_URL');
+        const isProd = configService.get<string>('NODE_ENV') === 'production';
 
         return {
           type: 'postgres',
@@ -40,14 +43,10 @@ import { ReportsModule } from './reports/reports.module';
                 database: configService.get<string>('DB_NAME'),
               }),
           autoLoadEntities: true,
-          // Em producao o synchronize fica desligado. Para criar o schema na
-          // primeira subida, defina DB_SYNC=true no Railway, suba, confirme que
-          // as tabelas foram criadas e depois REMOVA a variavel.
-          synchronize:
-            configService.get<string>('NODE_ENV') !== 'production' ||
-            ['true', '1', 'yes'].includes(
-              (configService.get<string>('DB_SYNC') ?? '').trim().toLowerCase(),
-            ),
+          // Producao usa migrations (migrationsRun); dev usa synchronize por conveniencia.
+          synchronize: !isProd,
+          migrations: [__dirname + '/migrations/*.js'],
+          migrationsRun: isProd,
           ssl: url ? { rejectUnauthorized: false } : false,
         };
       },
