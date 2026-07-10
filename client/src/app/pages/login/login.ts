@@ -29,7 +29,6 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    console.log("O método onSubmit foi chamado!"); // Para depuração, consegue ver laa no f12 -> console
     if (this.loginForm.invalid) {
       this.errorMessage = "Por favor, preencha todos os campos corretamente.";
       return;
@@ -40,7 +39,6 @@ export class LoginComponent {
 
     this.authService.login({ email, senha }).subscribe({
       next: (response) => {
-        console.log("Login bem-sucedido", response);
         this.router.navigate(['/dashboard']); // Navega para o dashboard
       },
       error: (err) => {

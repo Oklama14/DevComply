@@ -58,9 +58,21 @@ export class AiService {
       systemInstruction: instrucao,
     });
 
-    const result = await model.generateContent(prompt);
+    const result = await this.withTimeout(
+      model.generateContent(prompt),
+      30000,
+    );
     const text = result.response.text();
     return JSON.parse(text) as Resposta[];
+  }
+
+  private withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+    return Promise.race([
+      p,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error('Tempo esgotado na chamada da IA')), ms),
+      ),
+    ]);
   }
 
   async gerarPDF(respostas: Resposta[], projectName?: string): Promise<Buffer> {

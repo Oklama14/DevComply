@@ -64,6 +64,24 @@ register(
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+    const payload = this.decodePayload(token);
+    // Sem exp legivel: trata como valido (o backend ainda valida a assinatura).
+    if (payload?.exp && Date.now() >= payload.exp * 1000) {
+      this.clearToken();
+      return false;
+    }
+    return true;
+  }
+
+  private decodePayload(token: string): { exp?: number } | null {
+    try {
+      const base64 = token.split('.')[1];
+      const json = atob(base64.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
   }
 }

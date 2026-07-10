@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ChecklistModule } from './checklist/checklist.module';
 import { ReportsModule } from './reports/reports.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { ReportsModule } from './reports/reports.module';
     ProjectsModule,
     ChecklistModule,
     ReportsModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [

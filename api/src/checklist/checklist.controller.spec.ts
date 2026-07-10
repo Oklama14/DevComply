@@ -1,18 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChecklistController } from './checklist.controller';
+import { ChecklistService } from './checklist.service';
+import { ProjectsService } from '../projects/projects.service';
 
 describe('ChecklistController', () => {
   let controller: ChecklistController;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [ChecklistController],
+      providers: [
+        { provide: ChecklistService, useValue: {} },
+        { provide: ProjectsService, useValue: {} },
+      ],
     }).compile();
-
-    controller = module.get<ChecklistController>(ChecklistController);
+    controller = moduleRef.get(ChecklistController);
   });
 
-  it('should be defined', () => {
+  it('deve ser definido', () => {
     expect(controller).toBeDefined();
   });
 });

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 // Instrumentacao: qualquer erro nao tratado vira log legivel (em vez de queda silenciosa/502).
 process.on('unhandledRejection', (reason) => {
@@ -17,6 +18,9 @@ async function bootstrap() {
 
   // Seguranca de Cabecalhos HTTP
   app.use(helmet());
+
+  // Filtro global de erros (shape consistente + log de 5xx)
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Compressao (GZIP) das respostas
   app.use(compression());

@@ -12,7 +12,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { AiService } from '@/services/ai.service';
-import { Resposta, GerarRelatorioDto, FrontCategory } from '@/types/ai.types';
+import { Resposta, GerarRelatorioDto, FrontCategory, Conformidade } from '@/types/ai.types';
 import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
@@ -98,8 +98,19 @@ export class ReportsController {
         artigo_referente: cat.items[0]?.artigo_referente, // pega do primeiro item (se houver)
       };
 
-      const respostas = await this.ai.gerarJSON(dto, apiKey);
-      allRespostas.push(...respostas);
+      try {
+        const respostas = await this.ai.gerarJSON(dto, apiKey);
+        allRespostas.push(...respostas);
+      } catch {
+        // Uma categoria com falha na IA nao derruba o relatorio inteiro.
+        allRespostas.push({
+          titulo: `Categoria: ${cat.categoria_nome}`,
+          resumo:
+            'Nao foi possivel gerar a analise desta categoria pela IA. ' +
+            'Verifique se sua chave do Gemini esta configurada e valida em Configuracoes.',
+          em_conformidade: Conformidade.LOW,
+        });
+      }
     }
 
     if (!allRespostas.length) {

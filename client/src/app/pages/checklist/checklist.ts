@@ -79,7 +79,6 @@ export class Checklist implements OnInit {
       return;
     }
 
-    console.log('[Checklist] Carregando dados para projectId=', this.projectId);
 
     const project$ = this.checklistService.getProjectById(this.projectId).pipe(
       catchError(err => { console.error('[Checklist] getProjectById falhou', err); return of(null); })
@@ -100,7 +99,6 @@ export class Checklist implements OnInit {
       )
       .subscribe({
         next: ({ project, structure, responses }) => {
-          console.log('[Checklist] OK', { project, structureLen: structure?.length, responsesLen: responses?.length });
           this.project = project ?? null;
 
           const responseMap = new Map(responses?.map((r: any) => [r.perguntaId, r]) ?? []);
@@ -175,13 +173,12 @@ saveProgress(): void {
       )
     )
     .subscribe({
-      next: () => console.log('Respostas salvas e progresso do projeto atualizado!'),
+      next: () => {},
       error: (err) => console.error('Falha ao salvar respostas/atualizar progresso:', err),
     });
 }
 
   showTip(item: DisplayableChecklistItem): void {
-    if (item.tipText) console.log('[Checklist] Dica:', item.tipText);
   }
 
   generateReport(): void {
@@ -220,7 +217,6 @@ saveProgress(): void {
 
   this.checklistService.sendChecklistReportFile(form).subscribe({
     next: (pdfBlob: Blob) => {
-      console.log('[Relatório] PDF recebido com sucesso');
       const url = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
