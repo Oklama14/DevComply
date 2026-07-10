@@ -37,7 +37,7 @@ async function bootstrap() {
   // IPv6 + IPv4). O edge do Railway alcanca o container via IPv6 na rede
   // interna; ligar apenas em IPv4 deixa o app inalcancavel e gera 502.
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '::');
   console.log(`API up and listening on port ${port} (dual-stack) - ${await app.getUrl()}`);
 }
 bootstrap();
