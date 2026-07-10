@@ -1,6 +1,7 @@
 /**
- * Validacao das variaveis de ambiente no boot. Falha rapido com mensagem clara
- * em vez de subir e quebrar em runtime por falta de configuracao.
+ * Validacao das variaveis de ambiente no boot. Falha rapido (e com mensagem
+ * clara) apenas para o que e essencial: JWT e conexao de banco. Coisas de
+ * feature opcional (IA) apenas avisam, sem impedir o boot.
  */
 export function validateEnv(
   config: Record<string, unknown>,
@@ -21,13 +22,16 @@ export function validateEnv(
     );
   }
 
-  const isProd = config.NODE_ENV === 'production';
-  if (isProd && !config.GOOGLE_API_KEY) {
-    errors.push('GOOGLE_API_KEY e obrigatorio em producao.');
-  }
-
   if (errors.length) {
     throw new Error(`Configuracao invalida:\n- ${errors.join('\n- ')}`);
   }
+
+  // Opcional: nao bloqueia o boot, apenas avisa.
+  if (!config.GOOGLE_API_KEY) {
+    console.warn(
+      '[env] GOOGLE_API_KEY nao configurado — os relatorios de IA ficarao indisponiveis ate voce definir a chave.',
+    );
+  }
+
   return config;
 }
