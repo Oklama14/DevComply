@@ -6,7 +6,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-// Importação dos Módulos
+// Importacao dos Modulos
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -16,7 +16,7 @@ import { ReportsModule } from './reports/reports.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Make configuration available globally
+      isGlobal: true,
     }),
     ThrottlerModule.forRoot([{
       ttl: 60000,
@@ -27,11 +27,11 @@ import { ReportsModule } from './reports/reports.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const url = configService.get<string>('DATABASE_URL');
-        
+
         return {
           type: 'postgres',
-          ...(url 
-            ? { url } 
+          ...(url
+            ? { url }
             : {
                 host: configService.get<string>('DB_HOST', 'localhost'),
                 port: configService.get<number>('DB_PORT', 5432),
@@ -40,12 +40,16 @@ import { ReportsModule } from './reports/reports.module';
                 database: configService.get<string>('DB_NAME'),
               }),
           autoLoadEntities: true,
-          synchronize: configService.get<string>('NODE_ENV') !== 'production',
-          ssl: url ? { rejectUnauthorized: false } : false, // Many cloud providers (like Railway) require SSL
+          // Em producao o synchronize fica desligado. Para criar o schema na
+          // primeira subida, defina DB_SYNC=true no Railway, suba, confirme que
+          // as tabelas foram criadas e depois REMOVA a variavel.
+          synchronize:
+            configService.get<string>('NODE_ENV') !== 'production' ||
+            configService.get<string>('DB_SYNC') === 'true',
+          ssl: url ? { rejectUnauthorized: false } : false,
         };
       },
     }),
-    // Registro de todos os módulos da aplicação
     AuthModule,
     UsersModule,
     ProjectsModule,

@@ -7,10 +7,10 @@ import * as compression from 'compression';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Segurança de Cabeçalhos HTTP
+  // Seguranca de Cabecalhos HTTP
   app.use(helmet());
 
-  // Compressão (GZIP) das respostas para melhorar performance
+  // Compressao (GZIP) das respostas para melhorar performance
   app.use(compression());
 
   // Habilitar CORS dinamicamente
@@ -25,17 +25,19 @@ async function bootstrap() {
   });
 
   // Habilita o ValidationPipe globalmente.
-  // Isso garante que todas as requisições que chegam aos controladores
-  // e que usam DTOs com decoradores de validação sejam automaticamente validadas.
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Remove propriedades que não estão no DTO
-      forbidNonWhitelisted: true, // Lança um erro se propriedades extras forem enviadas
-      transform: true, // Transforma os tipos dos dados (ex: string de ID para number)
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 
-  // Escutar na porta do ambiente (Railway) ou 3000 (Local)
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  // Sem forcar '0.0.0.0': omitindo o host, o Node escuta em '::' (dual-stack
+  // IPv6 + IPv4). O edge do Railway alcanca o container via IPv6 na rede
+  // interna; ligar apenas em IPv4 deixa o app inalcancavel e gera 502.
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`API up and listening on port ${port} (dual-stack) - ${await app.getUrl()}`);
 }
 bootstrap();
