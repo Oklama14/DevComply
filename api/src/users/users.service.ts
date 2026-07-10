@@ -1,4 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ConflictException,
+  NotFoundException,
+  UnauthorizedException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -10,32 +17,44 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly repo: Repository<User>,
   ) {}
 
   async create(dto: CreateUserDto): Promise<User> {
-    const exists = await this.repo.findOne({ where: { email: dto.email } });
-    if (exists) {
-      throw new Error('E-mail já cadastrado');
+    try {
+      const exists = await this.repo.findOne({ where: { email: dto.email } });
+      if (exists) {
+        throw new ConflictException('E-mail ja cadastrado');
+      }
+
+      const senhaHash = await bcrypt.hash(dto.senha, 10);
+
+      const user = this.repo.create({
+        nome: dto.nome,
+        email: dto.email,
+        perfil: dto.perfil,
+        senhaHash,
+      });
+
+      const saved = await this.repo.save(user);
+      // Nao retorna o hash da senha
+      delete (saved as Partial<User>).senhaHash;
+      return saved;
+    } catch (err) {
+      if (err instanceof ConflictException) throw err;
+      this.logger.error(`Falha ao criar usuario (${dto?.email}): ${err?.message}`, err?.stack);
+      throw new InternalServerErrorException('Erro ao criar usuario');
     }
-    
-    const user = this.repo.create({
-      nome: dto.nome,
-      email: dto.email,
-      perfil: dto.perfil,
-      senhaHash: await bcrypt.hash(dto.senha, 10),
-    });
-    
-    return this.repo.save(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    // Incluindo senhaHash para validação de login
-    return this.repo.findOne({ 
+    return this.repo.findOne({
       where: { email },
-      select: ['id', 'nome', 'email', 'senhaHash', 'perfil']
+      select: ['id', 'nome', 'email', 'senhaHash', 'perfil'],
     });
   }
 
@@ -45,7 +64,7 @@ export class UsersService {
 
   async updateProfile(id: number, dto: UpdateProfileDto): Promise<User> {
     const user = await this.findOne(id);
-    if (!user) throw new Error('Usuário não encontrado');
+    if (!user) throw new NotFoundException('Usuario nao encontrado');
 
     user.nome = dto.nome ?? user.nome;
     user.perfil = dto.perfil ?? user.perfil;
@@ -54,16 +73,15 @@ export class UsersService {
   }
 
   async changePassword(id: number, dto: ChangePasswordDto): Promise<void> {
-    // Busca o usuário com a senha
-    const user = await this.repo.findOne({ 
+    const user = await this.repo.findOne({
       where: { id },
-      select: ['id', 'nome', 'email', 'senhaHash', 'perfil']
+      select: ['id', 'nome', 'email', 'senhaHash', 'perfil'],
     });
-    
-    if (!user) throw new Error('Usuário não encontrado');
+
+    if (!user) throw new NotFoundException('Usuario nao encontrado');
 
     const ok = await bcrypt.compare(dto.senhaAtual, user.senhaHash);
-    if (!ok) throw new Error('Senha atual inválida');
+    if (!ok) throw new UnauthorizedException('Senha atual invalida');
 
     user.senhaHash = await bcrypt.hash(dto.novaSenha, 10);
     await this.repo.save(user);
