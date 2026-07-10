@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User } from '@/users/entities/user.entity';
 import { Report } from '@/reports/entities/report.entity';
 import { ChecklistResponse } from '@/checklist/entities/checklist-response.entity';
@@ -30,4 +38,9 @@ export class Project {
   })
   progresso: number;
 
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

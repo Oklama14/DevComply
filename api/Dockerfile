@@ -1,25 +1,24 @@
-FROM node:20-alpine
-
-# Definir diretório de trabalho
+# --- Build (inclui devDependencies para compilar) ---
+FROM node:20-alpine AS build
 WORKDIR /app
-
-# Copiar arquivos de dependências
 COPY package*.json ./
-
-# Instalar TODAS as dependências temporariamente (necessário para o build)
-RUN npm install
-
-# Copiar o código fonte para dentro do container
+RUN npm ci
 COPY . .
-
-# EXECUTAR O BUILD (Isso vai criar a pasta /app/dist que estava faltando)
 RUN npm run build
 
-# Opcional: Limpar as devDependencies para deixar a imagem leve em produção
-RUN npm prune --production
+# --- Dependencias de producao apenas ---
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-# Expor porta
+# --- Runtime (imagem enxuta) ---
+FROM node:20-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY package*.json ./
+COPY logo.png ./logo.png
 EXPOSE 3000
-
-# Comando padrão de inicialização em produção
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main"]

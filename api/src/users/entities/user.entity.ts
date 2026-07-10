@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Project } from '@/projects/entities/project.entity';
 
 @Entity({ name: 'usuarios' })
@@ -22,6 +29,12 @@ export class User {
   // Chave da API do Gemini do proprio usuario (opcional). Nunca retornada por padrao.
   @Column({ name: 'gemini_api_key', type: 'text', nullable: true, select: false })
   geminiApiKey?: string | null;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
   @OneToMany(() => Project, project => project.usuario)
   projetos: Project[];
