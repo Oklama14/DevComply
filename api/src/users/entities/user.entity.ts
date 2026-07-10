@@ -19,6 +19,10 @@ export class User {
   @Column({ length: 20 })
   perfil: string;
 
+  // Chave da API do Gemini do proprio usuario (opcional). Nunca retornada por padrao.
+  @Column({ name: 'gemini_api_key', type: 'text', nullable: true, select: false })
+  geminiApiKey?: string | null;
+
   @OneToMany(() => Project, project => project.usuario)
   projetos: Project[];
 }

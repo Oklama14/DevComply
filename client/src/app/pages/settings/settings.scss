@@ -326,3 +326,56 @@ $red-600: #dc2626;
     }
   }
 }
+// Chave do Gemini
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+
+  label {
+    margin-bottom: 0;
+  }
+}
+
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $gray-400;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: $primary-blue;
+  }
+}
+
+.key-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+
+  .badge-ok {
+    background: $green-50;
+    color: $green-600;
+    border: 1px solid #a7f3d0;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  .link-remove {
+    background: none;
+    border: none;
+    color: $red-600;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

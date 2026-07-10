@@ -17,6 +17,9 @@ export interface ChangePasswordPayload {
   senhaAtual: string;
   novaSenha: string;
 }
+export interface UserSettings {
+  hasGeminiKey: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
@@ -33,5 +36,15 @@ export class UsersService {
 
   changePassword(payload: ChangePasswordPayload): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/me/password`, payload);
+  }
+
+  getSettings(): Observable<UserSettings> {
+    return this.http.get<UserSettings>(`${this.apiUrl}/me/settings`);
+  }
+
+  updateGeminiKey(geminiApiKey: string): Observable<UserSettings> {
+    return this.http.patch<UserSettings>(`${this.apiUrl}/me/gemini-key`, {
+      geminiApiKey,
+    });
   }
 }

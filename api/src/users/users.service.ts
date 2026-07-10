@@ -53,6 +53,36 @@ export class UsersService {
     }
   }
 
+  async getSettings(userId: number): Promise<{ hasGeminiKey: boolean }> {
+    const user = await this.repo.findOne({
+      where: { id: userId },
+      select: ['id', 'geminiApiKey'],
+    });
+    if (!user) throw new NotFoundException('Usuario nao encontrado');
+    return { hasGeminiKey: !!user.geminiApiKey };
+  }
+
+  async updateGeminiKey(
+    userId: number,
+    apiKey?: string,
+  ): Promise<{ hasGeminiKey: boolean }> {
+    const user = await this.findOne(userId);
+    if (!user) throw new NotFoundException('Usuario nao encontrado');
+    const clean = apiKey?.trim();
+    user.geminiApiKey = clean ? clean : null;
+    await this.repo.save(user);
+    return { hasGeminiKey: !!user.geminiApiKey };
+  }
+
+  /** Uso interno (geracao de relatorios). Retorna a chave crua do usuario. */
+  async getGeminiKey(userId: number): Promise<string | null> {
+    const user = await this.repo.findOne({
+      where: { id: userId },
+      select: ['id', 'geminiApiKey'],
+    });
+    return user?.geminiApiKey ?? null;
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.repo.findOne({
       where: { email },

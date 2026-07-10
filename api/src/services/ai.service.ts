@@ -9,15 +9,18 @@ const logoPath = path.join(__dirname, '..', '..', 'logo.png');
 
 @Injectable()
 export class AiService {
-  private readonly genAI: GoogleGenerativeAI;
+  constructor(private configService: ConfigService) {}
 
-  constructor(private configService: ConfigService) {
-    this.genAI = new GoogleGenerativeAI(
-      this.configService.get<string>('GOOGLE_API_KEY') ?? '',
-    );
+  /** Cria um client Gemini com a chave do usuario (se houver) ou a do ambiente. */
+  private client(apiKey?: string): GoogleGenerativeAI {
+    const key =
+      (apiKey && apiKey.trim()) ||
+      this.configService.get<string>('GOOGLE_API_KEY') ||
+      '';
+    return new GoogleGenerativeAI(key);
   }
 
-  async gerarJSON(dto: GerarRelatorioDto): Promise<Resposta[]> {
+  async gerarJSON(dto: GerarRelatorioDto, apiKey?: string): Promise<Resposta[]> {
     const instrucao = dto.instrucao ?? 'Escreva no máximo um único parágrafo.';
 
     const prompt =
@@ -26,7 +29,7 @@ export class AiService {
       `Usando as seguintes tecnologias: ${dto.resposta_tecnica}. ` +
       `Gere um relatório de conformidade, destacando pontos fortes e possíveis lacunas. Para cada possível lacuna, informe uma sugestão de melhoria relacionada ao gap. `;
 
-    const model = this.genAI.getGenerativeModel({
+    const model = this.client(apiKey).getGenerativeModel({
       model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',

@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
-import { RouterLink } from '@angular/router';
+import { UsersService } from '../../services/users';
 
-interface SettingsData {
-  openaiApiKey: string;
+interface LocalSettings {
   enableAiSuggestions: boolean;
   autoSaveResponses: boolean;
   detailedReports: boolean;
@@ -17,18 +15,17 @@ interface SettingsData {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './settings.html',
-  styleUrls: ['./settings.scss']
+  styleUrls: ['./settings.scss'],
 })
 export class Settings implements OnInit {
+  private fb = inject(FormBuilder);
+  private usersService = inject(UsersService);
+
   settingsForm!: FormGroup;
   loading = false;
   successMessage = '';
   errorMessage = '';
-
-  constructor(
-    private fb: FormBuilder,
-    private router: Router
-  ) {}
+  hasGeminiKey = false;
 
   ngOnInit(): void {
     this.initializeForm();
@@ -37,21 +34,28 @@ export class Settings implements OnInit {
 
   private initializeForm(): void {
     this.settingsForm = this.fb.group({
-      openaiApiKey: [''],
+      geminiApiKey: [''],
       enableAiSuggestions: [true],
       autoSaveResponses: [true],
       detailedReports: [true],
-      enableNotifications: [true]
+      enableNotifications: [true],
     });
   }
 
   private loadSettings(): void {
-    // Carregar configurações salvas do localStorage ou serviço
-    const savedSettings = localStorage.getItem('devcomply-settings');
-    if (savedSettings) {
-      const settings: SettingsData = JSON.parse(savedSettings);
-      this.settingsForm.patchValue(settings);
+    const saved = localStorage.getItem('devcomply-settings');
+    if (saved) {
+      try {
+        this.settingsForm.patchValue(JSON.parse(saved) as LocalSettings);
+      } catch {
+        // ignora settings corrompidos
+      }
     }
+    // Estado da chave (nunca recebemos a chave em si, apenas se existe).
+    this.usersService.getSettings().subscribe({
+      next: (s) => (this.hasGeminiKey = s.hasGeminiKey),
+      error: () => {},
+    });
   }
 
   onSaveSettings(): void {
@@ -59,46 +63,61 @@ export class Settings implements OnInit {
     this.successMessage = '';
     this.errorMessage = '';
 
-    try {
-      const settings: SettingsData = this.settingsForm.value;
-      
-      // Salvar no localStorage (em uma aplicação real, enviaria para o backend)
-      localStorage.setItem('devcomply-settings', JSON.stringify(settings));
-      
-      this.successMessage = 'Configurações salvas com sucesso!';
-      
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
+    const { geminiApiKey, ...local } = this.settingsForm.value;
+    localStorage.setItem('devcomply-settings', JSON.stringify(local));
 
-    } catch (error) {
-      this.errorMessage = 'Erro ao salvar configurações. Tente novamente.';
-      console.error('Erro ao salvar configurações:', error);
-    } finally {
-      this.loading = false;
+    const key = (geminiApiKey ?? '').trim();
+    if (!key) {
+      this.finishSave();
+      return;
     }
+
+    this.usersService.updateGeminiKey(key).subscribe({
+      next: (r) => {
+        this.hasGeminiKey = r.hasGeminiKey;
+        this.settingsForm.get('geminiApiKey')?.reset('');
+        this.finishSave();
+      },
+      error: () => {
+        this.errorMessage = 'Nao foi possivel salvar a chave do Gemini.';
+        this.loading = false;
+      },
+    });
+  }
+
+  removeGeminiKey(): void {
+    this.usersService.updateGeminiKey('').subscribe({
+      next: (r) => {
+        this.hasGeminiKey = r.hasGeminiKey;
+        this.successMessage = 'Chave do Gemini removida.';
+        setTimeout(() => (this.successMessage = ''), 3000);
+      },
+      error: () => (this.errorMessage = 'Nao foi possivel remover a chave.'),
+    });
+  }
+
+  private finishSave(): void {
+    this.successMessage = 'Configuracoes salvas com sucesso.';
+    this.loading = false;
+    setTimeout(() => (this.successMessage = ''), 3000);
   }
 
   onResetSettings(): void {
-    if (confirm('Tem certeza que deseja restaurar as configurações padrão?')) {
+    if (confirm('Restaurar as preferencias para o padrao?')) {
       this.settingsForm.reset({
-        openaiApiKey: '',
+        geminiApiKey: '',
         enableAiSuggestions: true,
         autoSaveResponses: true,
         detailedReports: true,
-        enableNotifications: true
+        enableNotifications: true,
       });
-      
-      // Remove do localStorage
       localStorage.removeItem('devcomply-settings');
-      
-      this.successMessage = 'Configurações restauradas para o padrão.';
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
+      this.successMessage = 'Preferencias restauradas.';
+      setTimeout(() => (this.successMessage = ''), 3000);
     }
   }
 
-  // Getter para facilitar acesso aos controles do formulário
-  get f() { return this.settingsForm.controls; }
+  get f() {
+    return this.settingsForm.controls;
+  }
 }

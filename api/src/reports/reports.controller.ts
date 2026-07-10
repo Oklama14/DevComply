@@ -15,6 +15,7 @@ import { AiService } from '@/services/ai.service';
 import { Resposta, GerarRelatorioDto, FrontCategory } from '@/types/ai.types';
 import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { ProjectsService } from '@/projects/projects.service';
+import { UsersService } from '@/users/users.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('reports')
@@ -22,6 +23,7 @@ export class ReportsController {
   constructor(
     private readonly ai: AiService,
     private readonly projectsService: ProjectsService,
+    private readonly usersService: UsersService,
   ) {}
 
   // ====== 1) multipart/form-data: arquivo JSON ======
@@ -50,17 +52,23 @@ export class ReportsController {
       throw new BadRequestException('JSON inválido no arquivo enviado.');
     }
 
-    return this.generateAndSendPdf(payload, res, body?.projectId, body?.projectName);
+    const apiKey = (await this.usersService.getGeminiKey(req.user.userId)) ?? undefined;
+    return this.generateAndSendPdf(payload, res, body?.projectId, body?.projectName, apiKey);
   }
 
 
   // ====== 2) application/json: JSON direto ======
   @Post('checklist-json')
-  async uploadChecklistJson(@Body() payload: FrontCategory[], @Res() res: Response) {
+  async uploadChecklistJson(
+    @Request() req,
+    @Body() payload: FrontCategory[],
+    @Res() res: Response,
+  ) {
     if (!Array.isArray(payload)) {
       throw new BadRequestException('Payload deve ser um array de categorias.');
     }
-    return this.generateAndSendPdf(payload, res);
+    const apiKey = (await this.usersService.getGeminiKey(req.user.userId)) ?? undefined;
+    return this.generateAndSendPdf(payload, res, undefined, undefined, apiKey);
   }
 
   // ====== helper: chama IA e gera o PDF ======
@@ -69,6 +77,7 @@ export class ReportsController {
     res: Response,
     projectId?: string | number,
     projectName?: string,
+    apiKey?: string,
   ) {
     const allRespostas: Resposta[] = [];
 
@@ -89,7 +98,7 @@ export class ReportsController {
         artigo_referente: cat.items[0]?.artigo_referente, // pega do primeiro item (se houver)
       };
 
-      const respostas = await this.ai.gerarJSON(dto);
+      const respostas = await this.ai.gerarJSON(dto, apiKey);
       allRespostas.push(...respostas);
     }
 
