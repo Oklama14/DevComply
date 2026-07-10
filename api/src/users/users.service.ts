@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcryptjs';
+import { EncryptionService } from '../common/crypto/encryption.service';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +23,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly repo: Repository<User>,
+    private readonly encryption: EncryptionService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -69,7 +71,7 @@ export class UsersService {
     const user = await this.findOne(userId);
     if (!user) throw new NotFoundException('Usuario nao encontrado');
     const clean = apiKey?.trim();
-    user.geminiApiKey = clean ? clean : null;
+    user.geminiApiKey = clean ? this.encryption.encrypt(clean) : null;
     await this.repo.save(user);
     return { hasGeminiKey: !!user.geminiApiKey };
   }
@@ -80,7 +82,25 @@ export class UsersService {
       where: { id: userId },
       select: ['id', 'geminiApiKey'],
     });
-    return user?.geminiApiKey ?? null;
+    return user?.geminiApiKey ? this.encryption.decrypt(user.geminiApiKey) : null;
+  }
+
+  /** Exclusao de conta (LGPD): remove o usuario e todos os dados vinculados. */
+  async deleteAccount(userId: number): Promise<void> {
+    await this.repo.manager.transaction(async (m) => {
+      const sub = `SELECT id FROM projetos WHERE "usuarioId" = $1`;
+      await m.query(
+        `DELETE FROM recomendacoes WHERE "relatorioId" IN (SELECT id FROM relatorios WHERE "projetoId" IN (${sub}))`,
+        [userId],
+      );
+      await m.query(`DELETE FROM relatorios WHERE "projetoId" IN (${sub})`, [userId]);
+      await m.query(
+        `DELETE FROM checklist_respostas WHERE "projeto_id" IN (${sub}) OR "projetoId" IN (${sub})`,
+        [userId],
+      );
+      await m.query(`DELETE FROM projetos WHERE "usuarioId" = $1`, [userId]);
+      await m.query(`DELETE FROM usuarios WHERE id = $1`, [userId]);
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {

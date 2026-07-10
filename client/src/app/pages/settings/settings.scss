@@ -379,3 +379,23 @@ $red-600: #dc2626;
     }
   }
 }
+
+// Zona de perigo
+.danger-zone {
+  border-color: #fca5a5;
+
+  .section-header h2 {
+    color: $red-600;
+  }
+}
+
+.btn-danger {
+  background: #fff;
+  color: $red-600;
+  border-color: #fca5a5;
+
+  &:hover:not(:disabled) {
+    background: $red-50;
+    border-color: $red-500;
+  }
+}

@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { UsersService } from '../../services/users';
+import { AuthService } from '../../services/auth';
 
 interface LocalSettings {
   enableAiSuggestions: boolean;
@@ -20,6 +21,7 @@ interface LocalSettings {
 export class Settings implements OnInit {
   private fb = inject(FormBuilder);
   private usersService = inject(UsersService);
+  private authService = inject(AuthService);
 
   settingsForm!: FormGroup;
   loading = false;
@@ -115,6 +117,17 @@ export class Settings implements OnInit {
       this.successMessage = 'Preferencias restauradas.';
       setTimeout(() => (this.successMessage = ''), 3000);
     }
+  }
+
+  deleteAccount(): void {
+    const ok = confirm(
+      'Isso vai excluir sua conta e todos os seus dados (projetos, checklists e relatorios) permanentemente. Deseja continuar?',
+    );
+    if (!ok) return;
+    this.usersService.deleteAccount().subscribe({
+      next: () => this.authService.logout(),
+      error: () => (this.errorMessage = 'Nao foi possivel excluir a conta.'),
+    });
   }
 
   get f() {

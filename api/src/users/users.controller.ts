@@ -1,4 +1,14 @@
-import { Controller, Body, Patch, Get, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  Patch,
+  Get,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateGeminiKeyDto } from './dto/update-gemini-key.dto';
@@ -34,5 +44,11 @@ export class UsersController {
   @Patch('me/gemini-key')
   updateGeminiKey(@Request() req, @Body() dto: UpdateGeminiKeyDto) {
     return this.users.updateGeminiKey(req.user.userId, dto.geminiApiKey);
+  }
+
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteMe(@Request() req): Promise<void> {
+    await this.users.deleteAccount(req.user.userId);
   }
 }

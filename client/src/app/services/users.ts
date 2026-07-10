@@ -47,4 +47,8 @@ export class UsersService {
       geminiApiKey,
     });
   }
+
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/me`);
+  }
 }

@@ -3,6 +3,7 @@ import { ConflictException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { EncryptionService } from '../common/crypto/encryption.service';
 import * as bcrypt from 'bcryptjs';
 
 jest.mock('bcryptjs');
@@ -18,7 +19,11 @@ describe('UsersService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     const moduleRef = await Test.createTestingModule({
-      providers: [UsersService, { provide: getRepositoryToken(User), useValue: repo }],
+      providers: [
+        UsersService,
+        { provide: getRepositoryToken(User), useValue: repo },
+        { provide: EncryptionService, useValue: { encrypt: (v: string) => v, decrypt: (v: string) => v } },
+      ],
     }).compile();
     service = moduleRef.get(UsersService);
   });

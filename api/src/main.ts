@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 // Instrumentacao: qualquer erro nao tratado vira log legivel (em vez de queda silenciosa/502).
 process.on('unhandledRejection', (reason) => {
@@ -21,6 +22,9 @@ async function bootstrap() {
 
   // Filtro global de erros (shape consistente + log de 5xx)
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Log estruturado por requisicao
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Compressao (GZIP) das respostas
   app.use(compression());
