@@ -1,72 +1,90 @@
-<div class="profile-page" *ngIf="!isLoading(); else loadingTpl">
-  <header class="profile-header">
-    <h1>Meu Perfil</h1>
-  </header>
+<div class="profile-container" *ngIf="!isLoading(); else loadingTpl">
+  <!-- Header -->
+  <div class="profile-header">
+    <nav class="breadcrumb">
+      <a routerLink="/dashboard">Home</a>
+      <span>›</span>
+      <span>Perfil</span>
+    </nav>
 
-  <div class="alerts">
-    <p class="alert success" *ngIf="msg()">{{ msg() }}</p>
-    <p class="alert error" *ngIf="err()">{{ err() }}</p>
+    <div class="title-row">
+      <h1>Meu Perfil</h1>
+    </div>
   </div>
 
-  <section class="card">
-    <h2>Informações</h2>
-    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
-      <div class="grid">
-        <label>
-          <span>Nome</span>
-          <input type="text" formControlName="nome" />
-          <small class="hint" *ngIf="profileForm.get('nome')?.invalid && profileForm.get('nome')?.touched">
-            Nome é obrigatório.
-          </small>
-        </label>
+  <!-- Mensagens de feedback -->
+  <div *ngIf="msg()" class="success-message">{{ msg() }}</div>
+  <div *ngIf="err()" class="error-message">{{ err() }}</div>
 
-        <label>
-          <span>Email</span>
-          <input type="email" formControlName="email" />
-        </label>
-
-        <label>
-          <span>Perfil (Ocupação)</span>
-          <input type="text" formControlName="perfil" placeholder="Ex: Professor(a), Engenheiro(a)..." />
-        </label>
+  <!-- Informações -->
+  <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>Informações</h2>
+        <p>Atualize os dados da sua conta.</p>
       </div>
 
-      <div class="actions">
-        <button type="submit" class="btn-primary" [disabled]="isSaving() || profileForm.invalid">
-          Salvar alterações
+      <div class="form-group">
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" formControlName="nome" class="form-control" />
+        <small class="form-hint error-hint"
+               *ngIf="profileForm.get('nome')?.invalid && profileForm.get('nome')?.touched">
+          Nome é obrigatório.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" class="form-control" />
+        <small class="form-hint">O email não pode ser alterado.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="perfil">Perfil (Ocupação)</label>
+        <input id="perfil" type="text" formControlName="perfil" class="form-control"
+               placeholder="Ex: Professor(a), Engenheiro(a)..." />
+      </div>
+
+      <div class="profile-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving() || profileForm.invalid">
+          <span *ngIf="isSaving()">Salvando...</span>
+          <span *ngIf="!isSaving()">Salvar alterações</span>
         </button>
       </div>
-    </form>
-  </section>
+    </div>
+  </form>
 
-  <section class="card">
-    <h2>Alterar Senha</h2>
-    <form [formGroup]="passwordForm" (ngSubmit)="requestPasswordChange()">
-      <div class="grid">
-        <label>
-          <span>Senha atual</span>
-          <input type="password" formControlName="currentPassword" />
-        </label>
-
-        <label>
-          <span>Nova senha</span>
-          <input type="password" formControlName="newPassword" />
-          <small class="hint">Mínimo de 8 caracteres.</small>
-        </label>
-
-        <label>
-          <span>Confirmar nova senha</span>
-          <input type="password" formControlName="confirmPassword" />
-        </label>
+  <!-- Alterar senha -->
+  <form [formGroup]="passwordForm" (ngSubmit)="requestPasswordChange()">
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>Alterar Senha</h2>
+        <p>Use uma senha forte, com no mínimo 8 caracteres.</p>
       </div>
 
-      <div class="actions">
-        <button type="submit" class="btn-secondary" [disabled]="passwordForm.invalid">
+      <div class="form-group">
+        <label for="currentPassword">Senha atual</label>
+        <input id="currentPassword" type="password" formControlName="currentPassword" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">Nova senha</label>
+        <input id="newPassword" type="password" formControlName="newPassword" class="form-control" />
+        <small class="form-hint">Mínimo de 8 caracteres.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar nova senha</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control" />
+      </div>
+
+      <div class="profile-actions">
+        <button type="submit" class="btn btn-secondary" [disabled]="passwordForm.invalid">
           Atualizar senha
         </button>
       </div>
-    </form>
-  </section>
+    </div>
+  </form>
 </div>
 
 <ng-template #loadingTpl>
