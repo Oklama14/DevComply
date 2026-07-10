@@ -1,42 +1,27 @@
-import { Controller, Post, Body, Param, ParseIntPipe, Patch, Get, UseGuards } from '@nestjs/common';
+import { Controller, Body, Patch, Get, UseGuards, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly users: UsersService) {}
 
-  // opcional: permitir criação via rota /users (além do /auth/register)
-  @Post()
-  create(@Body() dto: CreateUserDto) {
-    return this.users.create(dto);
+  // Perfil do usuario autenticado (id vem do token, nunca da URL -> sem IDOR).
+  @Get('me')
+  me(@Request() req) {
+    return this.users.findOne(req.user.userId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.users.findOne(id);
+  @Patch('me/profile')
+  updateProfile(@Request() req, @Body() dto: UpdateProfileDto) {
+    return this.users.updateProfile(req.user.userId, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id/profile')
-  updateProfile(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateProfileDto,
-  ) {
-    return this.users.updateProfile(id, dto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id/password')
-  changePassword(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ChangePasswordDto,
-  ) {
-    return this.users.changePassword(id, dto);
+  @Patch('me/password')
+  changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
+    return this.users.changePassword(req.user.userId, dto);
   }
 }
-

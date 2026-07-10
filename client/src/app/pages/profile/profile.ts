@@ -1,45 +1,36 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
-
-type Profile = {
-  id: number;
-  nome: string;
-  email: string;
-  perfil: string; // occupation / role
-};
+import { UsersService, UserProfile } from '../../services/users';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.html',
-  styleUrls: ['./profile.scss']
+  styleUrls: ['./profile.scss'],
 })
 export class ProfileComponent implements OnInit {
-  private http = inject(HttpClient);
   private fb = inject(FormBuilder);
+  private usersService = inject(UsersService);
 
-  profile?: Profile;
+  profile?: UserProfile;
   isLoading = signal(false);
   isSaving = signal(false);
   msg = signal<string | null>(null);
   err = signal<string | null>(null);
 
-  // editable fields (name, perfil). Email read-only, but easy to switch
   profileForm: FormGroup = this.fb.group({
     nome: ['', [Validators.required, Validators.maxLength(100)]],
     email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
-    perfil: [''] // occupation
+    perfil: [''],
   });
 
-  // password request form (simple request/trigger)
   passwordForm: FormGroup = this.fb.group({
-    currentPassword: ['',[Validators.required]],
-    newPassword: ['',[Validators.required, Validators.minLength(8)]],
-    confirmPassword: ['',[Validators.required]]
+    currentPassword: ['', [Validators.required]],
+    newPassword: ['', [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ['', [Validators.required]],
   });
 
   ngOnInit(): void {
@@ -51,8 +42,8 @@ export class ProfileComponent implements OnInit {
     this.msg.set(null);
     this.err.set(null);
 
-    // adjust endpoint to your API
-    this.http.get<Profile>('/api/users/me')
+    this.usersService
+      .getMe()
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res) => {
@@ -60,10 +51,10 @@ export class ProfileComponent implements OnInit {
           this.profileForm.reset({
             nome: res.nome,
             email: res.email,
-            perfil: res.perfil ?? ''
+            perfil: res.perfil ?? '',
           });
         },
-        error: (e) => this.err.set('Falha ao carregar perfil.')
+        error: () => this.err.set('Falha ao carregar perfil.'),
       });
   }
 
@@ -74,21 +65,18 @@ export class ProfileComponent implements OnInit {
     this.msg.set(null);
     this.err.set(null);
 
-    // enable email temporarily if you want to send it too
-    const payload = {
-      nome: this.profileForm.get('nome')?.value,
-      perfil: this.profileForm.get('perfil')?.value
-      // email: this.profileForm.get('email')?.value, // if editable
-    };
-
-    this.http.patch<Profile>(`/api/users/${this.profile.id}`, payload)
+    this.usersService
+      .updateProfile({
+        nome: this.profileForm.get('nome')?.value,
+        perfil: this.profileForm.get('perfil')?.value,
+      })
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (updated) => {
           this.profile = updated;
           this.msg.set('Perfil atualizado com sucesso!');
         },
-        error: () => this.err.set('Não foi possível atualizar o perfil.')
+        error: () => this.err.set('Nao foi possivel atualizar o perfil.'),
       });
   }
 
@@ -97,22 +85,21 @@ export class ProfileComponent implements OnInit {
 
     const { currentPassword, newPassword, confirmPassword } = this.passwordForm.value;
     if (newPassword !== confirmPassword) {
-      this.err.set('As senhas não coincidem.');
+      this.err.set('As senhas nao coincidem.');
       return;
     }
 
     this.msg.set(null);
     this.err.set(null);
 
-    this.http.post(`/api/users/${this.profile.id}/change-password`, {
-      currentPassword,
-      newPassword
-    }).subscribe({
-      next: () => {
-        this.msg.set('Senha alterada com sucesso.');
-        this.passwordForm.reset();
-      },
-      error: () => this.err.set('Falha ao alterar a senha. Verifique a senha atual.')
-    });
+    this.usersService
+      .changePassword({ senhaAtual: currentPassword, novaSenha: newPassword })
+      .subscribe({
+        next: () => {
+          this.msg.set('Senha alterada com sucesso.');
+          this.passwordForm.reset();
+        },
+        error: () => this.err.set('Falha ao alterar a senha. Verifique a senha atual.'),
+      });
   }
 }

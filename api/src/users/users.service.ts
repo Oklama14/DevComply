@@ -41,12 +41,14 @@ export class UsersService {
       });
 
       const saved = await this.repo.save(user);
-      // Nao retorna o hash da senha
       delete (saved as Partial<User>).senhaHash;
       return saved;
     } catch (err) {
       if (err instanceof ConflictException) throw err;
-      this.logger.error(`Falha ao criar usuario (${dto?.email}): ${err?.message}`, err?.stack);
+      this.logger.error(
+        `Falha ao criar usuario (${dto?.email}): ${err?.message}`,
+        err?.stack,
+      );
       throw new InternalServerErrorException('Erro ao criar usuario');
     }
   }

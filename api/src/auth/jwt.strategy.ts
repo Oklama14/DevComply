@@ -5,17 +5,20 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private configService: ConfigService) {
+  constructor(configService: ConfigService) {
+    const secret = configService.get<string>('JWT_SECRET');
+    if (!secret) {
+      // Falha rapido no boot em vez de aceitar tokens assinados com segredo padrao.
+      throw new Error('JWT_SECRET nao configurado');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET', 'direto00'), // Deve ser o mesmo segredo do JwtModule
+      secretOrKey: secret,
     });
   }
 
   async validate(payload: any) {
-    // O payload é o que definimos no login (id e email)
-    // O retorno desta função será injetado no objeto `request` do Express
     return { userId: payload.sub, email: payload.email };
   }
-}
+}

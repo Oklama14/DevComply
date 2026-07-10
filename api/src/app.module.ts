@@ -45,7 +45,9 @@ import { ReportsModule } from './reports/reports.module';
           // as tabelas foram criadas e depois REMOVA a variavel.
           synchronize:
             configService.get<string>('NODE_ENV') !== 'production' ||
-            configService.get<string>('DB_SYNC') === 'true',
+            ['true', '1', 'yes'].includes(
+              (configService.get<string>('DB_SYNC') ?? '').trim().toLowerCase(),
+            ),
           ssl: url ? { rejectUnauthorized: false } : false,
         };
       },
