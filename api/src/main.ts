@@ -21,14 +21,32 @@ async function bootstrap() {
   // Compressao (GZIP) das respostas
   app.use(compression());
 
-  // CORS dinamico
-  const allowedOrigins = ['http://localhost:4200', 'http://client:4200'];
+  // CORS robusto: tolera barra final e libera *.vercel.app (producao + previews).
+  const norm = (v: string) => v.replace(/\/+$/, '');
+  const staticOrigins = ['http://localhost:4200', 'http://client:4200'];
   if (process.env.FRONTEND_URL) {
-    allowedOrigins.push(process.env.FRONTEND_URL);
+    staticOrigins.push(norm(process.env.FRONTEND_URL));
   }
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Requests sem Origin (curl, health checks, server-to-server) sao permitidos.
+      if (!origin) return callback(null, true);
+      const cleaned = norm(origin);
+      let host = '';
+      try {
+        host = new URL(origin).hostname;
+      } catch {
+        host = '';
+      }
+      const allowed =
+        staticOrigins.includes(cleaned) || /\.vercel\.app$/.test(host);
+      if (allowed) return callback(null, true);
+      console.warn(`[CORS] origem bloqueada: ${origin}`);
+      return callback(null, false);
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.useGlobalPipes(
