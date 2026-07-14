@@ -8,7 +8,6 @@ interface LocalSettings {
   enableAiSuggestions: boolean;
   autoSaveResponses: boolean;
   detailedReports: boolean;
-  enableNotifications: boolean;
 }
 
 @Component({
@@ -40,7 +39,6 @@ export class Settings implements OnInit {
       enableAiSuggestions: [true],
       autoSaveResponses: [true],
       detailedReports: [true],
-      enableNotifications: [true],
     });
   }
 
@@ -111,7 +109,6 @@ export class Settings implements OnInit {
         enableAiSuggestions: true,
         autoSaveResponses: true,
         detailedReports: true,
-        enableNotifications: true,
       });
       localStorage.removeItem('devcomply-settings');
       this.successMessage = 'Preferencias restauradas.';
