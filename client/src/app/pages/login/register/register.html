@@ -19,6 +19,7 @@
         <label for="nome">Nome Completo</label>
         <input 
           id="nome" 
+          data-testid="register-nome"
           type="text" 
           formControlName="nome" 
           placeholder="Seu nome completo"
@@ -33,6 +34,7 @@
         <label for="email">Email</label>
         <input 
           id="email" 
+          data-testid="register-email"
           type="email" 
           formControlName="email" 
           placeholder="seu-email@exemplo.com"
@@ -47,6 +49,7 @@
         <label for="perfil">Perfil</label>
         <select 
           id="perfil" 
+          data-testid="register-perfil"
           formControlName="perfil"
           [class.error]="f['perfil'].invalid && f['perfil'].touched">
           <option value="desenvolvedor">Desenvolvedor</option>
@@ -63,6 +66,7 @@
         <label for="senha">Senha</label>
         <input 
           id="senha" 
+          data-testid="register-senha"
           type="password" 
           formControlName="senha" 
           placeholder="Mínimo 6 caracteres"
@@ -77,6 +81,7 @@
         <label for="confirmSenha">Confirmar Senha</label>
         <input 
           id="confirmSenha" 
+          data-testid="register-confirm-senha"
           type="password" 
           formControlName="confirmSenha" 
           placeholder="Digite novamente a senha"
@@ -96,6 +101,7 @@
             (mouseleave)="hidePoliticaPopup()"> <label class="checkbox-label">
               <input 
                 type="checkbox" 
+                data-testid="register-aceita-politica"
                 formControlName="aceitaPolitica"
                 class="checkbox-input">
               <span class="checkmark"></span>
@@ -122,6 +128,7 @@
             (mouseleave)="hideTermosPopup()"> <label class="checkbox-label">
               <input 
                 type="checkbox" 
+                data-testid="register-aceita-termos"
                 formControlName="aceitaTermos"
                 class="checkbox-input">
               <span class="checkmark"></span>
@@ -144,21 +151,22 @@
       </div>
 
 
-      <div *ngIf="errorMessage" class="error-message">
+      <div *ngIf="errorMessage" data-testid="register-error" class="error-message">
         {{ errorMessage }}
       </div>
 
-      <div *ngIf="successMessage" class="success-message">
+      <div *ngIf="successMessage" data-testid="register-success" class="success-message">
         {{ successMessage }}
       </div>
 
       <div class="alt-action">
         Já tem uma conta?
-        <a routerLink="/login">Faça login aqui</a>
+        <a routerLink="/login" data-testid="register-login-link">Faça login aqui</a>
       </div>
 
       <button 
         type="submit" 
+        data-testid="register-submit"
         class="btn-primary" 
         [disabled]="form.invalid || loading">
         <span *ngIf="loading">Criando conta...</span>

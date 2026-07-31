@@ -13,8 +13,8 @@
   </div>
 
   <!-- Mensagens de feedback -->
-  <div *ngIf="msg()" class="success-message">{{ msg() }}</div>
-  <div *ngIf="err()" class="error-message">{{ err() }}</div>
+  <div *ngIf="msg()" data-testid="profile-success" class="success-message">{{ msg() }}</div>
+  <div *ngIf="err()" data-testid="profile-error" class="error-message">{{ err() }}</div>
 
   <!-- Informações -->
   <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
@@ -26,7 +26,7 @@
 
       <div class="form-group">
         <label for="nome">Nome</label>
-        <input id="nome" type="text" formControlName="nome" class="form-control" />
+        <input id="nome" data-testid="profile-nome" type="text" formControlName="nome" class="form-control" />
         <small class="form-hint error-hint"
                *ngIf="profileForm.get('nome')?.invalid && profileForm.get('nome')?.touched">
           Nome é obrigatório.
@@ -35,18 +35,18 @@
 
       <div class="form-group">
         <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" class="form-control" />
+        <input id="email" data-testid="profile-email" type="email" formControlName="email" class="form-control" />
         <small class="form-hint">O email não pode ser alterado.</small>
       </div>
 
       <div class="form-group">
         <label for="perfil">Perfil (Ocupação)</label>
-        <input id="perfil" type="text" formControlName="perfil" class="form-control"
+        <input id="perfil" data-testid="profile-perfil" type="text" formControlName="perfil" class="form-control"
                placeholder="Ex: Professor(a), Engenheiro(a)..." />
       </div>
 
       <div class="profile-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="isSaving() || profileForm.invalid">
+        <button type="submit" data-testid="profile-save" class="btn btn-primary" [disabled]="isSaving() || profileForm.invalid">
           <span *ngIf="isSaving()">Salvando...</span>
           <span *ngIf="!isSaving()">Salvar alterações</span>
         </button>
@@ -64,22 +64,22 @@
 
       <div class="form-group">
         <label for="currentPassword">Senha atual</label>
-        <input id="currentPassword" type="password" formControlName="currentPassword" class="form-control" />
+        <input id="currentPassword" data-testid="profile-current-password" type="password" formControlName="currentPassword" class="form-control" />
       </div>
 
       <div class="form-group">
         <label for="newPassword">Nova senha</label>
-        <input id="newPassword" type="password" formControlName="newPassword" class="form-control" />
+        <input id="newPassword" data-testid="profile-new-password" type="password" formControlName="newPassword" class="form-control" />
         <small class="form-hint">Mínimo de 8 caracteres.</small>
       </div>
 
       <div class="form-group">
         <label for="confirmPassword">Confirmar nova senha</label>
-        <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control" />
+        <input id="confirmPassword" data-testid="profile-confirm-password" type="password" formControlName="confirmPassword" class="form-control" />
       </div>
 
       <div class="profile-actions">
-        <button type="submit" class="btn btn-secondary" [disabled]="passwordForm.invalid">
+        <button type="submit" data-testid="profile-change-password" class="btn btn-secondary" [disabled]="passwordForm.invalid">
           Atualizar senha
         </button>
       </div>

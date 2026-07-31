@@ -14,22 +14,22 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" placeholder="seu-email@exemplo.com">
+        <input id="email" data-testid="login-email" type="email" formControlName="email" placeholder="seu-email@exemplo.com">
       </div>
       <div class="form-group">
         <label for="senha">Senha</label>
-        <input id="senha" type="password" formControlName="senha" placeholder="********">
+        <input id="senha" data-testid="login-senha" type="password" formControlName="senha" placeholder="********">
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
+      <div *ngIf="errorMessage" data-testid="login-error" class="error-message">
         {{ errorMessage }}
       </div>
       <div class="alt-action" style="text-align:center; margin-top:12px; color:#6b7280;">
   Não tem conta?
-  <a routerLink="/register" style="color:#2563eb; font-weight:600; text-decoration:none;">Criar conta</a>
+  <a routerLink="/register" data-testid="login-register-link" style="color:#2563eb; font-weight:600; text-decoration:none;">Criar conta</a>
 </div>
 
-      <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">
+      <button type="submit" data-testid="login-submit" class="btn-primary" [disabled]="loginForm.invalid">
         Entrar
       </button>
     </form>

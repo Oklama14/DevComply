@@ -9,7 +9,7 @@
 
     <div class="title-row">
       <h1>Checklist LGPD</h1>
-        <button class="btn btn-primary" (click)="generateReport()">
+        <button class="btn btn-primary" data-testid="checklist-generate-report-top" (click)="generateReport()">
         <svg viewBox="0 0 24 24" width="16" height="16">
           <path d="M3 3h13l5 5v13a1 1 0 0 1-1 1H3zM16 3v6h6" fill="currentColor"></path>
         </svg>
@@ -20,11 +20,11 @@
 
   <!-- Cartão do projeto -->
   <section class="project-card" *ngIf="project">
-    <div class="project-title">Projeto: {{ project.nome }}</div>
+    <div class="project-title" data-testid="checklist-project-name">Projeto: {{ project.nome }}</div>
     <p class="project-desc">{{ project.descricao }}</p>
 
     <div class="progress-row">
-      <span>Progresso:</span> <strong>{{ overallProgress }}%</strong>
+      <span>Progresso:</span> <strong data-testid="checklist-progress">{{ overallProgress }}%</strong>
     </div>
     <div class="progressbar">
       <div class="progressbar-fill" [style.width.%]="overallProgress"></div>
@@ -32,16 +32,16 @@
   </section>
 
   <!-- Estados -->
-  <div *ngIf="isLoading" class="state muted">Carregando checklist…</div>
+  <div *ngIf="isLoading" class="state muted" data-testid="checklist-loading">Carregando checklist…</div>
   <div *ngIf="!isLoading && (!checklistData || !checklistData.length)" class="state muted">
     Nenhuma pergunta encontrada.
   </div>
 
   <!-- Categorias -->
-  <section *ngFor="let category of checklistData" class="category">
+  <section *ngFor="let category of checklistData" class="category" data-testid="checklist-category">
     <div class="category-header">
       <h2>{{ category.nome }}</h2>
-      <span class="cat-progress">{{ category.progress || 0 }}% completo</span>
+      <span class="cat-progress" data-testid="checklist-category-progress">{{ category.progress || 0 }}% completo</span>
     </div>
     <div class="category-desc" *ngIf="category.descricao">{{ category.descricao }}</div>
 
@@ -53,18 +53,21 @@
     <div class="items">
       <article *ngFor="let item of category.items"
                class="item"
+               data-testid="checklist-item"
+               [attr.data-item-id]="item.id"
                [class.item-completed]="item.completed">
 
         <!-- Cabeçalho do item -->
-        <div class="item-head" (click)="toggleItemExpansion(item)">
+        <div class="item-head" data-testid="checklist-item-head" (click)="toggleItemExpansion(item)">
           <div class="left">
             <input type="checkbox"
                    class="checkbox"
+                   data-testid="checklist-item-checkbox"
                    [(ngModel)]="item.completed"
                    (click)="$event.stopPropagation()" />
 
             <div class="title-wrap">
-              <h3 class="q-title">{{ item.titulo }}</h3>
+              <h3 class="q-title" data-testid="checklist-item-title">{{ item.titulo }}</h3>
               <p class="q-sub" *ngIf="item.descricao">{{ item.descricao }}</p>
             </div>
           </div>
@@ -90,12 +93,14 @@
           <label class="field">
             <span>Explicação da sua implementação:</span>
             <textarea [(ngModel)]="item.answer"
+                      data-testid="checklist-item-answer"
                       placeholder="Descreva como sua solução atende a este requisito..."></textarea>
           </label>
 
           <label class="field">
             <span>Detalhes técnicos:</span>
             <textarea [(ngModel)]="item.technicalDetails"
+                      data-testid="checklist-item-technical"
                       placeholder="Tecnologias, métodos de criptografia, estruturas de BD, etc."></textarea>
           </label>
         </div>
@@ -115,8 +120,8 @@
   </div>
   
   <div class="right-actions">
-    <button class="btn btn-primary" (click)="generateReport()">Gerar Relatório</button>
-    <button class="btn btn-secondary" (click)="saveProgress()">Salvar Progresso</button>
+    <button class="btn btn-primary" data-testid="checklist-generate-report" (click)="generateReport()">Gerar Relatório</button>
+    <button class="btn btn-secondary" data-testid="checklist-save" (click)="saveProgress()">Salvar Progresso</button>
   </div>
 </div>
 

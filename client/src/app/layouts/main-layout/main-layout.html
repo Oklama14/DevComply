@@ -1,6 +1,6 @@
 <div class="main-layout-container">
   <!-- Barra de Navegação Lateral -->
-  <nav class="sidebar">
+  <nav class="sidebar" data-testid="sidebar">
     <div class="sidebar-header">
       <!-- Logótipo SVG -->
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-icon">
@@ -11,25 +11,25 @@
 
     <ul class="nav-list">
       <li>
-        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+        <a routerLink="/dashboard" data-testid="nav-dashboard" routerLinkActive="active" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           <span>Dashboard</span>
         </a>
       </li>
       <li>
-        <a routerLink="/projects" routerLinkActive="active" class="nav-link">
+        <a routerLink="/projects" data-testid="nav-projects" routerLinkActive="active" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/><path d="m16 14 4 4m0-4-4 4"/></svg>
           <span>Projetos</span>
         </a>
       </li>
       <li>
-        <a routerLink="/checklist" routerLinkActive="active" class="nav-link">
+        <a routerLink="/checklist" data-testid="nav-checklist" routerLinkActive="active" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>Checklist LGPD</span>
         </a>
       </li>
       <li>
-        <a routerLink="profile" routerLinkActive="active" class="nav-link">
+        <a routerLink="profile" data-testid="nav-profile" routerLinkActive="active" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 1 0 0 8Z M5 21a7 7 0 0 1 14 0H5Z
 "/><circle cx="12" cy="12" r="3"/></svg>
           <span>Perfil</span>
@@ -37,7 +37,7 @@
       </li>
 
       <li>
-        <a routerLink="settings" routerLinkActive="active" class="nav-link">
+        <a routerLink="settings" data-testid="nav-settings" routerLinkActive="active" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
           <span>Configurações</span>
         </a>
@@ -46,7 +46,7 @@
 
     <!-- Secção de Logout no rodapé da barra lateral -->
     <div class="sidebar-footer">
-      <button (click)="logout()" class="nav-link">
+      <button (click)="logout()" data-testid="nav-logout" class="nav-link">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         <span>Sair</span>
       </button>

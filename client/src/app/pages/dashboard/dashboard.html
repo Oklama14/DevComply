@@ -8,29 +8,29 @@
         com um checklist interativo, análises técnicas e recomendações práticas.
       </p>
       <div class="hero-actions">
-        <button class="btn btn-primary" (click)="navigateToProjects()">Meus Projetos ({{ totalProjects }})</button>
+        <button class="btn btn-primary" data-testid="dashboard-my-projects" (click)="navigateToProjects()">Meus Projetos ({{ totalProjects }})</button>
         <button class="btn btn-outline" (click)="navigateToProjects()">Iniciar Checklist</button>
       </div>
     </div>
   </div>
 
   <!-- Secção de Estatísticas -->
-  <div class="stats-grid">
+  <div class="stats-grid" data-testid="dashboard-stats">
     <div class="stat-card">
       <div class="stat-label">Total de Projetos</div>
-      <div class="stat-value">{{ totalProjects }}</div>
+      <div class="stat-value" data-testid="stat-total">{{ totalProjects }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Projetos Completos</div>
-      <div class="stat-value text-green">{{ completedProjects }}</div>
+      <div class="stat-value text-green" data-testid="stat-completed">{{ completedProjects }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Projetos em Progresso</div>
-      <div class="stat-value text-amber">{{ inProgressProjects }}</div>
+      <div class="stat-value text-amber" data-testid="stat-in-progress">{{ inProgressProjects }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Projetos Pendentes</div>
-      <div class="stat-value text-blue">{{ pendingProjects }}</div>
+      <div class="stat-value text-blue" data-testid="stat-pending">{{ pendingProjects }}</div>
     </div>
   </div>
 

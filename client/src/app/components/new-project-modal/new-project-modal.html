@@ -1,24 +1,24 @@
 <div class="modal-backdrop" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-content" data-testid="project-modal" (click)="$event.stopPropagation()">
     <header class="modal-header">
       <h2>Novo Projeto</h2>
-      <button class="close-button" (click)="closeModal()">×</button>
+      <button class="close-button" data-testid="project-modal-close" (click)="closeModal()">×</button>
     </header>
     <main class="modal-body">
       <form [formGroup]="projectForm" (ngSubmit)="onSave()">
         <input type="hidden" formControlName="id" />
         <div class="form-group">
           <label for="nome">Nome do Projeto *</label>
-          <input id="nome" type="text" formControlName="nome" placeholder="Digite o nome do projeto">
+          <input id="nome" data-testid="project-modal-nome" type="text" formControlName="nome" placeholder="Digite o nome do projeto">
         </div>
         <div class="form-group">
           <label for="descricao">Descrição</label>
-          <textarea id="descricao" formControlName="descricao" rows="4"
+          <textarea id="descricao" data-testid="project-modal-descricao" formControlName="descricao" rows="4"
             placeholder="Descreva brevemente o projeto e seus objetivos"></textarea>
         </div>
         <footer class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
-                <button type="submit" class="btn-primary" [disabled]="!projectForm.valid">
+          <button type="button" class="btn-secondary" data-testid="project-modal-cancel" (click)="closeModal()">Cancelar</button>
+                <button type="submit" class="btn-primary" data-testid="project-modal-submit" [disabled]="!projectForm.valid">
         {{ id ? 'Salvar projeto' : 'Criar projeto' }}
       </button>
         </footer>

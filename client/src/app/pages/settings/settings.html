@@ -13,11 +13,11 @@
   </div>
 
   <!-- Mensagens de feedback -->
-  <div *ngIf="successMessage" class="success-message">
+  <div *ngIf="successMessage" data-testid="settings-success" class="success-message">
     {{ successMessage }}
   </div>
   
-  <div *ngIf="errorMessage" class="error-message">
+  <div *ngIf="errorMessage" data-testid="settings-error" class="error-message">
     {{ errorMessage }}
   </div>
 
@@ -50,6 +50,7 @@
 
         <input
           id="geminiApiKey"
+          data-testid="settings-gemini-key"
           type="password"
           formControlName="geminiApiKey"
           autocomplete="off"
@@ -57,8 +58,8 @@
           class="form-control">
 
         <div class="key-status" *ngIf="hasGeminiKey">
-          <span class="badge-ok">Chave configurada</span>
-          <button type="button" class="link-remove" (click)="removeGeminiKey()">Remover</button>
+          <span class="badge-ok" data-testid="settings-gemini-badge">Chave configurada</span>
+          <button type="button" class="link-remove" data-testid="settings-gemini-remove" (click)="removeGeminiKey()">Remover</button>
         </div>
 
         <small class="form-hint">
@@ -141,11 +142,12 @@
 
     <!-- Ações -->
     <div class="settings-actions">
-      <button type="button" class="btn btn-secondary" (click)="onResetSettings()">
+      <button type="button" class="btn btn-secondary" data-testid="settings-reset" (click)="onResetSettings()">
         Restaurar Padrão
       </button>
       <button 
         type="submit" 
+        data-testid="settings-submit"
         class="btn btn-primary" 
         [disabled]="loading">
         <span *ngIf="loading">Salvando...</span>
@@ -159,7 +161,7 @@
       <h2>Zona de perigo</h2>
       <p>Excluir sua conta remove permanentemente seus dados: projetos, checklists e relatórios.</p>
     </div>
-    <button type="button" class="btn btn-danger" (click)="deleteAccount()">
+    <button type="button" class="btn btn-danger" data-testid="settings-delete-account" (click)="deleteAccount()">
       Excluir minha conta
     </button>
   </div>
