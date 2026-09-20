@@ -15,6 +15,10 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { EncryptionService } from '../common/crypto/encryption.service';
+import {
+  POLITICA_PRIVACIDADE_VERSAO,
+  TERMOS_USO_VERSAO,
+} from './consent.constants';
 
 @Injectable()
 export class UsersService {
@@ -35,11 +39,20 @@ export class UsersService {
 
       const senhaHash = await bcrypt.hash(dto.senha, 10);
 
+      // O aceite e carimbado aqui, com a versao que o servidor considera vigente e
+      // a hora do servidor. O DTO ja recusou o cadastro sem aceite, entao chegar
+      // aqui significa que os dois documentos foram aceitos.
+      const aceitoEm = new Date();
+
       const user = this.repo.create({
         nome: dto.nome,
         email: dto.email,
         perfil: dto.perfil,
         senhaHash,
+        politicaVersao: POLITICA_PRIVACIDADE_VERSAO,
+        politicaAceitaEm: aceitoEm,
+        termosVersao: TERMOS_USO_VERSAO,
+        termosAceitoEm: aceitoEm,
       });
 
       const saved = await this.repo.save(user);
@@ -47,10 +60,10 @@ export class UsersService {
       return saved;
     } catch (err) {
       if (err instanceof ConflictException) throw err;
-      this.logger.error(
-        `Falha ao criar usuario (${dto?.email}): ${err?.message}`,
-        err?.stack,
-      );
+      // Sem o e-mail do titular: a mensagem ia para o agregador de logs do provedor
+      // e criava uma segunda copia de dado pessoal, com prazo de retencao que
+      // ninguem definiu (art. 6o, III). O stack abaixo ja da o contexto de depuracao.
+      this.logger.error(`Falha ao criar usuario: ${err?.message}`, err?.stack);
       throw new InternalServerErrorException('Erro ao criar usuario');
     }
   }
@@ -101,6 +114,89 @@ export class UsersService {
       await m.query(`DELETE FROM projetos WHERE "usuarioId" = $1`, [userId]);
       await m.query(`DELETE FROM usuarios WHERE id = $1`, [userId]);
     });
+  }
+
+  /**
+   * Portabilidade (art. 18, II e V): devolve tudo o que o sistema guarda sobre o
+   * titular, em formato que da para levar embora.
+   *
+   * Os campos sao montados um a um de proposito. Espalhar a entidade inteira com
+   * spread funcionaria hoje, porque senha e chave do Gemini estao com select:false —
+   * e passaria a vazar as duas no dia em que alguem mudasse isso.
+   */
+  async exportAccount(userId: number): Promise<Record<string, unknown>> {
+    const user = await this.findOne(userId);
+    if (!user) throw new NotFoundException('Usuario nao encontrado');
+
+    const m = this.repo.manager;
+    const doTitular = `SELECT id FROM projetos WHERE "usuarioId" = $1`;
+
+    const projetos = await m.query(
+      `SELECT id, nome, descricao, progresso, created_at, updated_at
+         FROM projetos WHERE "usuarioId" = $1 ORDER BY id`,
+      [userId],
+    );
+
+    // As colunas de relacionamento existem duplicadas em checklist_respostas
+    // (projetoId e projeto_id); o COALESCE cobre as duas ate a consolidacao.
+    const respostasChecklist = await m.query(
+      `SELECT r.id,
+              COALESCE(r."projetoId", r.projeto_id)   AS projeto_id,
+              p.codigo                                 AS pergunta_codigo,
+              p.pergunta                               AS pergunta,
+              r.resposta,
+              r."detalhesTecnicos"                     AS detalhes_tecnicos,
+              r.conformidade
+         FROM checklist_respostas r
+         LEFT JOIN checklist_perguntas p
+           ON p.id = COALESCE(r."perguntaId", r.pergunta_id)
+        WHERE COALESCE(r."projetoId", r.projeto_id) IN (${doTitular})
+        ORDER BY r.id`,
+      [userId],
+    );
+
+    const relatorios = await m.query(
+      `SELECT id, status, pontuacao, "projetoId" AS projeto_id
+         FROM relatorios WHERE "projetoId" IN (${doTitular}) ORDER BY id`,
+      [userId],
+    );
+
+    const recomendacoes = await m.query(
+      `SELECT id, tipo, descricao, "relatorioId" AS relatorio_id
+         FROM recomendacoes
+        WHERE "relatorioId" IN (
+                SELECT id FROM relatorios WHERE "projetoId" IN (${doTitular})
+              )
+        ORDER BY id`,
+      [userId],
+    );
+
+    return {
+      exportadoEm: new Date().toISOString(),
+      formato: 'devcomply-export/1',
+      titular: {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        perfil: user.perfil,
+        criadoEm: user.createdAt,
+        atualizadoEm: user.updatedAt,
+        consentimento: {
+          politicaPrivacidade: {
+            versao: user.politicaVersao ?? null,
+            aceitaEm: user.politicaAceitaEm ?? null,
+          },
+          termosDeUso: {
+            versao: user.termosVersao ?? null,
+            aceitoEm: user.termosAceitoEm ?? null,
+          },
+        },
+      },
+      projetos,
+      respostasChecklist,
+      relatorios,
+      recomendacoes,
+    };
   }
 
   async findByEmail(email: string): Promise<User | null> {

@@ -30,6 +30,23 @@ export class User {
   @Column({ name: 'gemini_api_key', type: 'text', nullable: true, select: false })
   geminiApiKey?: string | null;
 
+  // Consentimento (art. 8o, §1o): guardar apenas "aceitou" nao demonstra nada. A
+  // versao do texto e o carimbo de tempo sao o que permite dizer, depois, a qual
+  // documento o titular consentiu e quando. Nulo nos cadastros anteriores a estas
+  // colunas — para eles nao existe consentimento registrado, e o relatorio deve
+  // poder dizer isso.
+  @Column({ name: 'politica_versao', type: 'varchar', length: 30, nullable: true })
+  politicaVersao?: string | null;
+
+  @Column({ name: 'politica_aceita_em', type: 'timestamp', nullable: true })
+  politicaAceitaEm?: Date | null;
+
+  @Column({ name: 'termos_versao', type: 'varchar', length: 30, nullable: true })
+  termosVersao?: string | null;
+
+  @Column({ name: 'termos_aceito_em', type: 'timestamp', nullable: true })
+  termosAceitoEm?: Date | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

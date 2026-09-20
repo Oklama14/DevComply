@@ -1,4 +1,8 @@
-version: '3.8'
+# Os valores sensiveis vem de um arquivo .env nao versionado, ao lado deste
+# arquivo. A sintaxe ${VAR:?mensagem} faz o compose falhar com um erro claro quando
+# a variavel nao esta definida, em vez de subir com um valor de exemplo.
+#
+# Copie api/.env.example para .env, defina os valores, e nao commite o .env.
 
 services:
   postgres:
@@ -6,9 +10,9 @@ services:
     container_name: devcomply_db
     restart: always
     environment:
-      POSTGRES_USER: devcomply_user
-      POSTGRES_PASSWORD: Direto00@
-      POSTGRES_DB: devcomply_db
+      POSTGRES_USER: ${POSTGRES_USER:?defina POSTGRES_USER no .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      POSTGRES_DB: ${POSTGRES_DB:?defina POSTGRES_DB no .env}
     ports:
       - "5432:5432"
     volumes:
@@ -16,14 +20,14 @@ services:
     networks:
       - devcomply-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U devcomply_user -d devcomply_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 30s
       timeout: 10s
       retries: 3
 
   api:
     build:
-      context: ./API
+      context: ./api
       dockerfile: Dockerfile
     container_name: devcomply_api
     restart: always
@@ -31,14 +35,20 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://devcomply_user:Direto00@@postgres:5432/devcomply_db
+      # Os nomes abaixo sao os que app.module.ts realmente le. Antes daqui o compose
+      # definia DB_USERNAME e DB_PASSWORD, que a aplicacao nunca consultou — a
+      # conexao so funcionava por causa do DATABASE_URL, que por sua vez estava
+      # malformado (a senha continha @, quebrando a URL).
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USERNAME=devcomply_user
-      - DB_PASSWORD=Direto00@
-      - DB_NAME=devcomply_db
+      - DB_USER=${POSTGRES_USER:?defina POSTGRES_USER no .env}
+      - DB_PASS=${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      - DB_NAME=${POSTGRES_DB:?defina POSTGRES_DB no .env}
+      - JWT_SECRET=${JWT_SECRET:?defina JWT_SECRET no .env}
+      - APP_ENCRYPTION_KEY=${APP_ENCRYPTION_KEY:?defina APP_ENCRYPTION_KEY no .env}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
     volumes:
-      - ./API:/app
+      - ./api:/app
       - api_node_modules:/app/node_modules
     depends_on:
       postgres:
@@ -49,7 +59,7 @@ services:
 
   client:
     build:
-      context: ./Client
+      context: ./client
       dockerfile: Dockerfile
     container_name: devcomply_client
     restart: always
@@ -58,7 +68,7 @@ services:
     environment:
       - NODE_ENV=development
     volumes:
-      - ./Client:/app
+      - ./client:/app
       - client_node_modules:/app/node_modules
     depends_on:
       - api

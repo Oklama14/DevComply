@@ -36,6 +36,13 @@ export class UsersController {
     return this.users.changePassword(req.user.userId, dto);
   }
 
+  // Portabilidade (art. 18, II e V). A politica de privacidade publicada ja promete
+  // esta funcao ao titular, inclusive orientando a exportar antes de excluir a conta.
+  @Get('me/export')
+  exportarDados(@Request() req) {
+    return this.users.exportAccount(req.user.userId);
+  }
+
   @Get('me/settings')
   settings(@Request() req) {
     return this.users.getSettings(req.user.userId);

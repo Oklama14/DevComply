@@ -1,3 +1,10 @@
 # Repositório separado da suíte de testes E2E (devcomply-e2e).
 # Mantido nesta pasta por conveniência, versionado no próprio repositório.
 /devcomply-e2e/
+
+# Skill lgpd-scan: repositorio proprio, publicado separadamente.
+/lgpd-scan/
+
+# Segredos do docker-compose. O .env.example mostra quais variaveis existem.
+.env
+.env.local

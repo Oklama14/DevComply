@@ -5,7 +5,14 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
-export interface RegisterDto { nome: string; email: string; senha: string; perfil: string; }
+export interface RegisterDto {
+  nome: string;
+  email: string;
+  senha: string;
+  perfil: string;
+  aceitaPolitica: boolean;
+  aceitaTermos: boolean;
+}
 export interface LoginDto { email: string; senha: string; }
 export interface JwtResponse { access_token: string }
 export interface ApiOk { ok: boolean; message?: string }

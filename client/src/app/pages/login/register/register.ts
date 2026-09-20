@@ -71,11 +71,21 @@ export class Register implements OnInit {
       return;
     }
 
-    const { nome, email, senha, perfil } = this.form.value;
+    const { nome, email, senha, perfil, aceitaPolitica, aceitaTermos } =
+      this.form.value;
     this.loading = true;
 
+    // O aceite agora vai junto: antes o formulario exigia as duas caixas e descartava
+    // o resultado aqui, o que travava o botao sem registrar consentimento nenhum.
     this.auth.register(
-      { nome: nome!.trim(), email: email!.trim(), senha: senha!, perfil: perfil! },
+      {
+        nome: nome!.trim(),
+        email: email!.trim(),
+        senha: senha!,
+        perfil: perfil!,
+        aceitaPolitica: !!aceitaPolitica,
+        aceitaTermos: !!aceitaTermos
+      },
       { autoLogin: false }
     ).subscribe({
       next: () => {
