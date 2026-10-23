@@ -13,6 +13,8 @@ $gray-900: #111827;
 $green-50: #f0fdf4;
 $green-600: #059669;
 $red-50: #fef2f2;
+$red-300: #fca5a5;
+$red-500: #ef4444;
 $red-600: #dc2626;
 
 .profile-container {
@@ -210,6 +212,31 @@ $red-600: #dc2626;
   margin-top: 4px;
 }
 
+// Excluir conta
+.danger-zone {
+  border-color: $red-300;
+
+  .section-header h2 {
+    color: $red-600;
+  }
+}
+
+.danger-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-danger {
+  background: #fff;
+  color: $red-600;
+  border-color: $red-300;
+
+  &:hover:not(:disabled) {
+    background: $red-50;
+    border-color: $red-500;
+  }
+}
+
 .loading {
   text-align: center;
   padding: 48px 0;
@@ -222,7 +249,8 @@ $red-600: #dc2626;
   .profile-container { padding: 16px; }
   .profile-section { padding: 20px; }
   .title-row h1 { font-size: 28px; }
-  .profile-actions {
+  .profile-actions,
+  .danger-actions {
     .btn { width: 100%; justify-content: center; }
   }
 }

@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { finalize } from 'rxjs/operators';
 import { RouterLink } from '@angular/router';
 import { UsersService, UserProfile } from '../../services/users';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-profile',
@@ -15,10 +16,12 @@ import { UsersService, UserProfile } from '../../services/users';
 export class ProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private usersService = inject(UsersService);
+  private authService = inject(AuthService);
 
   profile?: UserProfile;
   isLoading = signal(false);
   isSaving = signal(false);
+  isDeleting = signal(false);
   msg = signal<string | null>(null);
   err = signal<string | null>(null);
 
@@ -101,6 +104,27 @@ export class ProfileComponent implements OnInit {
           this.passwordForm.reset();
         },
         error: () => this.err.set('Falha ao alterar a senha. Verifique a senha atual.'),
+      });
+  }
+
+  /** Exclui a conta (LGPD, art. 18, VI) — mesmo fluxo da Zona de perigo em Configuracoes. */
+  deleteAccount(): void {
+    if (this.isDeleting()) return;
+    const ok = confirm(
+      'Isso vai excluir sua conta e todos os seus dados (projetos, checklists e relatorios) permanentemente. Deseja continuar?',
+    );
+    if (!ok) return;
+
+    this.msg.set(null);
+    this.err.set(null);
+    this.isDeleting.set(true);
+
+    this.usersService
+      .deleteAccount()
+      .pipe(finalize(() => this.isDeleting.set(false)))
+      .subscribe({
+        next: () => this.authService.logout(),
+        error: () => this.err.set('Nao foi possivel excluir a conta.'),
       });
   }
 }

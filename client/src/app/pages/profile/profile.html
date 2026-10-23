@@ -85,6 +85,21 @@
       </div>
     </div>
   </form>
+
+  <!-- Excluir conta (mesma acao da Zona de perigo em Configuracoes) -->
+  <div class="profile-section danger-zone">
+    <div class="section-header">
+      <h2>Excluir conta</h2>
+      <p>Remove permanentemente sua conta e todos os seus dados: projetos, checklists e relatórios. Essa ação não pode ser desfeita.</p>
+    </div>
+
+    <div class="danger-actions">
+      <button type="button" data-testid="profile-delete-account" class="btn btn-danger"
+              [disabled]="isDeleting()" (click)="deleteAccount()">
+        {{ isDeleting() ? 'Excluindo...' : 'Excluir minha conta' }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <ng-template #loadingTpl>
