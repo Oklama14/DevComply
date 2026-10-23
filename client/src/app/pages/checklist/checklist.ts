@@ -1,6 +1,6 @@
-import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { Component, NgZone, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of, switchMap } from 'rxjs';
 import { catchError, finalize, timeout } from 'rxjs/operators';
@@ -20,20 +20,25 @@ type DisplayableChecklistCategory = Omit<ChecklistCategory, 'items'> & {
   progress?: number;
 };
 
+type Feedback = { type: 'success' | 'error' | 'info'; message: string };
+
 @Component({
   selector: 'app-checklist',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './checklist.html',
   styleUrls: ['./checklist.scss']
 })
 export class Checklist implements OnInit {
   platformId = inject(PLATFORM_ID);
+  private zone = inject(NgZone);
   projectId: number | null = null;
   project: Project | null = null;
   checklistData: DisplayableChecklistCategory[] = [];
   isLoading = true;
   isGeneratingReport = false;
+  isSaving = false;
+  feedback: Feedback | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -151,8 +156,15 @@ export class Checklist implements OnInit {
     item.expanded = !item.expanded;
   }
 
+  /** Atualiza o % da secao assim que um item e marcado/desmarcado. */
+  onItemToggled(category: DisplayableChecklistCategory): void {
+    const total = category.items?.length || 0;
+    const done = category.items.filter(i => i.completed).length;
+    category.progress = total ? Math.round((done / total) * 100) : 0;
+  }
+
 saveProgress(): void {
-  if (!this.projectId) return;
+  if (!this.projectId || this.isSaving) return;
 
   const responsesToSave = this.checklistData.flatMap(category =>
     category.items.map(item => ({
@@ -165,23 +177,26 @@ saveProgress(): void {
 
   const progresso = Number(this.overallProgress) || 0;
 
-
+  this.isSaving = true;
   this.checklistService.saveChecklistResponses(this.projectId, responsesToSave)
     .pipe(
       switchMap(() =>
         this.projectsService.update(this.projectId!, { progresso })
-      )
+      ),
+      finalize(() => this.isSaving = false)
     )
     .subscribe({
-      next: () => {},
-      error: (err) => console.error('Falha ao salvar respostas/atualizar progresso:', err),
+      next: () => this.feedback = { type: 'success', message: 'Progresso salvo.' },
+      error: (err) => {
+        console.error('Falha ao salvar respostas/atualizar progresso:', err);
+        this.feedback = { type: 'error', message: 'Não foi possível salvar o progresso. Tente novamente.' };
+      },
     });
 }
 
-  showTip(item: DisplayableChecklistItem): void {
-  }
-
   generateReport(): void {
+  if (this.isGeneratingReport) return;
+
   const payload = (this.checklistData || [])
     .map(cat => {
       const checked = (cat.items || []).filter(i => !!i.completed);
@@ -190,6 +205,7 @@ saveProgress(): void {
       return {
         categoria_nome: cat.nome,
         items: checked.map(i => ({
+          codigo: i.codigo ?? undefined,
           titulo_item: i.titulo,
           resposta_implementacao: i.answer ?? '',
           resposta_tecnica: i.technicalDetails ?? '',
@@ -200,7 +216,11 @@ saveProgress(): void {
     .filter(Boolean) as Array<{ categoria_nome: string; items: any[] }>;
 
   if (!payload.length) {
-    console.warn('[Relatório] Nenhum item marcado — nada para enviar.');
+    // Antes so ia para o console e o botao parecia nao funcionar.
+    this.feedback = {
+      type: 'info',
+      message: 'Marque ao menos um item do checklist (e descreva a implementação) para gerar o relatório.'
+    };
     return;
   }
 
@@ -213,25 +233,42 @@ saveProgress(): void {
   if (this.projectId) form.append('projectId', String(this.projectId));
   if (this.project?.nome) form.append('projectName', this.project.nome);
 
-  this.isGeneratingReport = true; 
+  this.isGeneratingReport = true;
+  this.feedback = { type: 'info', message: 'Gerando o relatório com IA. Isso pode levar alguns segundos…' };
 
-  this.checklistService.sendChecklistReportFile(form).subscribe({
-    next: (pdfBlob: Blob) => {
-      const url = window.URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `relatorio-lgpd-${this.project?.id ?? 'sem-projeto'}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-      this.isGeneratingReport = false; 
-    },
-    error: (err: any) => {
-      console.error('[Relatório] Falha ao enviar', err);
-      this.isGeneratingReport = false; 
-    },
-    complete: () => {
-      this.isGeneratingReport = false; 
-    }
-  });
+  this.checklistService.sendChecklistReportFile(form)
+    .pipe(finalize(() => this.isGeneratingReport = false))
+    .subscribe({
+      next: (pdfBlob: Blob) => {
+        const url = window.URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `relatorio-lgpd-${this.project?.id ?? 'sem-projeto'}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.feedback = { type: 'success', message: 'Relatório gerado. O download do PDF foi iniciado.' };
+      },
+      error: (err: any) => {
+        console.error('[Relatório] Falha ao enviar', err);
+        this.feedback = { type: 'error', message: 'Não foi possível gerar o relatório. Tente novamente em instantes.' };
+        // Ler o Blob e assincrono (Promise nativa, fora da zona): volta para a zona
+        // para o Angular atualizar a tela com a mensagem da API.
+        this.reportErrorMessage(err).then(message =>
+          this.zone.run(() => this.feedback = { type: 'error', message })
+        );
+      },
+    });
 }
+
+  /** Com responseType 'blob', o corpo do erro (JSON da API) tambem chega como Blob. */
+  private async reportErrorMessage(err: any): Promise<string> {
+    const fallback = 'Não foi possível gerar o relatório. Tente novamente em instantes.';
+    try {
+      const body = err?.error instanceof Blob ? JSON.parse(await err.error.text()) : err?.error;
+      const msg = Array.isArray(body?.message) ? body.message.join(' ') : body?.message;
+      return typeof msg === 'string' && msg.trim() ? msg : fallback;
+    } catch {
+      return fallback;
+    }
+  }
 }

@@ -6,11 +6,13 @@ import { environment } from '../../environments/environment';
 
 export interface ChecklistItem {
   id: number;
+  codigo?: string;        // codigo do item no LGPD-Check (ex.: "S-17")
   titulo: string;
   descricao?: string;
   completed: boolean;
-  lgpdReference?: string;
-  tipText?: string;
+  lgpdReference?: string; // artigos da LGPD (ex.: "Art. 18, V")
+  tipText?: string;       // recomendacao do LGPD-Check
+  obrigatorio?: boolean;  // false = item opcional (boa pratica)
 }
 
 export interface ChecklistCategory {

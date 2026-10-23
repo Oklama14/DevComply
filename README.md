@@ -8,7 +8,7 @@ relatórios de conformidade assistidos por IA (Google Gemini).
 
 - **API** (`/api`): NestJS 11 + TypeORM + PostgreSQL. Deploy: Railway (Docker).
 - **Cliente** (`/client`): Angular 20 (SPA). Deploy: Vercel.
-- **IA**: Google Gemini (`gemini-2.5-flash`), chave global ou por usuário.
+- **IA**: Google Gemini (`gemini-3.8-flash`, com `gemini-3.5-flash-lite` como alternativa), chave global ou por usuário.
 
 ## Estrutura
 
@@ -25,6 +25,7 @@ client/  SPA Angular
 | `JWT_SECRET`     | sim         | Segredo para assinar os JWT. Use um valor forte e aleatório. |
 | `FRONTEND_URL`   | recomendada | Origem do frontend para o CORS (ex.: `https://dev-comply.vercel.app`). `*.vercel.app` já é liberado. |
 | `GOOGLE_API_KEY` | opcional    | Chave padrão do Gemini. Sem ela, os relatórios só funcionam com a chave do próprio usuário. |
+| `GEMINI_MODEL`   | opcional    | Modelos do Gemini em ordem de tentativa, separados por vírgula. Padrão: `gemini-3.8-flash,gemini-3.5-flash-lite`. |
 | `NODE_ENV`       | sim (prod)  | `production` em produção (ativa migrations e desativa `synchronize`). |
 | `APP_ENCRYPTION_KEY` | recomendada | Segredo para cifrar dados sensíveis em repouso (ex.: chave Gemini do usuário). Sem ela, guarda em texto (com aviso). |
 | `PORT`           | auto        | Injetada pelo Railway (o app usa `process.env.PORT`). |
@@ -66,6 +67,21 @@ npm run migration:revert
 Em produção as migrations rodam sozinhas no boot (`migrationsRun`). A migration
 inicial (`InitialSchema`) é idempotente, então é segura tanto em banco novo
 quanto no banco já existente.
+
+## Checklist LGPD (LGPD-Check)
+
+O catálogo do checklist fica em `api/src/checklist/catalog/lgpd-check.catalog.ts`,
+com os 61 itens do LGPD-Check (Mendes, Viana e Rivero, SBES 2021; Neitzke et al.,
+SBQS 2023). O checklist exibe 3 perguntas obrigatórias por seção
+(`CODIGOS_NO_CHECKLIST`), em 6 seções — Transparência, Processamento de dados,
+Consentimento, Direitos dos usuários, Segurança de dados e Responsabilidade do
+controlador.
+
+- Produção: a migration `LgpdCheckCatalog` aplica o catálogo (idempotente).
+  Para mudar o catálogo depois, crie uma nova migration que chame
+  `aplicarCatalogoLgpdCheck`.
+- Desenvolvimento: o catálogo é aplicado no boot da API (nada é semeado
+  durante requisições).
 
 ## Testes
 

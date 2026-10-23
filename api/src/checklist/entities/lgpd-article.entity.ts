@@ -15,9 +15,11 @@ export class LgpdArticle {
   @Column({ type: 'text' })
   descricao: string;
 
+  // Ordem de exibicao da secao no checklist.
+  @Column({ type: 'int', default: 0 })
+  ordem: number;
 
   // Define a relação: um artigo (categoria) tem muitas questões.
   @OneToMany(() => ChecklistQuestion, (question) => question.artigo)
   questoes: ChecklistQuestion[];
 }
-

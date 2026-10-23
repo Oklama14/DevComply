@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { ChecklistQuestion } from './entities/checklist-question.entity';
 import { ChecklistResponse } from './entities/checklist-response.entity';
@@ -8,9 +8,12 @@ import { LgpdArticle } from './entities/lgpd-article.entity';
 
 import { SaveChecklistDto } from './dto/save-checklist.dto';
 import { ChecklistCategoryDto, ChecklistItemDto } from './dto/checklist.dto';
+import { aplicarCatalogoLgpdCheck } from './catalog/lgpd-check.catalog';
 
 @Injectable()
-export class ChecklistService {
+export class ChecklistService implements OnApplicationBootstrap {
+  private readonly logger = new Logger(ChecklistService.name);
+
   constructor(
     @InjectRepository(ChecklistQuestion)
     private readonly questionRepo: Repository<ChecklistQuestion>,
@@ -20,37 +23,29 @@ export class ChecklistService {
 
     @InjectRepository(LgpdArticle)
     private readonly articleRepo: Repository<LgpdArticle>,
+
+    private readonly dataSource: DataSource,
   ) {}
 
-  /** SEED DEV — cria 1 artigo e 3 perguntas se estiver vazio */
-  private async ensureSeed(): Promise<void> {
-    const count = await this.questionRepo.count();
-    if (count > 0) return;
-
-    // Artigo (categoria)
-    const artigo = this.articleRepo.create({
-      artigo: 'Art. 6º',
-      titulo: 'Princípios de Transparência',
-      descricao: 'Avaliação da transparência e informação aos titulares de dados',
-    });
-    await this.articleRepo.save(artigo);
-
-    // Perguntas
-    const perguntas = [
-      { codigo: 'T-01', pergunta: 'O sistema possui uma política de privacidade clara e acessível?', artigoId: artigo.id },
-      { codigo: 'T-02', pergunta: 'Os usuários são informados sobre a finalidade específica da coleta de dados?', artigoId: artigo.id },
-      { codigo: 'T-03', pergunta: 'Existe um mecanismo para obter e registrar o consentimento dos usuários?', artigoId: artigo.id },
-    ];
-    await this.questionRepo.save(perguntas.map(p => this.questionRepo.create(p)));
+  /**
+   * Em desenvolvimento (synchronize, sem migrations) aplica o catalogo do LGPD-Check
+   * no boot. Em producao o catalogo vem da migration LgpdCheckCatalog — nada e
+   * semeado durante requisicoes.
+   */
+  async onApplicationBootstrap(): Promise<void> {
+    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') return;
+    try {
+      await aplicarCatalogoLgpdCheck((sql, params) => this.dataSource.query(sql, params));
+    } catch (err) {
+      this.logger.warn(`Nao foi possivel aplicar o catalogo do checklist: ${String(err)}`);
+    }
   }
 
-  /** Estrutura agrupada por artigo (o front consome isso) */
+  /** Estrutura agrupada por secao (o front consome isso) */
   async getStructuredQuestions(): Promise<ChecklistCategoryDto[]> {
-    await this.ensureSeed(); // <-- garante dados no dev
-
     const rows = await this.questionRepo.find({
       relations: ['artigo'],
-      order: { artigo: { id: 'ASC' }, id: 'ASC' },
+      order: { artigo: { ordem: 'ASC', id: 'ASC' }, ordem: 'ASC', id: 'ASC' },
     });
 
     const map = new Map<number, ChecklistCategoryDto>();
@@ -67,14 +62,15 @@ export class ChecklistService {
           items: [],
         });
       }
-const lgpdRef = a?.artigo ?? q.codigo; // pode ficar undefined se ambos faltarem
 
       const item: ChecklistItemDto = {
         id: q.id,
+        codigo: q.codigo ?? undefined,
         titulo: q.pergunta,
-        descricao: undefined,                          // adicione coluna se quiser
-        lgpdReference: lgpdRef, // badge "Art. 6º"
-        tipText: undefined,                            // adicione coluna 'dica' se quiser
+        descricao: q.descricao ?? undefined,
+        lgpdReference: q.referencia ?? a?.artigo ?? undefined, // badge "Art. 18, V"
+        tipText: q.dica ?? undefined, // recomendacao do LGPD-Check
+        obrigatorio: q.obrigatorio ?? true,
       };
       map.get(catId)!.items.push(item);
     }
@@ -105,7 +101,7 @@ const lgpdRef = a?.artigo ?? q.codigo; // pode ficar undefined se ambos faltarem
   }
 
   const existing = await this.responseRepo.find({
-    where: { projetoId: projectId },  
+    where: { projetoId: projectId },
   });
 
   const byPergunta = new Map<number, ChecklistResponse>(
@@ -119,7 +115,7 @@ const lgpdRef = a?.artigo ?? q.codigo; // pode ficar undefined se ambos faltarem
 
     if (!current) {
       current = this.responseRepo.create({
-        projetoId: projectId,           
+        projetoId: projectId,
         perguntaId: dto.perguntaId,
       } as Partial<ChecklistResponse>);
     }

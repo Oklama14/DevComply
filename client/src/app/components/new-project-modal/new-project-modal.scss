@@ -55,12 +55,38 @@
     font-weight: 500;
   }
 
-  input, textarea {
+  // Nome e Descricao com a mesma largura, borda, fonte e foco.
+  // border-box faz o padding/borda ficarem DENTRO dos 100% (antes o input
+  // usava content-box e ficava ~34px mais largo que o textarea).
+  input,
+  textarea {
+    display: block;
     width: 100%;
+    box-sizing: border-box;
     padding: 0.75rem 1rem;
     border: 1px solid #ced4da;
     border-radius: 8px;
+    font-family: inherit;
     font-size: 1rem;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    }
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
   }
 }
 
@@ -68,7 +94,9 @@
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  padding: 1.5rem;
+  // O rodape fica dentro do .modal-body: sem padding lateral, os botoes
+  // terminam alinhados com a borda direita dos campos.
+  padding: 1.5rem 0 0;
   border-top: 1px solid #e9ecef;
 }
 
@@ -93,8 +121,3 @@
   }
 }
 
-.form-group textarea {
-  width: 100%;  
-  box-sizing: border-box;  
-  min-height: 120px; 
-}

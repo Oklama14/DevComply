@@ -9,12 +9,24 @@
 
     <div class="title-row">
       <h1>Checklist LGPD</h1>
-        <button class="btn btn-primary" data-testid="checklist-generate-report-top" (click)="generateReport()">
-        <svg viewBox="0 0 24 24" width="16" height="16">
-          <path d="M3 3h13l5 5v13a1 1 0 0 1-1 1H3zM16 3v6h6" fill="currentColor"></path>
+        <button class="btn btn-primary" data-testid="checklist-generate-report-top" (click)="generateReport()" [disabled]="isGeneratingReport">
+        <span class="spinner" *ngIf="isGeneratingReport"></span>
+        <svg *ngIf="!isGeneratingReport" class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+          <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+          <path d="M12 18v-6"/>
+          <path d="m9 15 3 3 3-3"/>
         </svg>
-        Gerar Relatório
+        {{ isGeneratingReport ? 'Gerando relatório…' : 'Gerar Relatório' }}
       </button>
+    </div>
+
+    <!-- Feedback (relatório / salvar) -->
+    <div *ngIf="feedback" class="alert" [class.alert-error]="feedback.type === 'error'"
+         [class.alert-success]="feedback.type === 'success'" [class.alert-info]="feedback.type === 'info'"
+         role="status" aria-live="polite" data-testid="checklist-feedback">
+      <span>{{ feedback.message }}</span>
+      <button type="button" class="alert-close" aria-label="Fechar aviso" (click)="feedback = null">×</button>
     </div>
   </div>
 
@@ -29,6 +41,9 @@
     <div class="progressbar">
       <div class="progressbar-fill" [style.width.%]="overallProgress"></div>
     </div>
+    <p class="source-note">
+      Perguntas baseadas no LGPD-Check (Mendes, Viana e Rivero, SBES 2021; Neitzke et al., SBQS 2023).
+    </p>
   </section>
 
   <!-- Estados -->
@@ -64,6 +79,7 @@
                    class="checkbox"
                    data-testid="checklist-item-checkbox"
                    [(ngModel)]="item.completed"
+                   (ngModelChange)="onItemToggled(category)"
                    (click)="$event.stopPropagation()" />
 
             <div class="title-wrap">
@@ -73,13 +89,9 @@
           </div>
 
           <div class="right">
-            <!-- Tooltip do protótipo: usa item.tipText (coluna 'dica') -->
-            <div class="tooltip" *ngIf="item.tipText" (click)="$event.stopPropagation()">
-              <button class="chip help" aria-label="Ver dica">?</button>
-              <div class="tooltip-bubble">
-                <strong>💡 Dica:</strong> {{ item.tipText }}
-              </div>
-            </div>
+            <!-- Código do item no LGPD-Check -->
+            <span class="chip code" *ngIf="item.codigo" data-testid="checklist-item-code">{{ item.codigo }}</span>
+            <span class="chip optional" *ngIf="item.obrigatorio === false" title="Boa prática recomendada, não exigida expressamente pela LGPD">Opcional</span>
 
             <!-- Badge com referência LGPD -->
             <span class="chip law" *ngIf="item.lgpdReference">{{ item.lgpdReference }}</span>
@@ -90,6 +102,11 @@
 
         <!-- Corpo expandido -->
         <div class="item-body" *ngIf="item.expanded">
+          <div class="recommendation" *ngIf="item.tipText" data-testid="checklist-item-recommendation">
+            <strong>💡 Recomendação (LGPD-Check)</strong>
+            <p>{{ item.tipText }}</p>
+          </div>
+
           <label class="field">
             <span>Explicação da sua implementação:</span>
             <textarea [(ngModel)]="item.answer"
@@ -118,10 +135,21 @@
       Voltar para Projetos
     </button>
   </div>
-  
+
   <div class="right-actions">
-    <button class="btn btn-primary" data-testid="checklist-generate-report" (click)="generateReport()">Gerar Relatório</button>
-    <button class="btn btn-secondary" data-testid="checklist-save" (click)="saveProgress()">Salvar Progresso</button>
+    <button class="btn btn-primary" data-testid="checklist-generate-report" (click)="generateReport()" [disabled]="isGeneratingReport">
+      <span class="spinner" *ngIf="isGeneratingReport"></span>
+      <svg *ngIf="!isGeneratingReport" class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+        <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+        <path d="M12 18v-6"/>
+        <path d="m9 15 3 3 3-3"/>
+      </svg>
+      {{ isGeneratingReport ? 'Gerando relatório…' : 'Gerar Relatório' }}
+    </button>
+    <button class="btn btn-secondary" data-testid="checklist-save" (click)="saveProgress()" [disabled]="isSaving">
+      {{ isSaving ? 'Salvando…' : 'Salvar Progresso' }}
+    </button>
   </div>
 </div>
 
@@ -136,8 +164,8 @@
     <div class="disclaimer-content">
       <h3>Sobre as Análises por IA</h3>
       <p>
-        As sugestões e análises baseadas em Inteligência Artificial são ferramentas de apoio e podem conter imprecisões ou "alucinações". 
-        Sempre valide as recomendações com especialistas jurídicos e técnicos qualificados antes de implementar mudanças críticas em seus sistemas. 
+        As sugestões e análises baseadas em Inteligência Artificial são ferramentas de apoio e podem conter imprecisões ou "alucinações".
+        Sempre valide as recomendações com especialistas jurídicos e técnicos qualificados antes de implementar mudanças críticas em seus sistemas.
         A conformidade com a LGPD requer análise humana especializada e não deve ser baseada exclusivamente em análises automatizadas.
       </p>
     </div>
