@@ -1,8 +1,8 @@
 @use 'sass:color';
 $primary-color: #3b82f6;
-$secondary-color: #6b7280;
-$light-gray: #f3f4f6;
-$border-color: #e5e7eb;
+$secondary-color: var(--gray-500);
+$light-gray: var(--gray-100);
+$border-color: var(--gray-200);
 
 .projects-page {
   padding: 2rem;
@@ -17,7 +17,7 @@ $border-color: #e5e7eb;
   h1 {
     font-size: 1.875rem;
     font-weight: bold;
-    color: #111827;
+    color: var(--gray-900);
   }
 }
 
@@ -43,7 +43,7 @@ $border-color: #e5e7eb;
 }
 
 .project-card {
-  background-color: white;
+  background-color: var(--surface);
   border: 1px solid $border-color;
   border-radius: 0.75rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
@@ -100,12 +100,12 @@ $border-color: #e5e7eb;
   .card-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid $border-color;
-    background-color: #fafafa;
+    background-color: var(--gray-50);
   }
 
   .btn-secondary {
     background-color: transparent;
-    color: $primary-color;
+    color: var(--link);
     padding: 0.5rem 1rem;
     border: 1px solid $primary-color;
     border-radius: 0.5rem;
@@ -130,7 +130,7 @@ $border-color: #e5e7eb;
   .message-title {
     font-size: 1.125rem;
     font-weight: 500;
-    color: #111827;
+    color: var(--gray-900);
     margin-top: 1rem;
   }
 
@@ -153,10 +153,10 @@ $border-color: #e5e7eb;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
   border-radius: 6px;
-  color: #495057;
+  color: var(--gray-700);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -164,13 +164,13 @@ $border-color: #e5e7eb;
   text-decoration: none;
 
   &:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
-    color: #212529;
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+    color: var(--gray-900);
   }
 
   &:active {
-    background: #dee2e6;
+    background: var(--gray-200);
   }
 
   svg {

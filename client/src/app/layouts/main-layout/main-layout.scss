@@ -1,14 +1,46 @@
-$sidebar-bg: #ffffff;
+$sidebar-bg: var(--surface);
 $sidebar-width: 260px;
-$text-color: #4A5568; // Cinza escuro para texto
-$text-light: #A0AEC0; // Cinza claro para texto secundário
+$text-color: var(--gray-600); // Cinza escuro para texto
+$text-light: var(--gray-400); // Cinza claro para texto secundário
 $primary-color: #3B82F6; // Azul
-$hover-bg: #F0F5FF; // Azul muito claro para hover
-$border-color: #E2E8F0;
+$hover-bg: var(--blue-50); // Azul muito claro para hover
+$border-color: var(--gray-200);
 
 .main-layout-container {
   display: flex;
   height: 100vh;
+  height: 100dvh;
+}
+
+// Barra superior e gaveta: so aparecem no celular (media query no fim do arquivo)
+.mobile-topbar,
+.sidebar-overlay,
+.icon-btn.sidebar-close {
+  display: none;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: $text-color;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $hover-bg;
+    color: var(--link);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
 }
 
 .sidebar {
@@ -29,7 +61,7 @@ $border-color: #E2E8F0;
   margin-bottom: 2rem;
 
   .logo-icon {
-    color: $primary-color;
+    color: var(--link);
   }
 
   .logo-text {
@@ -63,12 +95,12 @@ $border-color: #E2E8F0;
 
   &:hover {
     background-color: $hover-bg;
-    color: $primary-color;
+    color: var(--link);
   }
 
   &.active {
     background-color: $hover-bg;
-    color: $primary-color;
+    color: var(--link);
     font-weight: 600;
   }
 
@@ -100,11 +132,11 @@ $border-color: #E2E8F0;
     text-decoration: none;
 
     &:hover {
-      color: $primary-color;
+      color: var(--link);
     }
 
     svg {
-      color: $primary-color;
+      color: var(--link);
       flex-shrink: 0;
     }
   }
@@ -117,11 +149,11 @@ $border-color: #E2E8F0;
     color: $text-light;
 
     a {
-      color: #718096;
+      color: var(--gray-500);
       text-decoration: none;
 
       &:hover {
-        color: $primary-color;
+        color: var(--link);
         text-decoration: underline;
       }
     }
@@ -130,6 +162,75 @@ $border-color: #E2E8F0;
 
 .main-content {
   flex-grow: 1;
-  background-color: #F9FAFB;
+  min-width: 0;
+  background-color: var(--gray-50);
   overflow-y: auto; // Adiciona scroll se o conteúdo for maior que a tela
+}
+
+// ---------- Celular e tablet estreito ----------
+@media (max-width: 768px) {
+  .main-layout-container {
+    flex-direction: column;
+  }
+
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+    height: 56px;
+    padding: 0 8px;
+    background-color: $sidebar-bg;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .topbar-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: $text-color;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1100;
+    width: min(280px, 85vw);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+
+    &.open {
+      transform: translateX(0);
+      // sombra so com a gaveta aberta (fechada, ela vazava na borda esquerda)
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .sidebar-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .icon-btn.sidebar-close {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(17, 24, 39, 0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
 }

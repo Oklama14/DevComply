@@ -69,11 +69,11 @@
           data-testid="register-senha"
           type="password" 
           formControlName="senha" 
-          placeholder="Mínimo 6 caracteres"
+          placeholder="Mínimo 8 caracteres"
           [class.error]="f['senha'].invalid && f['senha'].touched">
         <div class="error-text" *ngIf="f['senha'].invalid && f['senha'].touched">
           <span *ngIf="f['senha'].errors?.['required']">Senha é obrigatória</span>
-          <span *ngIf="f['senha'].errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</span>
+          <span *ngIf="f['senha'].errors?.['minlength']">Senha deve ter pelo menos 8 caracteres</span>
         </div>
       </div>
 
@@ -98,6 +98,24 @@
            so a caixa (ou o botao "Li e concordo" do resumo) registra o aceite. -->
       <fieldset class="consent-group">
         <legend>Antes de criar a conta</legend>
+
+        <div class="consent-item">
+          <div class="consent-row">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                data-testid="register-maioridade"
+                formControlName="declaraMaioridade"
+                class="checkbox-input"
+                aria-describedby="maioridade-erro">
+              <span class="checkmark" aria-hidden="true"></span>
+              <span>Declaro que tenho 18 anos ou mais</span>
+            </label>
+          </div>
+          <div class="error-text" id="maioridade-erro" *ngIf="f['declaraMaioridade'].invalid && f['declaraMaioridade'].touched">
+            <span>O DevComply é destinado a maiores de 18 anos.</span>
+          </div>
+        </div>
 
         <div class="consent-item">
           <div class="consent-row">

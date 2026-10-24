@@ -1,22 +1,22 @@
 // Variáveis de cores consistentes com o design moderno
 $primary-blue: #2563eb;
 $primary-blue-hover: #1d4ed8;
-$primary-blue-light: #dbeafe;
-$gray-50: #f9fafb;
-$gray-100: #f3f4f6;
-$gray-200: #e5e7eb;
-$gray-300: #d1d5db;
-$gray-400: #9ca3af;
-$gray-500: #6b7280;
-$gray-600: #4b5563;
-$gray-700: #374151;
-$gray-800: #1f2937;
-$gray-900: #111827;
-$green-50: #f0fdf4;
-$green-200: #bbf7d0;
-$amber-50: #fffbeb;
-$amber-200: #fde68a;
-$amber-700: #b45309;
+$primary-blue-light: var(--blue-100);
+$gray-50: var(--gray-50);
+$gray-100: var(--gray-100);
+$gray-200: var(--gray-200);
+$gray-300: var(--gray-300);
+$gray-400: var(--gray-400);
+$gray-500: var(--gray-500);
+$gray-600: var(--gray-600);
+$gray-700: var(--gray-700);
+$gray-800: var(--gray-800);
+$gray-900: var(--gray-900);
+$green-50: var(--green-50);
+$green-200: var(--green-200);
+$amber-50: var(--amber-50);
+$amber-200: var(--amber-200);
+$amber-700: var(--amber-text);
 
 .page { 
   padding: 0 24px 24px 24px; 
@@ -97,7 +97,7 @@ h1 {
 }
 
 .btn-secondary { 
-  background: #fff; 
+  background: var(--surface); 
   color: $gray-700; 
   border-color: $gray-300;
   
@@ -126,9 +126,9 @@ h1 {
   font-size: 14px;
   line-height: 1.5;
 
-  &.alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
-  &.alert-success { background: $green-50; border-color: $green-200; color: #166534; }
-  &.alert-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+  &.alert-info { background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-text); }
+  &.alert-success { background: $green-50; border-color: $green-200; color: var(--green-text); }
+  &.alert-error { background: var(--red-50); border-color: var(--red-200); color: var(--red-text); }
 
   .alert-close {
     background: none;
@@ -145,7 +145,7 @@ h1 {
 
 // Card do projeto atualizado
 .project-card {
-  background: #fff; 
+  background: var(--surface); 
   border: 1px solid $gray-200; 
   border-radius: 12px; 
   padding: 24px; 
@@ -183,7 +183,7 @@ h1 {
     border-radius: 8px;
 
     a {
-      color: $primary-blue;
+      color: var(--link);
       font-weight: 600;
       text-decoration: none;
       white-space: nowrap;
@@ -192,8 +192,30 @@ h1 {
     }
   }
 
+  .save-status {
+    margin-left: auto;
+    font-size: 13px;
+    color: $gray-500;
+
+    &.is-error {
+      color: #dc2626;
+    }
+
+    .link-retry {
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      font-weight: 600;
+      color: var(--link);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
   .progress-row { 
     display: flex; 
+    flex-wrap: wrap;
     gap: 8px; 
     align-items: center; 
     color: $gray-600; 
@@ -240,7 +262,7 @@ h1 {
 // Categorias redesenhadas
 .category { 
   margin: 32px 0;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid $gray-200;
   border-radius: 12px;
   padding: 24px;
@@ -289,7 +311,7 @@ h1 {
 .item { 
   border: 1px solid $gray-200; 
   border-radius: 12px; 
-  background: #fff;
+  background: var(--surface);
   transition: all 0.15s ease;
   
   &:hover {
@@ -315,7 +337,7 @@ h1 {
   cursor: pointer;
   
   &:hover {
-    background: rgba($gray-50, 0.5);
+    background: var(--gray-50);
   }
 }
 
@@ -380,8 +402,8 @@ h1 {
   
   &.law { 
     background: $primary-blue-light; 
-    color: $primary-blue-hover; 
-    border-color: #bfdbfe;
+    color: var(--primary-text); 
+    border-color: var(--blue-200);
     white-space: nowrap;
   }
 
@@ -439,7 +461,7 @@ h1 {
   padding: 20px; 
   display: grid; 
   gap: 20px;
-  background: rgba($gray-50, 0.3);
+  background: var(--gray-50);
 }
 
 .field { 
@@ -464,7 +486,7 @@ textarea {
   font-family: inherit;
   font-size: 14px;
   color: $gray-900; 
-  background: #fff;
+  background: var(--surface);
   resize: vertical;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   
@@ -495,7 +517,7 @@ textarea {
   box-sizing: border-box;
   width: 360px;
   max-width: calc(100vw - 48px);
-  background: #fff; 
+  background: var(--surface); 
   color: $gray-800; 
   border: 1px solid $gray-200; 
   border-radius: 12px;
@@ -512,7 +534,7 @@ textarea {
   font-weight: 400;
   
   strong {
-    color: $primary-blue;
+    color: var(--link);
     display: block;
     margin-bottom: 4px;
   }
@@ -524,7 +546,7 @@ textarea {
     bottom: 100%;
     right: 16px;
     border: 6px solid transparent;
-    border-bottom-color: #fff;
+    border-bottom-color: var(--surface);
   }
   
   &::after {
@@ -657,7 +679,7 @@ textarea {
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  background: rgba($amber-50, 0.5);
+  background: var(--amber-50);
   border: 1px solid #fbbf24;
   border-radius: 12px;
   padding: 20px;
@@ -692,7 +714,7 @@ textarea {
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid #fff;
+  border: 2px solid var(--surface);
   border-radius: 50%;
   border-top-color: transparent;
   animation: spin 0.8s linear infinite;
@@ -711,10 +733,10 @@ textarea {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
   border-radius: 6px;
-  color: #495057;
+  color: var(--gray-700);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -722,13 +744,13 @@ textarea {
   text-decoration: none;
 
   &:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
-    color: #212529;
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+    color: var(--gray-900);
   }
 
   &:active {
-    background: #dee2e6;
+    background: var(--gray-200);
   }
 
   svg {

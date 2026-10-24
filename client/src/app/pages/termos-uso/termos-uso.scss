@@ -1,20 +1,20 @@
 // Variables
 $primary-color: #3b82f6; // Cor "Azuleta" do dashboard
-$text-color: #1f2937;
-$text-light: #6b7280;
-$card-background: #ffffff;
-$border-color: #e5e7eb;
+$text-color: var(--gray-800);
+$text-light: var(--gray-500);
+$card-background: var(--surface);
+$border-color: var(--gray-200);
 $secondary-color: #1e40af;
 $accent-color: $primary-color;
 $text-dark: $text-color;
-$text-medium: #4b5563;
-$bg-light: #f9fafb;
+$text-medium: var(--gray-600);
+$bg-light: var(--gray-50);
 $bg-white: $card-background;
-$warning-bg: #fef3c7;
+$warning-bg: var(--amber-100);
 $warning-border: #f59e0b;
-$success-bg: #d1fae5;
+$success-bg: var(--green-100);
 $success-border: #10b981;
-$info-bg: #dbeafe;
+$info-bg: var(--blue-100);
 
 // Global styles for the component
 :host {
@@ -100,7 +100,7 @@ $info-bg: #dbeafe;
 
     &:hover {
       background-color: $bg-light;
-      color: $primary-color;
+      color: var(--link);
     }
   }
 }
@@ -158,13 +158,13 @@ $info-bg: #dbeafe;
 
     &:hover {
       background-color: $bg-light;
-      color: $primary-color;
+      color: var(--link);
       padding-left: 0.8rem;
     }
 
     &.active {
       background-color: $bg-light;
-      color: $primary-color;
+      color: var(--link);
       font-weight: 600;
       padding-left: 0.8rem;
     }
@@ -184,7 +184,7 @@ $info-bg: #dbeafe;
   scroll-margin-top: 100px;
 
   h2 {
-    color: $primary-color;
+    color: var(--link);
     font-size: 1.8rem;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
@@ -193,7 +193,7 @@ $info-bg: #dbeafe;
   }
 
   h3 {
-    color: $secondary-color;
+    color: var(--primary-text);
     font-size: 1.3rem;
     margin: 1.5rem 0 0.8rem;
     font-weight: 600;
@@ -234,7 +234,7 @@ $info-bg: #dbeafe;
     border-color: $warning-border;
 
     strong {
-      color: #b45309;
+      color: var(--amber-text);
     }
   }
 
@@ -253,12 +253,12 @@ $info-bg: #dbeafe;
   }
 
   a {
-    color: $primary-color;
+    color: var(--link);
     font-weight: 600;
     text-decoration: underline;
 
     &:hover {
-      color: $secondary-color;
+      color: var(--primary-text);
     }
   }
 }
@@ -273,7 +273,7 @@ $info-bg: #dbeafe;
   table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
+    background-color: var(--surface);
 
     thead {
       background-color: $primary-color;
@@ -304,14 +304,14 @@ $info-bg: #dbeafe;
 
 // Summary Box
 .summary-box {
-  background: linear-gradient(135deg, #e0e7ff, #dbeafe);
+  background: linear-gradient(135deg, var(--blue-100), var(--blue-100));
   padding: 2rem;
   border-radius: 12px;
   margin: 2rem 0;
   border: 2px solid $primary-color;
 
   h3 {
-    color: $primary-color;
+    color: var(--link);
     margin-bottom: 1rem;
   }
 }
@@ -325,7 +325,7 @@ $info-bg: #dbeafe;
 
 .summary-item {
   h4 {
-    color: $secondary-color;
+    color: var(--primary-text);
     font-size: 1rem;
     margin-bottom: 0.5rem;
   }
@@ -396,7 +396,8 @@ $info-bg: #dbeafe;
 // Responsive Design
 @media (max-width: 968px) {
   .container {
-    grid-template-columns: 1fr;
+    // minmax(0, 1fr): tabelas e o menu largo nao empurram a coluna para fora da tela
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .sidebar {
@@ -480,6 +481,6 @@ $info-bg: #dbeafe;
   }
 
   .alert {
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-300);
   }
 }

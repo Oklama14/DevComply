@@ -1,19 +1,19 @@
 // Variáveis (mesmo design system do restante do app)
 $primary-blue: #2563eb;
 $primary-blue-hover: #1d4ed8;
-$gray-50: #f9fafb;
-$gray-100: #f3f4f6;
-$gray-200: #e5e7eb;
-$gray-300: #d1d5db;
-$gray-400: #9ca3af;
-$gray-500: #6b7280;
-$gray-600: #4b5563;
-$gray-700: #374151;
-$gray-900: #111827;
-$green-50: #f0fdf4;
+$gray-50: var(--gray-50);
+$gray-100: var(--gray-100);
+$gray-200: var(--gray-200);
+$gray-300: var(--gray-300);
+$gray-400: var(--gray-400);
+$gray-500: var(--gray-500);
+$gray-600: var(--gray-600);
+$gray-700: var(--gray-700);
+$gray-900: var(--gray-900);
+$green-50: var(--green-50);
 $green-600: #059669;
-$red-50: #fef2f2;
-$red-300: #fca5a5;
+$red-50: var(--red-50);
+$red-300: var(--red-300);
 $red-500: #ef4444;
 $red-600: #dc2626;
 
@@ -61,7 +61,7 @@ $red-600: #dc2626;
 .success-message {
   background: $green-50;
   color: $green-600;
-  border: 1px solid #a7f3d0;
+  border: 1px solid var(--green-200);
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -72,7 +72,7 @@ $red-600: #dc2626;
 .error-message {
   background: $red-50;
   color: $red-600;
-  border: 1px solid #fca5a5;
+  border: 1px solid var(--red-300);
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -82,7 +82,7 @@ $red-600: #dc2626;
 
 // Seções em card
 .profile-section {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid $gray-200;
   border-radius: 12px;
   padding: 24px;
@@ -193,7 +193,7 @@ $red-600: #dc2626;
 }
 
 .btn-secondary {
-  background: #fff;
+  background: var(--surface);
   color: $gray-700;
   border-color: $gray-300;
 
@@ -241,13 +241,13 @@ $red-600: #dc2626;
     }
 
     &.highlight {
-      border-color: #bfdbfe;
-      background: #eff6ff;
+      border-color: var(--blue-200);
+      background: var(--blue-50);
     }
   }
 
   a {
-    color: $primary-blue;
+    color: var(--link);
     text-decoration: none;
 
     &:hover {
@@ -265,7 +265,7 @@ $red-600: #dc2626;
   color: $gray-500;
 
   a {
-    color: $primary-blue;
+    color: var(--link);
     font-weight: 600;
     text-decoration: none;
 
@@ -297,7 +297,7 @@ $red-600: #dc2626;
 }
 
 .danger-zone .section-header a {
-  color: $primary-blue;
+  color: var(--link);
   font-weight: 600;
   text-decoration: none;
 
@@ -319,7 +319,7 @@ $red-600: #dc2626;
 }
 
 .btn-danger {
-  background: #fff;
+  background: var(--surface);
   color: $red-600;
   border-color: $red-300;
 

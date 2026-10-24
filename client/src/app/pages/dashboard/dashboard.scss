@@ -1,10 +1,10 @@
 @use 'sass:color';
 
 $primary-color: #3b82f6;  
-$text-color: #1f2937;
-$text-light: #6b7280;
-$card-background: #ffffff;
-$border-color: #e5e7eb;
+$text-color: var(--gray-800);
+$text-light: var(--gray-500);
+$card-background: var(--surface);
+$border-color: var(--gray-200);
 
 // Mixin para botões
 @mixin btn($bg, $text) {
@@ -41,7 +41,7 @@ $border-color: #e5e7eb;
 }
 
 .hero-section {
-  background: linear-gradient(90deg, #f0f5ff, #eef2ff);
+  background: linear-gradient(90deg, var(--blue-50), var(--blue-50));
   border-radius: 1rem;
   padding: 2.5rem;
   margin-bottom: 2.5rem;
@@ -69,7 +69,7 @@ $border-color: #e5e7eb;
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
@@ -106,7 +106,7 @@ $border-color: #e5e7eb;
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
@@ -122,8 +122,8 @@ $border-color: #e5e7eb;
 }
 
 .feature-icon {
-  background-color: #e0e7ff;
-  color: $primary-color;
+  background-color: var(--blue-100);
+  color: var(--link);
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -168,8 +168,35 @@ $border-color: #e5e7eb;
     flex-shrink: 0;
 
     &:hover {
-      background-color: #f0f5ff; // Fundo azul claro no hover
+      background-color: var(--blue-50); // Fundo azul claro no hover
     }
   }
 }
 
+
+// Celular: menos respiro lateral e titulo menor para caber em 360-390px
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1.25rem 1rem;
+  }
+
+  .hero-section {
+    padding: 1.5rem 1.25rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .hero-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .section-title {
+    font-size: 1.375rem;
+  }
+}

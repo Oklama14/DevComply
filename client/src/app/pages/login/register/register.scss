@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f3f4f6; 
+  background-color: var(--gray-100); 
 }
 
 .register-container {
@@ -15,7 +15,7 @@
   max-width: 400px;
   margin: 0 auto;
   padding: 2.5rem;
-  background-color: white;
+  background-color: var(--surface);
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -29,7 +29,7 @@
   gap: 12px;
 
   .logo-icon {
-    color: #3B82F6;
+    color: var(--link);
   }
 
   .logo-text {
@@ -40,18 +40,18 @@
     .main-title {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #111827;
+      color: var(--gray-900);
     }
 
     .subtitle {
       font-size: 1rem;
-      color: #4B5563;
+      color: var(--gray-600);
     }
   }
 }
 
 .welcome-message {
-  color: #6b7280;
+  color: var(--gray-500);
   margin-bottom: 2rem;
 }
 
@@ -67,18 +67,18 @@ form {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--gray-700);
   }
 
   input,
   select {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s, box-shadow 0.2s;
-    background-color: white;
+    background-color: var(--surface);
 
     &:focus {
       outline: none;
@@ -122,8 +122,8 @@ form {
 
 .error-message {
   color: #ef4444;
-  background-color: #fee2e2;
-  border: 1px solid #fca5a5;
+  background-color: var(--red-100);
+  border: 1px solid var(--red-300);
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -132,8 +132,8 @@ form {
 
 .success-message {
   color: #10b981;
-  background-color: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  background-color: var(--green-50);
+  border: 1px solid var(--green-200);
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -143,11 +143,11 @@ form {
 .alt-action {
   text-align: center;
   margin: 12px 0;
-  color: #6b7280;
+  color: var(--gray-500);
   font-size: 0.9rem;
 
   a {
-    color: #2563eb;
+    color: var(--link);
     font-weight: 600;
     text-decoration: none;
 
@@ -174,7 +174,7 @@ form {
   }
 
   &:disabled {
-    background-color: #9ca3af;
+    background-color: var(--gray-400);
     cursor: not-allowed;
   }
 }
@@ -218,15 +218,15 @@ form {
 .consent-group {
   margin: 0;
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--gray-200);
   border-radius: 8px;
-  background: #f9fafb;
+  background: var(--gray-50);
 
   legend {
     padding: 0 6px;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
   }
 }
 
@@ -240,7 +240,7 @@ form {
   flex-wrap: wrap;
   column-gap: 4px;
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--gray-700);
   line-height: 1.4;
 }
 
@@ -265,8 +265,8 @@ form {
   position: relative;
   height: 18px;
   width: 18px;
-  background-color: #fff;
-  border: 2px solid #9ca3af;
+  background-color: var(--surface);
+  border: 2px solid var(--gray-400);
   border-radius: 4px;
   margin-right: 10px;
   flex-shrink: 0;
@@ -297,7 +297,7 @@ form {
   top: 0;
   width: 5px;
   height: 10px;
-  border: solid white;
+  border: solid var(--surface);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -313,13 +313,13 @@ form {
   padding: 6px 0;
   font: inherit;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--link);
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
 
   &:hover {
-    color: #1d4ed8;
+    color: var(--primary-text);
   }
 
   &:focus-visible {
@@ -332,7 +332,7 @@ form {
 .consent-hint {
   margin: 8px 0 0;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--gray-500);
 }
 
 .consent-item .error-text {
@@ -359,7 +359,7 @@ form {
   width: 100%;
   max-width: 560px;
   max-height: calc(100vh - 32px);
-  background: #fff;
+  background: var(--surface);
   border-radius: 12px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.05);
   text-align: left;
@@ -372,13 +372,13 @@ form {
   justify-content: space-between;
   gap: 12px;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--gray-200);
 
   h2 {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--gray-900);
   }
 }
 
@@ -387,14 +387,14 @@ form {
   border: none;
   font-size: 1.75rem;
   line-height: 1;
-  color: #6b7280;
+  color: var(--gray-500);
   cursor: pointer;
   padding: 0 4px;
   border-radius: 6px;
 
   &:hover {
-    color: #111827;
-    background: #f3f4f6;
+    color: var(--gray-900);
+    background: var(--gray-100);
   }
 }
 
@@ -406,7 +406,7 @@ form {
 .doc-lead {
   margin: 0 0 12px;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--gray-500);
 }
 
 .doc-points {
@@ -420,14 +420,14 @@ form {
     display: grid;
     gap: 2px;
     padding-left: 12px;
-    border-left: 3px solid #bfdbfe;
+    border-left: 3px solid var(--blue-200);
     font-size: 0.9rem;
     line-height: 1.5;
-    color: #374151;
+    color: var(--gray-700);
   }
 
   strong {
-    color: #111827;
+    color: var(--gray-900);
   }
 }
 
@@ -438,7 +438,7 @@ form {
   margin-top: 16px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--link);
   text-decoration: none;
 
   &:hover {
@@ -451,7 +451,7 @@ form {
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--gray-200);
 }
 
 .doc-btn {
@@ -463,11 +463,11 @@ form {
   border: 1px solid transparent;
 
   &.secondary {
-    background: #fff;
-    color: #374151;
-    border-color: #d1d5db;
+    background: var(--surface);
+    color: var(--gray-700);
+    border-color: var(--gray-300);
 
-    &:hover { background: #f9fafb; }
+    &:hover { background: var(--gray-50); }
   }
 
   &.primary {

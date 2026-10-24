@@ -12,6 +12,7 @@ export interface RegisterDto {
   perfil: string;
   aceitaPolitica: boolean;
   aceitaTermos: boolean;
+  declaraMaioridade: boolean;
 }
 export interface LoginDto { email: string; senha: string; }
 export interface JwtResponse { access_token: string }

@@ -12,7 +12,7 @@
 }
 
 .modal-content {
-  background-color: white;
+  background-color: var(--surface);
   border-radius: 12px;
   width: 100%;
   max-width: 500px;
@@ -25,7 +25,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--gray-100);
 
   h2 {
     font-size: 1.5rem;
@@ -38,7 +38,7 @@
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: #6c757d;
+  color: var(--gray-500);
   line-height: 1;
 }
 
@@ -64,17 +64,17 @@
     width: 100%;
     box-sizing: border-box;
     padding: 0.75rem 1rem;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--gray-300);
     border-radius: 8px;
     font-family: inherit;
     font-size: 1rem;
     line-height: 1.5;
-    color: #212529;
-    background-color: #fff;
+    color: var(--gray-900);
+    background-color: var(--surface);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
     &::placeholder {
-      color: #9ca3af;
+      color: var(--gray-400);
     }
 
     &:focus {
@@ -97,14 +97,14 @@
   // O rodape fica dentro do .modal-body: sem padding lateral, os botoes
   // terminam alinhados com a borda direita dos campos.
   padding: 1.5rem 0 0;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--gray-100);
 }
 
 .btn-secondary {
   padding: 0.75rem 1.5rem;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--gray-300);
   border-radius: 8px;
-  background-color: white;
+  background-color: var(--surface);
   cursor: pointer;
 }
 

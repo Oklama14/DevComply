@@ -1,9 +1,10 @@
-import { Component, NgZone, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { Component, DestroyRef, HostListener, NgZone, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { forkJoin, of, switchMap } from 'rxjs';
-import { catchError, finalize, timeout } from 'rxjs/operators';
+import { EMPTY, Observable, Subject, forkJoin, of, switchMap } from 'rxjs';
+import { catchError, concatMap, debounceTime, finalize, tap, timeout } from 'rxjs/operators';
 import { ChecklistService, ChecklistCategory, ChecklistItem } from '../../services/checklist';
 import { Project, ProjectsService } from '../../services/projects'
 import { Location } from '@angular/common';
@@ -22,6 +23,11 @@ type DisplayableChecklistCategory = Omit<ChecklistCategory, 'items'> & {
 
 type Feedback = { type: 'success' | 'error' | 'info'; message: string };
 
+type EstadoSalvamento = 'idle' | 'pendente' | 'salvando' | 'salvo' | 'erro';
+
+/** Espera depois da ultima alteracao antes de salvar sozinho. */
+const ESPERA_AUTOSAVE_MS = 1500;
+
 @Component({
   selector: 'app-checklist',
   standalone: true,
@@ -29,16 +35,27 @@ type Feedback = { type: 'success' | 'error' | 'info'; message: string };
   templateUrl: './checklist.html',
   styleUrls: ['./checklist.scss']
 })
-export class Checklist implements OnInit {
+export class Checklist implements OnInit, OnDestroy {
   platformId = inject(PLATFORM_ID);
   private zone = inject(NgZone);
+  private destroyRef = inject(DestroyRef);
   projectId: number | null = null;
   project: Project | null = null;
   checklistData: DisplayableChecklistCategory[] = [];
   isLoading = true;
   isGeneratingReport = false;
-  isSaving = false;
   feedback: Feedback | null = null;
+
+  // Salvamento automatico: cada alteracao agenda um salvamento; os salvamentos
+  // rodam em fila (concatMap) para nunca gravar uma versao velha por cima da nova.
+  estadoSalvamento: EstadoSalvamento = 'idle';
+  salvoEm: Date | null = null;
+  private alteracoes$ = new Subject<void>();
+  private versaoAlteracao = 0;
+
+  get isSaving(): boolean {
+    return this.estadoSalvamento === 'salvando';
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -75,6 +92,38 @@ export class Checklist implements OnInit {
       this.projectId = id;
       this.loadChecklistData();
     });
+
+    this.alteracoes$
+      .pipe(
+        debounceTime(ESPERA_AUTOSAVE_MS),
+        concatMap(() => this.persistir$()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+  }
+
+  /** Chamado a cada alteracao do usuario (caixa marcada ou texto digitado). */
+  marcarAlteracao(): void {
+    if (!this.projectId) return;
+    this.versaoAlteracao++;
+    this.estadoSalvamento = 'pendente';
+    this.alteracoes$.next();
+  }
+
+  /** Ao sair da tela com alteracoes ainda na espera, salva na hora. */
+  ngOnDestroy(): void {
+    if (this.estadoSalvamento === 'pendente') {
+      this.persistir$().subscribe();
+    }
+  }
+
+  /** Fechar/recarregar a aba com algo por salvar: o navegador pede confirmacao. */
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.estadoSalvamento === 'pendente' || this.estadoSalvamento === 'salvando') {
+      event.preventDefault();
+      event.returnValue = '';
+    }
   }
 
   loadChecklistData(): void {
@@ -161,38 +210,53 @@ export class Checklist implements OnInit {
     const total = category.items?.length || 0;
     const done = category.items.filter(i => i.completed).length;
     category.progress = total ? Math.round((done / total) * 100) : 0;
+    this.marcarAlteracao();
   }
 
-saveProgress(): void {
-  if (!this.projectId || this.isSaving) return;
+/** Grava todas as respostas e o progresso do projeto. */
+  private persistir$(): Observable<unknown> {
+    if (!this.projectId) return EMPTY;
 
-  const responsesToSave = this.checklistData.flatMap(category =>
-    category.items.map(item => ({
-      perguntaId: item.id,
-      resposta: item.answer ?? '',
-      detalhesTecnicos: item.technicalDetails ?? '',
-      conformidade: !!item.completed
-    }))
-  );
+    const versao = this.versaoAlteracao;
+    const responsesToSave = this.checklistData.flatMap(category =>
+      category.items.map(item => ({
+        perguntaId: item.id,
+        resposta: item.answer ?? '',
+        detalhesTecnicos: item.technicalDetails ?? '',
+        conformidade: !!item.completed
+      }))
+    );
+    const progresso = Number(this.overallProgress) || 0;
 
-  const progresso = Number(this.overallProgress) || 0;
-
-  this.isSaving = true;
-  this.checklistService.saveChecklistResponses(this.projectId, responsesToSave)
-    .pipe(
-      switchMap(() =>
-        this.projectsService.update(this.projectId!, { progresso })
-      ),
-      finalize(() => this.isSaving = false)
-    )
-    .subscribe({
-      next: () => this.feedback = { type: 'success', message: 'Progresso salvo.' },
-      error: (err) => {
+    this.estadoSalvamento = 'salvando';
+    // zone.run: com withFetch() a resposta pode chegar fora da zona do Angular e a
+    // tela ficaria presa em "Salvando…" ate o proximo clique.
+    return this.checklistService.saveChecklistResponses(this.projectId, responsesToSave).pipe(
+      switchMap(() => this.projectsService.update(this.projectId!, { progresso })),
+      tap(() => this.zone.run(() => {
+        this.salvoEm = new Date();
+        // Se o usuario mexeu de novo durante o envio, ainda ha algo na fila.
+        this.estadoSalvamento = versao === this.versaoAlteracao ? 'salvo' : 'pendente';
+      })),
+      catchError(err => {
         console.error('Falha ao salvar respostas/atualizar progresso:', err);
-        this.feedback = { type: 'error', message: 'Não foi possível salvar o progresso. Tente novamente.' };
+        this.zone.run(() => this.estadoSalvamento = 'erro');
+        return EMPTY;
+      }),
+    );
+  }
+
+  /** Botao "Salvar Progresso": salva na hora, sem esperar o automatico. */
+  saveProgress(): void {
+    if (!this.projectId || this.isSaving) return;
+    this.persistir$().subscribe({
+      complete: () => {
+        this.feedback = this.estadoSalvamento === 'erro'
+          ? { type: 'error', message: 'Não foi possível salvar o progresso. Tente novamente.' }
+          : { type: 'success', message: 'Progresso salvo.' };
       },
     });
-}
+  }
 
   generateReport(): void {
   if (this.isGeneratingReport) return;

@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f3f4f6; 
+  background-color: var(--gray-100); 
 }
 
 .login-container {
@@ -15,7 +15,7 @@
   max-width: 400px;
   margin: 0 auto;
   padding: 2.5rem;
-  background-color: white;
+  background-color: var(--surface);
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -29,7 +29,7 @@
   gap: 12px;
 
   .logo-icon {
-    color: #3B82F6;
+    color: var(--link);
   }
 
   .logo-text {
@@ -40,18 +40,18 @@
     .main-title {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #111827;
+      color: var(--gray-900);
     }
 
     .subtitle {
       font-size: 1rem;
-      color: #4B5563;
+      color: var(--gray-600);
     }
   }
 }
 
 .welcome-message {
-  color: #6b7280;
+  color: var(--gray-500);
   margin-bottom: 2rem;
 }
 
@@ -67,13 +67,13 @@ form {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--gray-700);
   }
 
   input {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -88,8 +88,8 @@ form {
 
 .error-message {
   color: #ef4444;
-  background-color: #fee2e2;
-  border: 1px solid #fca5a5;
+  background-color: var(--red-100);
+  border: 1px solid var(--red-300);
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -113,7 +113,7 @@ form {
   }
 
   &:disabled {
-    background-color: #9ca3af;
+    background-color: var(--gray-400);
     cursor: not-allowed;
   }
 }

@@ -76,90 +76,38 @@
       </div>
     </div>
 
-    <!-- Seção de Preferências -->
-    <div class="settings-section">
-      <div class="section-header">
-        <h2>Preferências</h2>
-        <p>Personalize sua experiência na plataforma</p>
-      </div>
-
-      <!-- Toggle para Sugestões de IA -->
-      <div class="toggle-item">
-        <div class="toggle-content">
-          <label for="enableAiSuggestions" class="toggle-label">Sugestões de IA</label>
-          <p class="toggle-description">
-            Receba sugestões técnicas baseadas em IA para melhorar a conformidade.
-          </p>
-        </div>
-        <div class="toggle-switch">
-          <input 
-            type="checkbox" 
-            id="enableAiSuggestions" 
-            formControlName="enableAiSuggestions"
-            class="switch-input">
-          <label for="enableAiSuggestions" class="switch-label">
-            <span class="switch-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Toggle para Salvamento Automático -->
-      <div class="toggle-item">
-        <div class="toggle-content">
-          <label for="autoSaveResponses" class="toggle-label">Salvar automaticamente</label>
-          <p class="toggle-description">
-            Salve automaticamente suas respostas ao checklist enquanto você digita.
-          </p>
-        </div>
-        <div class="toggle-switch">
-          <input 
-            type="checkbox" 
-            id="autoSaveResponses" 
-            formControlName="autoSaveResponses"
-            class="switch-input">
-          <label for="autoSaveResponses" class="switch-label">
-            <span class="switch-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Toggle para Relatórios Detalhados -->
-      <div class="toggle-item">
-        <div class="toggle-content">
-          <label for="detailedReports" class="toggle-label">Relatórios detalhados</label>
-          <p class="toggle-description">
-            Inclua recomendações técnicas detalhadas nos relatórios de conformidade.
-          </p>
-        </div>
-        <div class="toggle-switch">
-          <input 
-            type="checkbox" 
-            id="detailedReports" 
-            formControlName="detailedReports"
-            class="switch-input">
-          <label for="detailedReports" class="switch-label">
-            <span class="switch-slider"></span>
-          </label>
-        </div>
-      </div>
-
-    </div>
-
     <!-- Ações -->
     <div class="settings-actions">
-      <button type="button" class="btn btn-secondary" data-testid="settings-reset" (click)="onResetSettings()">
-        Restaurar Padrão
-      </button>
       <button 
         type="submit" 
         data-testid="settings-submit"
         class="btn btn-primary" 
         [disabled]="loading">
         <span *ngIf="loading">Salvando...</span>
-        <span *ngIf="!loading">Salvar Configurações</span>
+        <span *ngIf="!loading">Salvar chave</span>
       </button>
     </div>
   </form>
+
+  <!-- Aparência: aplica na hora, sem precisar salvar -->
+  <div class="settings-section" data-testid="settings-theme">
+    <div class="section-header">
+      <h2>Aparência</h2>
+      <p>Escolha o tema do DevComply. A mudança vale na hora.</p>
+    </div>
+
+    <div class="theme-options" role="radiogroup" aria-label="Tema">
+      <label class="theme-option" *ngFor="let opt of temas" [class.selected]="theme.preferencia() === opt.valor">
+        <input type="radio" name="tema" [value]="opt.valor" [checked]="theme.preferencia() === opt.valor"
+               (change)="theme.definir(opt.valor)" [attr.data-testid]="'settings-theme-' + opt.valor">
+        <span class="theme-swatch" [ngClass]="'swatch-' + opt.valor" aria-hidden="true"></span>
+        <span class="theme-text">
+          <strong>{{ opt.titulo }}</strong>
+          <small>{{ opt.descricao }}</small>
+        </span>
+      </label>
+    </div>
+  </div>
 
   <div class="settings-section danger-zone">
     <div class="section-header">

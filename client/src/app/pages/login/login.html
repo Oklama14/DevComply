@@ -24,9 +24,9 @@
       <div *ngIf="errorMessage" data-testid="login-error" class="error-message">
         {{ errorMessage }}
       </div>
-      <div class="alt-action" style="text-align:center; margin-top:12px; color:#6b7280;">
+      <div class="alt-action" style="text-align:center; margin-top:12px; color:var(--gray-500);">
   Não tem conta?
-  <a routerLink="/register" data-testid="login-register-link" style="color:#2563eb; font-weight:600; text-decoration:none;">Criar conta</a>
+  <a routerLink="/register" data-testid="login-register-link" style="color:var(--link); font-weight:600; text-decoration:none;">Criar conta</a>
 </div>
 
       <button type="submit" data-testid="login-submit" class="btn-primary" [disabled]="loginForm.invalid">

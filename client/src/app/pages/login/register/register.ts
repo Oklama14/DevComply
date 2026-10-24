@@ -128,10 +128,11 @@ export class Register implements OnInit, OnDestroy {
         nome: ['', [Validators.required, Validators.minLength(3)]],
         email: ['', [Validators.required, Validators.email]],
         perfil: ['desenvolvedor', [Validators.required]],
-        senha: ['', [Validators.required, Validators.minLength(6)]],
+        senha: ['', [Validators.required, Validators.minLength(8)]],
         confirmSenha: ['', [Validators.required]],
         aceitaPolitica: [false, [mustBeTrue]],
-        aceitaTermos: [false, [mustBeTrue]]
+        aceitaTermos: [false, [mustBeTrue]],
+        declaraMaioridade: [false, [mustBeTrue]]
       },
       { validators: passwordMatch }
     );
@@ -148,7 +149,7 @@ export class Register implements OnInit, OnDestroy {
       return;
     }
 
-    const { nome, email, senha, perfil, aceitaPolitica, aceitaTermos } =
+    const { nome, email, senha, perfil, aceitaPolitica, aceitaTermos, declaraMaioridade } =
       this.form.value;
     this.loading = true;
 
@@ -161,7 +162,8 @@ export class Register implements OnInit, OnDestroy {
         senha: senha!,
         perfil: perfil!,
         aceitaPolitica: !!aceitaPolitica,
-        aceitaTermos: !!aceitaTermos
+        aceitaTermos: !!aceitaTermos,
+        declaraMaioridade: !!declaraMaioridade
       },
       { autoLogin: false }
     ).subscribe({

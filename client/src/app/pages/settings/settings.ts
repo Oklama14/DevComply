@@ -4,12 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { UsersService } from '../../services/users';
 import { AuthService } from '../../services/auth';
-
-interface LocalSettings {
-  enableAiSuggestions: boolean;
-  autoSaveResponses: boolean;
-  detailedReports: boolean;
-}
+import { ThemeService, PreferenciaTema } from '../../services/theme';
 
 @Component({
   selector: 'app-settings',
@@ -22,6 +17,13 @@ export class Settings implements OnInit {
   private fb = inject(FormBuilder);
   private usersService = inject(UsersService);
   private authService = inject(AuthService);
+  readonly theme = inject(ThemeService);
+
+  readonly temas: Array<{ valor: PreferenciaTema; titulo: string; descricao: string }> = [
+    { valor: 'claro', titulo: 'Claro', descricao: 'Fundo claro' },
+    { valor: 'escuro', titulo: 'Escuro', descricao: 'Fundo escuro, menos brilho' },
+    { valor: 'sistema', titulo: 'Automático', descricao: 'Segue o tema do seu sistema' },
+  ];
 
   settingsForm!: FormGroup;
   loading = false;
@@ -37,20 +39,16 @@ export class Settings implements OnInit {
   private initializeForm(): void {
     this.settingsForm = this.fb.group({
       geminiApiKey: [''],
-      enableAiSuggestions: [true],
-      autoSaveResponses: [true],
-      detailedReports: [true],
     });
   }
 
   private loadSettings(): void {
-    const saved = localStorage.getItem('devcomply-settings');
-    if (saved) {
-      try {
-        this.settingsForm.patchValue(JSON.parse(saved) as LocalSettings);
-      } catch {
-        // ignora settings corrompidos
-      }
+    // As antigas "Preferencias" (sugestoes de IA, salvar automaticamente, relatorios
+    // detalhados) nao tinham efeito e foram removidas; apaga o que ficou no navegador.
+    try {
+      localStorage.removeItem('devcomply-settings');
+    } catch {
+      // armazenamento bloqueado: nada a limpar
     }
     // Estado da chave (nunca recebemos a chave em si, apenas se existe).
     this.usersService.getSettings().subscribe({
@@ -64,12 +62,10 @@ export class Settings implements OnInit {
     this.successMessage = '';
     this.errorMessage = '';
 
-    const { geminiApiKey, ...local } = this.settingsForm.value;
-    localStorage.setItem('devcomply-settings', JSON.stringify(local));
-
-    const key = (geminiApiKey ?? '').trim();
+    const key = (this.settingsForm.value.geminiApiKey ?? '').trim();
     if (!key) {
-      this.finishSave();
+      this.errorMessage = 'Digite a chave do Gemini para salvar.';
+      this.loading = false;
       return;
     }
 
@@ -98,23 +94,9 @@ export class Settings implements OnInit {
   }
 
   private finishSave(): void {
-    this.successMessage = 'Configuracoes salvas com sucesso.';
+    this.successMessage = 'Chave do Gemini salva.';
     this.loading = false;
     setTimeout(() => (this.successMessage = ''), 3000);
-  }
-
-  onResetSettings(): void {
-    if (confirm('Restaurar as preferencias para o padrao?')) {
-      this.settingsForm.reset({
-        geminiApiKey: '',
-        enableAiSuggestions: true,
-        autoSaveResponses: true,
-        detailedReports: true,
-      });
-      localStorage.removeItem('devcomply-settings');
-      this.successMessage = 'Preferencias restauradas.';
-      setTimeout(() => (this.successMessage = ''), 3000);
-    }
   }
 
   deleteAccount(): void {

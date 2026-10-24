@@ -37,6 +37,18 @@
 
     <div class="progress-row">
       <span>Progresso:</span> <strong data-testid="checklist-progress">{{ overallProgress }}%</strong>
+      <span class="save-status" role="status" aria-live="polite" data-testid="checklist-save-status"
+            [class.is-error]="estadoSalvamento === 'erro'">
+        <ng-container [ngSwitch]="estadoSalvamento">
+          <ng-container *ngSwitchCase="'pendente'">Alterações não salvas…</ng-container>
+          <ng-container *ngSwitchCase="'salvando'">Salvando…</ng-container>
+          <ng-container *ngSwitchCase="'salvo'">✓ Salvo às {{ salvoEm | date:'HH:mm' }}</ng-container>
+          <ng-container *ngSwitchCase="'erro'">
+            Não foi possível salvar. <button type="button" class="link-retry" (click)="saveProgress()">Tentar de novo</button>
+          </ng-container>
+          <ng-container *ngSwitchDefault>Salvamento automático ativado</ng-container>
+        </ng-container>
+      </span>
     </div>
     <div class="progressbar">
       <div class="progressbar-fill" [style.width.%]="overallProgress"></div>
@@ -121,6 +133,7 @@
           <label class="field">
             <span>Explicação da sua implementação:</span>
             <textarea [(ngModel)]="item.answer"
+                      (ngModelChange)="marcarAlteracao()"
                       data-testid="checklist-item-answer"
                       placeholder="Descreva como sua solução atende a este requisito..."></textarea>
           </label>
@@ -128,6 +141,7 @@
           <label class="field">
             <span>Detalhes técnicos:</span>
             <textarea [(ngModel)]="item.technicalDetails"
+                      (ngModelChange)="marcarAlteracao()"
                       data-testid="checklist-item-technical"
                       placeholder="Tecnologias, métodos de criptografia, estruturas de BD, etc."></textarea>
           </label>

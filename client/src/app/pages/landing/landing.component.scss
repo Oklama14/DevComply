@@ -4,11 +4,11 @@
 // Variáveis de cores mantendo a identidade visual
 $primary-color: #3b82f6;
 $primary-dark: #2563eb;
-$text-color: #1f2937;
-$text-light: #6b7280;
-$background-light: #f8fafc;
+$text-color: var(--gray-800);
+$text-light: var(--gray-500);
+$background-light: var(--gray-50);
 $white: #ffffff;
-$border-color: #e5e7eb;
+$border-color: var(--gray-200);
 
 // Mixins reutilizáveis
 @mixin container {
@@ -46,7 +46,7 @@ $border-color: #e5e7eb;
 
 // Header
 .landing-header {
-  background: $white;
+  background: var(--surface);
   border-bottom: 1px solid $border-color;
   position: fixed;
   top: 0;
@@ -94,7 +94,7 @@ $border-color: #e5e7eb;
 
 // Hero Section
 .hero-section {
-  background: linear-gradient(135deg, #f0f5ff 0%, #eef2ff 100%);
+  background: linear-gradient(135deg, var(--blue-50) 0%, var(--blue-50) 100%);
   padding: 8rem 0 4rem;
   margin-top: 4rem;
 
@@ -108,7 +108,7 @@ $border-color: #e5e7eb;
   .hero-badge {
     display: inline-block;
     background: rgba($primary-color, 0.1);
-    color: $primary-color;
+    color: var(--link);
     padding: 0.5rem 1rem;
     border-radius: 2rem;
     font-size: 0.875rem;
@@ -124,7 +124,7 @@ $border-color: #e5e7eb;
     margin-bottom: 1.5rem;
     
     .highlight {
-      color: $primary-color;
+      color: var(--link);
     }
   }
 
@@ -163,7 +163,7 @@ $border-color: #e5e7eb;
 // Features Section
 .features-section {
   padding: 5rem 0;
-  background: $white;
+  background: var(--surface);
 
   .section-header {
     text-align: center;
@@ -189,12 +189,12 @@ $border-color: #e5e7eb;
   .features-grid {
     @include container;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 2rem;
   }
 
   .feature-card {
-    background: $white;
+    background: var(--surface);
     padding: 2rem;
     border-radius: 1rem;
     border: 1px solid $border-color;
@@ -215,7 +215,7 @@ $border-color: #e5e7eb;
       align-items: center;
       justify-content: center;
       margin: 0 auto 1.5rem;
-      color: $primary-color;
+      color: var(--link);
     }
 
     h3 {
@@ -377,7 +377,7 @@ $border-color: #e5e7eb;
 
 // Footer
 .landing-footer {
-  background: $text-color;
+  background: #1f2937; // sem-tema: rodape sempre escuro, texto branco
   color: $white;
   padding: 3rem 0 2rem;
 
@@ -464,7 +464,8 @@ $border-color: #e5e7eb;
     gap: 2rem;
   }
   
-  .footer-content {
+  // .landing-footer na frente: a regra original e aninhada e venceria esta
+  .landing-footer .footer-content {
     grid-template-columns: 1fr;
     gap: 2rem;
     text-align: center;
@@ -519,7 +520,7 @@ $border-color: #e5e7eb;
 }
 
 .methodology-section {
-  background: $white;
+  background: var(--surface);
 }
 
 .theory-section {
@@ -527,7 +528,7 @@ $border-color: #e5e7eb;
 }
 
 .results-section {
-  background: $white;
+  background: var(--surface);
 }
 
 .validation-section {
@@ -537,19 +538,19 @@ $border-color: #e5e7eb;
 .problem-grid,
 .theory-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
   gap: 2rem;
 }
 
 .problem-card,
 .theory-card {
-  background: $white;
+  background: var(--surface);
   padding: 2rem;
   border-radius: 1rem;
   border: 1px solid $border-color;
   
   h3 {
-    color: $primary-color;
+    color: var(--link);
     margin-bottom: 1rem;
     font-size: 1.25rem;
   }
@@ -617,7 +618,7 @@ $border-color: #e5e7eb;
     width: 80px;
     height: 80px;
     background: rgba($primary-color, 0.1);
-    color: $primary-color;
+    color: var(--link);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -640,7 +641,7 @@ $border-color: #e5e7eb;
 }
 
 .flow-arrow {
-  color: $primary-color;
+  color: var(--link);
   font-size: 2rem;
   font-weight: 700;
 }
@@ -662,14 +663,14 @@ $border-color: #e5e7eb;
 }
 
 .spec-card {
-  background: $white;
+  background: var(--surface);
   padding: 1.5rem;
   border-radius: 0.75rem;
   border: 1px solid $border-color;
   text-align: center;
   
   h4 {
-    color: $primary-color;
+    color: var(--link);
     margin-bottom: 0.5rem;
   }
   
@@ -686,14 +687,14 @@ $border-color: #e5e7eb;
 }
 
 .result-card {
-  background: $white;
+  background: var(--surface);
   padding: 2rem;
   border-radius: 1rem;
   border: 1px solid $border-color;
   text-align: center;
   
   h3 {
-    color: $primary-color;
+    color: var(--link);
     margin-bottom: 1rem;
     font-size: 1.125rem;
   }
@@ -732,14 +733,14 @@ $border-color: #e5e7eb;
 .stat {
   text-align: center;
   padding: 2rem;
-  background: $white;
+  background: var(--surface);
   border-radius: 1rem;
   border: 1px solid $border-color;
   
   .stat-number {
     font-size: 3rem;
     font-weight: 800;
-    color: $primary-color;
+    color: var(--link);
     margin-bottom: 0.5rem;
   }
   

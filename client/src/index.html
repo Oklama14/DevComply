@@ -1,13 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <title>DevComply</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Aplica o tema antes do Angular subir (evita piscar branco no modo escuro).
+       Mesma regra do ThemeService: "devcomply-theme" = claro | escuro; sem valor = sistema. -->
+  <script>
+    (function () {
+      var pref = null;
+      try { pref = localStorage.getItem('devcomply-theme'); } catch (e) {}
+      var escuro = pref === 'escuro' ||
+        (pref !== 'claro' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', escuro ? 'dark' : 'light');
+      document.documentElement.style.colorScheme = escuro ? 'dark' : 'light';
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>
