@@ -4,7 +4,7 @@
     <h1>Política de Privacidade - DevComply</h1>
     <p>Ferramenta de Apoio à Conformidade com a LGPD para Desenvolvedores</p>
     <div class="last-update">
-      <strong>Última atualização:</strong> 28 de outubro de 2025 | <strong>Versão:</strong> 1.0
+      <strong>Última atualização:</strong> 23 de outubro de 2026 | <strong>Versão:</strong> 2026-10-23
     </div>
   </div>
 </header>
@@ -122,7 +122,7 @@
             </tr>
             <tr>
               <td>Endereço de e-mail</td>
-              <td>Autenticação, comunicações, recuperação de senha</td>
+              <td>Autenticação (login) e comunicações sobre a conta</td>
               <td>Execução de contrato (Art. 7º, V)</td>
             </tr>
             <tr>
@@ -282,59 +282,61 @@
       
       <h3>8.1. Períodos de Retenção</h3>
       <ul>
-        <li><strong>Conta ativa:</strong> Dados mantidos enquanto conta existir</li>
-        <li><strong>Após encerramento:</strong> 30 dias para recuperação, depois exclusão definitiva</li>
-        <li><strong>Obrigações legais:</strong> Registros fiscais (5 anos), acesso à internet (6 meses)</li>
+        <li><strong>Conta ativa:</strong> seus dados ficam guardados enquanto a conta existir.</li>
+        <li><strong>Exclusão da conta:</strong> é <strong>imediata e definitiva</strong>. No momento em que você confirma a exclusão, apagamos sua conta, seus projetos, as respostas do checklist e o registro de aceite dos Termos e desta Política. <strong>Não há período de recuperação.</strong></li>
+        <li><strong>Relatórios em PDF:</strong> não ficam guardados no DevComply. O relatório é gerado na hora e entregue para download no seu navegador.</li>
+        <li><strong>Dados enviados ao Google Gemini:</strong> seguem as regras de retenção do Google, que o DevComply não controla (veja a seção 5).</li>
+        <li><strong>Obrigações legais:</strong> quando a lei exigir, alguns registros podem ser mantidos pelo prazo legal (por exemplo, registros de acesso a aplicações por 6 meses, conforme o Marco Civil da Internet).</li>
       </ul>
 
       <h3>8.2. Como Solicitar Exclusão</h3>
       <ol>
-        <li>Através da plataforma: Configurações > Excluir Conta</li>
-        <li>Por e-mail para o DPO</li>
+        <li>Pela plataforma: <strong>Perfil &gt; Excluir conta</strong> ou <strong>Configurações &gt; Zona de perigo &gt; Excluir minha conta</strong>.</li>
+        <li>Por e-mail para o Encarregado (DPO): artcs2003@gmail.com.</li>
       </ol>
 
       <div class="alert alert-warning">
-        <strong>⚠️ Faça backup:</strong> Exporte seus dados antes de excluir a conta.
+        <strong>⚠️ A exclusão não pode ser desfeita.</strong> Se quiser uma cópia dos seus dados antes de excluir a conta, solicite ao Encarregado pelo e-mail acima.
       </div>
     </section>
 
     <!-- Section 9: Cookies -->
     <section id="cookies" class="section">
-      <h2>9. COOKIES E TECNOLOGIAS DE RASTREAMENTO</h2>
+      <h2>9. COOKIES E ARMAZENAMENTO NO NAVEGADOR</h2>
       
-      <h3>9.1. Cookies Utilizados</h3>
+      <p>O DevComply <strong>não usa cookies de rastreamento nem de publicidade</strong>. Para funcionar, ele guarda apenas os itens abaixo no armazenamento local (<em>localStorage</em>) do seu navegador:</p>
+
+      <h3>9.1. Itens Armazenados</h3>
       
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>Cookie</th>
+              <th>Item</th>
               <th>Finalidade</th>
               <th>Duração</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>session_id</td>
-              <td>Manter sessão autenticada</td>
-              <td>Até logout</td>
+              <td>access_token</td>
+              <td>Manter você conectado (token de autenticação)</td>
+              <td>Expira em 1 dia; é apagado quando você clica em Sair</td>
             </tr>
             <tr>
-              <td>csrf_token</td>
-              <td>Proteção CSRF</td>
-              <td>Sessão</td>
-            </tr>
-            <tr>
-              <td>auth_token</td>
-              <td>Token de autenticação</td>
-              <td>7 dias</td>
+              <td>devcomply-settings</td>
+              <td>Guardar as preferências da tela de Configurações</td>
+              <td>Até você restaurar o padrão ou limpar os dados do navegador</td>
             </tr>
           </tbody>
         </table>
       </div>
 
+      <h3>9.2. Fontes de Terceiros</h3>
+      <p>A fonte tipográfica do site é carregada do Google Fonts. Para entregar a fonte, o Google recebe dados técnicos da conexão, como o endereço IP e o navegador utilizado.</p>
+
       <h3>9.3. Gerenciamento</h3>
-      <p>Você pode controlar cookies através das configurações do navegador. Desabilitar cookies essenciais impedirá o funcionamento do DevComply.</p>
+      <p>Você pode apagar esses dados nas configurações do navegador. Sem o <em>access_token</em>, será preciso entrar novamente.</p>
     </section>
 
     <!-- Section 10: Direitos -->
@@ -377,7 +379,9 @@
 
       <h3>10.1. Como Exercer</h3>
       <ul>
-        <li>Através da plataforma (Configurações)</li>
+        <li><strong>Correção:</strong> pela plataforma, em Perfil.</li>
+        <li><strong>Exclusão:</strong> pela plataforma, em Perfil ou Configurações (veja a seção 8.2).</li>
+        <li><strong>Acesso e portabilidade (cópia dos dados):</strong> por e-mail ao Encarregado (DPO).</li>
         <li>E-mail do DPO: artcs2003@gmail.com</li>
         <li>Resposta em até 15 dias</li>
       </ul>
@@ -489,7 +493,7 @@
           <div class="summary-item">
             <h4>📧 Contato</h4>
             <ul>
-              <li>DPO: [E-MAIL]</li>
+              <li>DPO: artcs2003@gmail.com</li>
               <li>ANPD: gov.br/anpd</li>
             </ul>
           </div>
@@ -512,7 +516,7 @@
 
     <!-- Footer info -->
     <section class="section document-info">
-      <p><strong>Versão:</strong> 1.0 | <strong>Data:</strong> 28/10/2025</p>
+      <p><strong>Versão:</strong> 2026-10-23 | <strong>Data:</strong> 23/10/2026</p>
       <p>© 2025 DevComply. Todos os direitos reservados.</p>
     </section>
   </main>
