@@ -165,11 +165,31 @@ h1 {
     line-height: 1.5;
   }
   
-.source-note {
+  .source-note {
     margin: 16px 0 0;
     font-size: 13px;
     color: $gray-500;
     line-height: 1.5;
+  }
+
+  .data-notice {
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: $gray-700;
+    background: $gray-50;
+    border: 1px solid $gray-200;
+    border-radius: 8px;
+
+    a {
+      color: $primary-blue;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+
+      &:hover { text-decoration: underline; }
+    }
   }
 
   .progress-row { 

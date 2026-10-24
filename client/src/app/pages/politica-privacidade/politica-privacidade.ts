@@ -1,5 +1,6 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { AfterViewInit, Component, OnInit, HostListener } from '@angular/core';
 import { ViewportScroller, CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-politica-privacidade',
@@ -8,11 +9,25 @@ import { ViewportScroller, CommonModule } from '@angular/common';
   templateUrl: './politica-privacidade.html',
   styleUrls: ['./politica-privacidade.scss']
 })
-export class PoliticaPrivacidade implements OnInit {
+export class PoliticaPrivacidade implements OnInit, AfterViewInit {
   showBackToTop = false;
   activeSection = '';
 
-  constructor(private viewportScroller: ViewportScroller) {}
+  constructor(
+    private viewportScroller: ViewportScroller,
+    private route: ActivatedRoute,
+  ) {}
+
+  /**
+   * Links de dentro do sistema apontam para uma secao (ex.: /politica-privacidade#compartilhamento).
+   * Depois que a pagina renderiza, rola ate ela.
+   */
+  ngAfterViewInit(): void {
+    const secao = this.route.snapshot.fragment;
+    if (secao) {
+      setTimeout(() => this.scrollToSection(secao));
+    }
+  }
 
   ngOnInit(): void {
     // Scroll to top on component init

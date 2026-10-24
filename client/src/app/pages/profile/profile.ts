@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { UsersService, UserProfile } from '../../services/users';
 import { AuthService } from '../../services/auth';
 
@@ -17,6 +17,7 @@ export class ProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private usersService = inject(UsersService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
 
   profile?: UserProfile;
   isLoading = signal(false);
@@ -39,6 +40,24 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProfile();
+    // Link "Como usamos seus dados" da barra lateral (/profile#seus-dados)
+    this.route.fragment.subscribe((f) => {
+      if (f) this.scrollToFragment(f);
+    });
+  }
+
+  private scrollToFragment(id: string): void {
+    // A pagina so renderiza depois de carregar o perfil: tenta por alguns instantes.
+    let tentativas = 0;
+    const tentar = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (tentativas++ < 20) {
+        setTimeout(tentar, 100);
+      }
+    };
+    setTimeout(tentar);
   }
 
   loadProfile(): void {

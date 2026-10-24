@@ -1,5 +1,6 @@
-import { Component, OnInit, HostListener, Inject } from '@angular/core';
+import { AfterViewInit, Component, OnInit, HostListener } from '@angular/core';
 import { ViewportScroller, CommonModule } from '@angular/common'; // Importe o CommonModule
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-termos-uso',
@@ -8,7 +9,7 @@ import { ViewportScroller, CommonModule } from '@angular/common'; // Importe o C
   templateUrl: './termos-uso.html',
   styleUrl: './termos-uso.scss'
 })
-export class TermosUso implements OnInit {
+export class TermosUso implements OnInit, AfterViewInit {
   showBackToTop = false;
   activeSection = 'introducao'; // Inicia na introdução
 
@@ -21,7 +22,21 @@ export class TermosUso implements OnInit {
     'informacoes-contato'
   ];
 
-  constructor(private viewportScroller: ViewportScroller) {}
+  constructor(
+    private viewportScroller: ViewportScroller,
+    private route: ActivatedRoute,
+  ) {}
+
+  /**
+   * Links de dentro do sistema apontam para uma secao (ex.: /politica-privacidade#compartilhamento).
+   * Depois que a pagina renderiza, rola ate ela.
+   */
+  ngAfterViewInit(): void {
+    const secao = this.route.snapshot.fragment;
+    if (secao) {
+      setTimeout(() => this.scrollToSection(secao));
+    }
+  }
 
   ngOnInit(): void {
     // Garante que a página inicie no topo

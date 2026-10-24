@@ -149,6 +149,18 @@ $red-600: #dc2626;
     color: $gray-500;
     font-size: 13px;
     line-height: 1.4;
+
+    &.data-hint {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: $gray-50;
+      border: 1px solid $gray-200;
+      border-radius: 8px;
+      color: $gray-700;
+      line-height: 1.5;
+
+      a { font-weight: 600; }
+    }
   }
 }
 

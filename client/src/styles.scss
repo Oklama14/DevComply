@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+// Campos com width: 100% + padding ficavam ~34px mais largos que o container
+// (login, cadastro, chave do Gemini...). border-box mantem padding e borda dentro.
+input,
+textarea,
+select {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;

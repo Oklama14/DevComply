@@ -86,6 +86,48 @@
     </div>
   </form>
 
+  <!-- Transparencia: onde os dados do usuario sao usados -->
+  <div class="profile-section" id="seus-dados" data-testid="profile-data-usage">
+    <div class="section-header">
+      <h2>Como usamos seus dados</h2>
+      <p>O que o DevComply guarda sobre você e onde cada dado é usado. Os links abrem a Política de Privacidade em nova aba.</p>
+    </div>
+
+    <ul class="data-usage">
+      <li>
+        <span class="usage-title"><strong>Dados da conta</strong> (nome, e-mail e ocupação)</span>
+        <span>Identificam você e permitem o login. A senha é guardada só como hash, nunca em texto.</span>
+        <a href="/politica-privacidade#dados-coletados" target="_blank" rel="noopener">Dados coletados</a>
+      </li>
+      <li>
+        <span class="usage-title"><strong>Projetos e respostas do checklist</strong></span>
+        <span>Ficam salvos na sua conta para você acompanhar o progresso de cada projeto.</span>
+        <a href="/politica-privacidade#finalidades" target="_blank" rel="noopener">Finalidades</a>
+      </li>
+      <li class="highlight">
+        <span class="usage-title"><strong>Relatórios com IA</strong></span>
+        <span>Quando você clica em <em>Gerar Relatório</em>, as respostas dos itens marcados são enviadas ao Google Gemini para análise, inclusive para servidores fora do Brasil.</span>
+        <a href="/politica-privacidade#compartilhamento" target="_blank" rel="noopener">Compartilhamento com o Google</a>
+      </li>
+      <li>
+        <span class="usage-title"><strong>Chave do Gemini</strong> (opcional)</span>
+        <span>Se você cadastrar uma em <a routerLink="/settings">Configurações</a>, ela é usada só para gerar os seus relatórios e nunca é exibida de volta.</span>
+        <a href="/politica-privacidade#seguranca" target="_blank" rel="noopener">Segurança</a>
+      </li>
+      <li>
+        <span class="usage-title"><strong>Seus direitos</strong></span>
+        <span>Você pode corrigir seus dados nesta página e excluir a conta logo abaixo.</span>
+        <a href="/politica-privacidade#direitos" target="_blank" rel="noopener">Direitos do titular</a>
+      </li>
+    </ul>
+
+    <div class="legal-footer">
+      <a href="/politica-privacidade" target="_blank" rel="noopener" data-testid="profile-politica">Ler a Política de Privacidade</a>
+      <span aria-hidden="true">·</span>
+      <a href="/termos-uso" target="_blank" rel="noopener" data-testid="profile-termos">Ler os Termos de Uso</a>
+    </div>
+  </div>
+
   <!-- Excluir conta (mesma acao da Zona de perigo em Configuracoes) -->
   <div class="profile-section danger-zone">
     <div class="section-header">
