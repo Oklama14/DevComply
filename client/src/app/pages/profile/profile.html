@@ -116,7 +116,7 @@
       </li>
       <li>
         <span class="usage-title"><strong>Seus direitos</strong></span>
-        <span>Você pode corrigir seus dados nesta página e excluir a conta logo abaixo.</span>
+        <span>Você pode corrigir seus dados nesta página, baixar uma cópia de tudo e excluir a conta logo abaixo.</span>
         <a href="/politica-privacidade#direitos" target="_blank" rel="noopener">Direitos do titular</a>
       </li>
     </ul>
@@ -128,11 +128,31 @@
     </div>
   </div>
 
+  <!-- Portabilidade: copia de todos os dados em JSON -->
+  <div class="profile-section" id="exportar" data-testid="profile-export-section">
+    <div class="section-header">
+      <h2>Baixar meus dados</h2>
+      <p>Gera um arquivo JSON com tudo o que o DevComply guarda sobre você: dados da conta, registro de aceite dos Termos e da Política, projetos e respostas do checklist. A senha e o valor da chave do Gemini não são incluídos.</p>
+    </div>
+
+    <div class="export-row">
+      <span class="export-status" role="status" aria-live="polite">
+        <span *ngIf="exportMsg()" class="ok" data-testid="profile-export-ok">{{ exportMsg() }}</span>
+        <span *ngIf="exportErr()" class="fail" data-testid="profile-export-error">{{ exportErr() }}</span>
+      </span>
+      <button type="button" data-testid="profile-export" class="btn btn-secondary"
+              [disabled]="isExporting()" (click)="exportData()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+        {{ isExporting() ? 'Gerando arquivo...' : 'Baixar meus dados (JSON)' }}
+      </button>
+    </div>
+  </div>
+
   <!-- Excluir conta (mesma acao da Zona de perigo em Configuracoes) -->
   <div class="profile-section danger-zone">
     <div class="section-header">
       <h2>Excluir conta</h2>
-      <p>Remove permanentemente sua conta e todos os seus dados: projetos, checklists e relatórios. Essa ação não pode ser desfeita.</p>
+      <p>Remove permanentemente sua conta e todos os seus dados: projetos, checklists e relatórios. Essa ação não pode ser desfeita. Se quiser uma cópia, <a href="#exportar" (click)="irPara('exportar', $event)">baixe seus dados</a> antes.</p>
     </div>
 
     <div class="danger-actions">

@@ -164,7 +164,8 @@
   <div class="settings-section danger-zone">
     <div class="section-header">
       <h2>Zona de perigo</h2>
-      <p>Excluir sua conta remove permanentemente seus dados: projetos, checklists e relatórios.</p>
+      <p>Excluir sua conta remove permanentemente seus dados: projetos, checklists e relatórios.
+        Se quiser uma cópia, <a routerLink="/profile" fragment="exportar" data-testid="settings-export-link">baixe seus dados em Perfil</a> antes.</p>
     </div>
     <button type="button" class="btn btn-danger" data-testid="settings-delete-account" (click)="deleteAccount()">
       Excluir minha conta

@@ -275,6 +275,35 @@ $red-600: #dc2626;
   }
 }
 
+// Baixar meus dados
+.export-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .btn svg {
+    flex-shrink: 0;
+  }
+}
+
+.export-status {
+  font-size: 14px;
+  margin-right: auto;
+
+  .ok { color: $green-600; }
+  .fail { color: $red-600; }
+}
+
+.danger-zone .section-header a {
+  color: $primary-blue;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
 // Excluir conta
 .danger-zone {
   border-color: $red-300;
@@ -313,7 +342,8 @@ $red-600: #dc2626;
   .profile-section { padding: 20px; }
   .title-row h1 { font-size: 28px; }
   .profile-actions,
-  .danger-actions {
+  .danger-actions,
+  .export-row {
     .btn { width: 100%; justify-content: center; }
   }
 }

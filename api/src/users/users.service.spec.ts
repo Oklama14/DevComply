@@ -14,6 +14,7 @@ describe('UsersService', () => {
     findOne: jest.fn(),
     create: jest.fn((x) => x),
     save: jest.fn(async (x) => ({ id: 1, ...x })),
+    manager: { query: jest.fn() },
   };
 
   beforeEach(async () => {
@@ -51,5 +52,35 @@ describe('UsersService', () => {
   it('updateGeminiKey limpa a chave quando o valor e vazio', async () => {
     repo.findOne.mockResolvedValue({ id: 1 });
     await expect(service.updateGeminiKey(1, '   ')).resolves.toEqual({ hasGeminiKey: false });
+  });
+
+  it('exportAccount devolve os dados do titular sem senha e sem o valor da chave do Gemini', async () => {
+    repo.findOne.mockResolvedValue({
+      id: 1,
+      nome: 'A',
+      email: 'a@a.com',
+      perfil: 'dev',
+      senha: 'HASH-SECRETO',
+      geminiApiKey: 'AIza-SEGREDO',
+      politicaVersao: '2026-10-23',
+    });
+    repo.manager.query
+      .mockResolvedValueOnce([{ id: 10, nome: 'Projeto' }]) // projetos
+      .mockResolvedValueOnce([{ id: 5, pergunta_codigo: 'S-01', resposta: 'JWT' }]) // respostas
+      .mockResolvedValueOnce([]) // relatorios
+      .mockResolvedValueOnce([]); // recomendacoes
+
+    const out: any = await service.exportAccount(1);
+
+    expect(out.formato).toBe('devcomply-export/1');
+    expect(out.titular).toMatchObject({ id: 1, email: 'a@a.com', chaveGemini: { cadastrada: true } });
+    expect(out.titular.consentimento.politicaPrivacidade.versao).toBe('2026-10-23');
+    expect(out.projetos).toHaveLength(1);
+    expect(out.respostasChecklist[0].pergunta_codigo).toBe('S-01');
+    const json = JSON.stringify(out);
+    expect(json).not.toContain('HASH-SECRETO');
+    expect(json).not.toContain('AIza-SEGREDO');
+    // Toda consulta e filtrada pelo titular (parametro $1 = id do usuario).
+    for (const call of repo.manager.query.mock.calls) expect(call[1]).toEqual([1]);
   });
 });

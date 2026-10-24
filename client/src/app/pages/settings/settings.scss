@@ -400,6 +400,14 @@ $red-600: #dc2626;
   .section-header h2 {
     color: $red-600;
   }
+
+  .section-header a {
+    color: $primary-blue;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
 }
 
 .btn-danger {

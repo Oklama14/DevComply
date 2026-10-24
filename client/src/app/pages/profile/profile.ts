@@ -23,6 +23,9 @@ export class ProfileComponent implements OnInit {
   isLoading = signal(false);
   isSaving = signal(false);
   isDeleting = signal(false);
+  isExporting = signal(false);
+  exportMsg = signal<string | null>(null);
+  exportErr = signal<string | null>(null);
   msg = signal<string | null>(null);
   err = signal<string | null>(null);
 
@@ -123,6 +126,45 @@ export class ProfileComponent implements OnInit {
           this.passwordForm.reset();
         },
         error: () => this.err.set('Falha ao alterar a senha. Verifique a senha atual.'),
+      });
+  }
+
+  /** Rola ate uma secao da propria pagina (links internos). */
+  irPara(id: string, event?: Event): void {
+    event?.preventDefault();
+    this.scrollToFragment(id);
+  }
+
+  /**
+   * Portabilidade (LGPD, art. 18, II e V): baixa um JSON com tudo o que o sistema
+   * guarda sobre o titular (GET /users/me/export).
+   */
+  exportData(): void {
+    if (this.isExporting()) return;
+    this.isExporting.set(true);
+    this.exportMsg.set(null);
+    this.exportErr.set(null);
+
+    this.usersService
+      .exportMyData()
+      .pipe(finalize(() => this.isExporting.set(false)))
+      .subscribe({
+        next: (dados) => {
+          const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          // Data local (toISOString usaria UTC e viraria o dia seguinte a noite no Brasil)
+          const d = new Date();
+          const hoje = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          a.download = `devcomply-meus-dados-${hoje}.json`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          this.exportMsg.set('Arquivo gerado. O download foi iniciado.');
+        },
+        error: () => this.exportErr.set('Nao foi possivel gerar o arquivo. Tente novamente.'),
       });
   }
 

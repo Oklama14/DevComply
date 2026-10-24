@@ -48,6 +48,11 @@ export class UsersService {
     });
   }
 
+  /** Portabilidade (LGPD, art. 18, II e V): tudo o que o sistema guarda sobre o titular. */
+  exportMyData(): Observable<Record<string, unknown>> {
+    return this.http.get<Record<string, unknown>>(`${this.apiUrl}/me/export`);
+  }
+
   deleteAccount(): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/me`);
   }

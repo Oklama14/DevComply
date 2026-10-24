@@ -130,6 +130,9 @@ export class UsersService {
 
     const m = this.repo.manager;
     const doTitular = `SELECT id FROM projetos WHERE "usuarioId" = $1`;
+    // A chave do Gemini e um dado guardado sobre o titular: o arquivo informa que
+    // ela existe, mas nunca o valor.
+    const { hasGeminiKey } = await this.getSettings(userId);
 
     const projetos = await m.query(
       `SELECT id, nome, descricao, progresso, created_at, updated_at
@@ -190,6 +193,10 @@ export class UsersService {
             versao: user.termosVersao ?? null,
             aceitoEm: user.termosAceitoEm ?? null,
           },
+        },
+        chaveGemini: {
+          cadastrada: hasGeminiKey,
+          observacao: 'Por seguranca, o valor da chave nao e exportado.',
         },
       },
       projetos,
