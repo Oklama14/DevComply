@@ -5,6 +5,7 @@ import { AiService, IaIndisponivelError } from '@/services/ai.service';
 import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
 import { Conformidade } from '@/types/ai.types';
+import { ConfigService } from '@nestjs/config';
 
 describe('ReportsController', () => {
   let controller: ReportsController;
@@ -32,6 +33,7 @@ describe('ReportsController', () => {
         { provide: AiService, useValue: ai },
         { provide: ProjectsService, useValue: projects },
         { provide: UsersService, useValue: users },
+        { provide: ConfigService, useValue: { get: () => undefined } },
       ],
     }).compile();
     controller = moduleRef.get(ReportsController);

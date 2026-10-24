@@ -26,6 +26,7 @@ client/  SPA Angular
 | `FRONTEND_URL`   | recomendada | Origem do frontend para o CORS (ex.: `https://dev-comply.vercel.app`). `*.vercel.app` já é liberado. |
 | `GOOGLE_API_KEY` | opcional    | Chave padrão do Gemini. Sem ela, os relatórios só funcionam com a chave do próprio usuário. |
 | `GEMINI_MODEL`   | opcional    | Modelos do Gemini em ordem de tentativa, separados por vírgula. Padrão: `gemini-3.8-flash,gemini-3.5-flash-lite`. |
+| `REPORTS_PER_HOUR` | opcional  | Quantos relatórios cada usuário pode gerar por hora (janela móvel). Acima disso a API responde 429. Padrão: `10`. |
 | `NODE_ENV`       | sim (prod)  | `production` em produção (ativa migrations e desativa `synchronize`). |
 | `APP_ENCRYPTION_KEY` | recomendada | Segredo para cifrar dados sensíveis em repouso (ex.: chave Gemini do usuário). Sem ela, guarda em texto (com aviso). |
 | `PORT`           | auto        | Injetada pelo Railway (o app usa `process.env.PORT`). |

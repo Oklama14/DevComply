@@ -22,7 +22,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres.' })
+  @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres.' })
   senha: string;
 
   // O ValidationPipe global roda com forbidNonWhitelisted, entao estes dois campos
@@ -35,4 +35,10 @@ export class CreateUserDto {
   @IsBoolean()
   @Equals(true, { message: 'É necessário aceitar os Termos de Uso.' })
   aceitaTermos: boolean;
+
+  // Os Termos (4.1) exigem 18 anos ou mais. A declaracao vem junto com o aceite:
+  // o cadastro so passa com true, entao termosAceitoEm marca tambem o momento dela.
+  @IsBoolean()
+  @Equals(true, { message: 'É necessário declarar ter 18 anos ou mais.' })
+  declaraMaioridade: boolean;
 }

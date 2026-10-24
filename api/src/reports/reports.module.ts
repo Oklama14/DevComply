@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReportsController } from './reports.controller';
 import { ReportsService } from './reports.service';
+import { ReportRateLimitGuard } from './report-rate-limit.guard';
 import { Report } from './entities/report.entity';
 import { Recommendation } from './entities/recommendation.entity';
 import { AiModule } from '../services/ai.module'; // Import AiModule here
@@ -17,6 +18,6 @@ import { UsersModule } from '../users/users.module';
     UsersModule,
   ],
   controllers: [ReportsController],
-  providers: [ReportsService],
+  providers: [ReportsService, ReportRateLimitGuard],
 })
 export class ReportsModule {}

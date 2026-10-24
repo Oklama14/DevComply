@@ -18,6 +18,7 @@ import { Resposta, GerarRelatorioDto, FrontCategory, FrontItem, Conformidade } f
 import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
+import { ReportRateLimitGuard } from './report-rate-limit.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('reports')
@@ -32,6 +33,7 @@ export class ReportsController {
 
   // ====== 1) multipart/form-data: arquivo JSON ======
   @Post('checklist')
+  @UseGuards(ReportRateLimitGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadChecklist(
     @Request() req,
@@ -63,6 +65,7 @@ export class ReportsController {
 
   // ====== 2) application/json: JSON direto ======
   @Post('checklist-json')
+  @UseGuards(ReportRateLimitGuard)
   async uploadChecklistJson(
     @Request() req,
     @Body() payload: FrontCategory[],
