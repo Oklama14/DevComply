@@ -94,62 +94,53 @@
         </div>
       </div>
       
-      <div class="checkbox-group">
-        <div class="checkbox-item">
-          <div class="checkbox-wrapper"
-            (mouseenter)="showPoliticaPopup = true"
-            (mouseleave)="hidePoliticaPopup()"> <label class="checkbox-label">
-              <input 
-                type="checkbox" 
+      <!-- Consentimento: o link abre um resumo (modal) e NAO marca a caixa;
+           so a caixa (ou o botao "Li e concordo" do resumo) registra o aceite. -->
+      <fieldset class="consent-group">
+        <legend>Antes de criar a conta</legend>
+
+        <div class="consent-item">
+          <div class="consent-row">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
                 data-testid="register-aceita-politica"
                 formControlName="aceitaPolitica"
-                class="checkbox-input">
-              <span class="checkmark"></span>
-              Concordo com a <span class="link-text">Política de Privacidade</span>
+                class="checkbox-input"
+                aria-describedby="politica-erro">
+              <span class="checkmark" aria-hidden="true"></span>
+              <span>Li e concordo com a</span>
             </label>
-            
-            <div class="popup" 
-                 *ngIf="showPoliticaPopup"
-                 (mouseenter)="keepPoliticaPopup()"
-                 (mouseleave)="hidePoliticaPopup()">
-              <h4>Política de Privacidade</h4>
-              <p>Resumo da política: Coletamos apenas dados necessários para o funcionamento do sistema, protegemos suas informações conforme a LGPD, não compartilhamos dados com terceiros sem consentimento e garantimos seu direito à transparência sobre como seus dados são utilizados.</p>
-              <a routerLink="/politica-privacidade" class="popup-link" (click)="$event.stopPropagation()">Ver política completa</a>
-            </div>
+            <button type="button" class="doc-link" data-testid="register-ver-politica"
+                    (click)="abrirDoc('politica', $event)">Política de Privacidade</button>
           </div>
-          <div class="error-text" *ngIf="f['aceitaPolitica'].invalid && f['aceitaPolitica'].touched">
-            <span>Você deve aceitar a Política de Privacidade</span>
+          <div class="error-text" id="politica-erro" *ngIf="f['aceitaPolitica'].invalid && f['aceitaPolitica'].touched">
+            <span>Você precisa aceitar a Política de Privacidade.</span>
           </div>
         </div>
 
-        <div class="checkbox-item">
-          <div class="checkbox-wrapper"
-            (mouseenter)="showTermosPopup = true"
-            (mouseleave)="hideTermosPopup()"> <label class="checkbox-label">
-              <input 
-                type="checkbox" 
+        <div class="consent-item">
+          <div class="consent-row">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
                 data-testid="register-aceita-termos"
                 formControlName="aceitaTermos"
-                class="checkbox-input">
-              <span class="checkmark"></span>
-              Aceito os <span class="link-text">Termos de Uso</span>
+                class="checkbox-input"
+                aria-describedby="termos-erro">
+              <span class="checkmark" aria-hidden="true"></span>
+              <span>Li e aceito os</span>
             </label>
-            
-            <div class="popup" 
-                 *ngIf="showTermosPopup"
-                 (mouseenter)="keepTermosPopup()"
-                 (mouseleave)="hideTermosPopup()">
-              <h4>Termos de Uso</h4>
-              <p>Resumo dos termos: Ao usar nossa plataforma, você concorda em utilizar os recursos de forma ética, respeitar os direitos de propriedade intelectual, não realizar atividades maliciosas e cumprir com as obrigações legais aplicáveis ao tratamento de dados pessoais.</p>
-              <a routerLink="/termos-uso" class="popup-link" (click)="$event.stopPropagation()">Ver termos completos</a>
-            </div>
+            <button type="button" class="doc-link" data-testid="register-ver-termos"
+                    (click)="abrirDoc('termos', $event)">Termos de Uso</button>
           </div>
-          <div class="error-text" *ngIf="f['aceitaTermos'].invalid && f['aceitaTermos'].touched">
-            <span>Você deve aceitar os Termos de Uso</span>
+          <div class="error-text" id="termos-erro" *ngIf="f['aceitaTermos'].invalid && f['aceitaTermos'].touched">
+            <span>Você precisa aceitar os Termos de Uso.</span>
           </div>
         </div>
-      </div>
 
+        <p class="consent-hint">Clique no nome do documento para ver um resumo antes de aceitar.</p>
+      </fieldset>
 
       <div *ngIf="errorMessage" data-testid="register-error" class="error-message">
         {{ errorMessage }}
@@ -168,10 +159,43 @@
         type="submit" 
         data-testid="register-submit"
         class="btn-primary" 
-        [disabled]="form.invalid || loading">
+        [disabled]="loading">
         <span *ngIf="loading">Criando conta...</span>
         <span *ngIf="!loading">Criar Conta</span>
       </button>
     </form>
+  </div>
+</div>
+
+<!-- Resumo da Politica / dos Termos -->
+<div class="doc-backdrop" *ngIf="docAberto as doc" (click)="fecharDoc()" data-testid="register-doc-modal">
+  <div class="doc-modal" #docModal role="dialog" aria-modal="true" aria-labelledby="doc-titulo"
+       tabindex="-1" (click)="$event.stopPropagation()">
+    <header class="doc-header">
+      <h2 id="doc-titulo">{{ docs[doc].titulo }}</h2>
+      <button type="button" class="doc-close" aria-label="Fechar" (click)="fecharDoc()">×</button>
+    </header>
+
+    <div class="doc-body">
+      <p class="doc-lead">Resumo dos principais pontos. Em caso de dúvida, vale o texto completo.</p>
+      <ul class="doc-points">
+        <li *ngFor="let p of docs[doc].pontos">
+          <strong>{{ p.titulo }}</strong>
+          <span>{{ p.texto }}</span>
+        </li>
+      </ul>
+      <a class="doc-full" [href]="docs[doc].url" target="_blank" rel="noopener" data-testid="register-doc-completo">
+        Ler o documento completo
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        <span class="sr-only">(abre em nova aba)</span>
+      </a>
+    </div>
+
+    <footer class="doc-footer">
+      <button type="button" class="doc-btn secondary" (click)="fecharDoc()">Fechar</button>
+      <button type="button" class="doc-btn primary" data-testid="register-doc-aceitar" (click)="aceitarDoc()">
+        {{ doc === 'politica' ? 'Li e concordo' : 'Li e aceito' }}
+      </button>
+    </footer>
   </div>
 </div>

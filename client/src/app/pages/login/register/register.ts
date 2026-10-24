@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -21,6 +21,78 @@ function mustBeTrue(c: AbstractControl): ValidationErrors | null {
   return c.value === true ? null : { required: true };
 }
 
+type Doc = 'politica' | 'termos';
+
+interface ResumoDoc {
+  titulo: string;
+  url: string;
+  pontos: Array<{ titulo: string; texto: string }>;
+}
+
+/**
+ * Resumos exibidos no cadastro. Precisam acompanhar o texto completo
+ * (pages/politica-privacidade e pages/termos-uso): ao mudar um documento,
+ * revise o resumo correspondente.
+ */
+const RESUMOS: Record<Doc, ResumoDoc> = {
+  politica: {
+    titulo: 'Política de Privacidade',
+    url: '/politica-privacidade',
+    pontos: [
+      {
+        titulo: 'O que guardamos',
+        texto: 'Nome, e-mail, perfil, senha (só como hash, nunca em texto), seus projetos e as respostas do checklist.',
+      },
+      {
+        titulo: 'Para que usamos',
+        texto: 'Criar sua conta, guardar seus projetos e gerar os relatórios de conformidade.',
+      },
+      {
+        titulo: 'Com quem compartilhamos',
+        texto: 'Ao gerar um relatório, as respostas dos itens marcados são enviadas ao Google Gemini (IA) para análise, inclusive para servidores fora do Brasil. Não vendemos seus dados.',
+      },
+      {
+        titulo: 'Seus direitos',
+        texto: 'Corrigir seus dados e baixar uma cópia deles no Perfil, e excluir a conta quando quiser. A exclusão é imediata e definitiva.',
+      },
+      {
+        titulo: 'Contato',
+        texto: 'Encarregado de dados (DPO): artcs2003@gmail.com.',
+      },
+    ],
+  },
+  termos: {
+    titulo: 'Termos de Uso',
+    url: '/termos-uso',
+    pontos: [
+      {
+        titulo: 'O que é o DevComply',
+        texto: 'Uma ferramenta de apoio técnico para avaliar a conformidade de projetos com a LGPD, com checklist e relatórios gerados por IA (Google Gemini).',
+      },
+      {
+        titulo: 'O que ele não substitui',
+        texto: 'Consultoria jurídica, o encarregado de dados (DPO) ou auditorias formais. As análises são informativas e a responsabilidade pela conformidade continua sendo sua.',
+      },
+      {
+        titulo: 'Sua conta',
+        texto: 'É preciso ter 18 anos ou mais e informar dados verdadeiros. A conta é pessoal e intransferível, e você responde pelo que for feito com ela.',
+      },
+      {
+        titulo: 'Uso aceitável',
+        texto: 'Não usar o serviço para fins ilícitos, não tentar invadi-lo ou sobrecarregá-lo e não extrair dados por meios automatizados.',
+      },
+      {
+        titulo: 'O que você insere',
+        texto: 'Você responde pela veracidade das informações e deve ter autorização para compartilhar os dados técnicos dos seus projetos.',
+      },
+      {
+        titulo: 'Encerramento',
+        texto: 'Você pode excluir a conta a qualquer momento, no Perfil ou em Configurações.',
+      },
+    ],
+  },
+};
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -28,13 +100,18 @@ function mustBeTrue(c: AbstractControl): ValidationErrors | null {
   templateUrl: './register.html',
   styleUrls: ['./register.scss']
 })
-export class Register implements OnInit {
+export class Register implements OnInit, OnDestroy {
   loading = false;
   errorMessage = '';
   successMessage = '';
-  showPoliticaPopup = false; 
-  showTermosPopup = false; 
-  private popupTimeout: any;
+
+  // Resumo da Politica/dos Termos (modal). Substitui os popups de hover, que
+  // nao funcionavam no celular nem no teclado e cobriam a outra caixa.
+  readonly docs = RESUMOS;
+  docAberto: Doc | null = null;
+  private focoAnterior: HTMLElement | null = null;
+
+  @ViewChild('docModal') private docModal?: ElementRef<HTMLElement>;
 
 
   form!: FormGroup;
@@ -99,23 +176,35 @@ export class Register implements OnInit {
       complete: () => this.loading = false
     });
   }
-  hidePoliticaPopup(): void {
-    this.popupTimeout = setTimeout(() => {
-      this.showPoliticaPopup = false;
-    }, 300); // 300ms de delay
+  abrirDoc(doc: Doc, event?: Event): void {
+    event?.preventDefault();
+    this.focoAnterior = document.activeElement as HTMLElement | null;
+    this.docAberto = doc;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => this.docModal?.nativeElement.focus());
   }
 
-  hideTermosPopup(): void {
-    this.popupTimeout = setTimeout(() => {
-      this.showTermosPopup = false;
-    }, 300); // 300ms de delay
+  fecharDoc(): void {
+    if (!this.docAberto) return;
+    this.docAberto = null;
+    document.body.style.overflow = '';
+    this.focoAnterior?.focus();
   }
 
-  keepPoliticaPopup(): void {
-    clearTimeout(this.popupTimeout);
+  /** "Li e concordo" no resumo marca a caixa correspondente. */
+  aceitarDoc(): void {
+    const campo = this.docAberto === 'politica' ? 'aceitaPolitica' : 'aceitaTermos';
+    this.form.get(campo)?.setValue(true);
+    this.form.get(campo)?.markAsTouched();
+    this.fecharDoc();
   }
 
-  keepTermosPopup(): void {
-    clearTimeout(this.popupTimeout);
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
+    this.fecharDoc();
+  }
+
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
   }
 }
