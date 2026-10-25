@@ -14,7 +14,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { AiService, IaIndisponivelError } from '@/services/ai.service';
-import { Resposta, GerarRelatorioDto, FrontCategory, FrontItem, Conformidade } from '@/types/ai.types';
+import { FrontCategory } from '@/types/ai.types';
+import { AvaliacaoIA } from './relatorio.types';
+import { itensDeEntrada, montarRelatorio } from './montar-relatorio';
+import { gerarRelatorioPdf } from './relatorio-pdf';
 import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
@@ -88,71 +91,44 @@ export class ReportsController {
     apiKey?: string,
     userId?: number,
   ) {
-    const linha = (i: FrontItem, texto: string | undefined, vazio: string) => {
-      const ref = [i.codigo, i.artigo_referente].filter(Boolean).join(' | ');
-      return `• ${ref ? `[${ref}] ` : ''}${i.titulo_item}: ${texto?.trim() || vazio}`;
-    };
+    const entrada = itensDeEntrada(categories);
+    const marcados = entrada.filter((i) => i.marcado);
+    if (!marcados.length) {
+      throw new BadRequestException('Marque ao menos um item do checklist para gerar o relatório.');
+    }
+    const naoMarcados = entrada.filter((i) => !i.marcado);
 
-    // Categorias em paralelo: com o checklist completo (6 secoes) a versao
-    // sequencial podia passar de minutos.
-    const resultados = await Promise.allSettled(
-      categories.map((cat) => {
-        const items = cat.items || [];
-        const dto: GerarRelatorioDto = {
-          instrucao: 'Escreva no máximo um único parágrafo por item.',
-          categoria: cat.categoria_nome,
-          resposta_implementacao: items
-            .map((i) => linha(i, i.resposta_implementacao, '(sem resposta)'))
-            .join('\n'),
-          resposta_tecnica: items
-            .map((i) => linha(i, i.resposta_tecnica, '(sem detalhes)'))
-            .join('\n'),
-          artigo_referente: items[0]?.artigo_referente,
-        };
-        return this.ai.gerarJSON(dto, apiKey);
-      }),
-    );
-
-    const allRespostas: Resposta[] = [];
-    const falhas: IaIndisponivelError[] = [];
-
-    resultados.forEach((r, idx) => {
-      const cat = categories[idx];
-      if (r.status === 'fulfilled') {
-        allRespostas.push(...r.value);
-        return;
-      }
+    // Uma chamada para o checklist inteiro. Os itens nao marcados nao sao avaliados:
+    // entram como "Nao atende" com a recomendacao do LGPD-Check.
+    let avaliacao: AvaliacaoIA;
+    let modelo: string;
+    try {
+      ({ avaliacao, modelo } = await this.ai.avaliarChecklist(marcados, naoMarcados, apiKey, projectName));
+    } catch (err) {
       const erro =
-        r.reason instanceof IaIndisponivelError
-          ? r.reason
-          : new IaIndisponivelError('Não foi possível gerar a análise pela IA.', 'outro');
-      falhas.push(erro);
-      // Antes o erro era engolido sem log; agora fica no log do servidor (Railway).
-      this.logger.warn(
-        `IA falhou na categoria "${cat.categoria_nome}" (projeto ${projectId ?? '-'}): ` +
-          `${erro.motivo} - ${String((r.reason as Error)?.message ?? r.reason)}`,
-      );
-      // Uma categoria com falha nao derruba o relatorio inteiro.
-      allRespostas.push({
-        titulo: `Categoria: ${cat.categoria_nome}`,
-        resumo: `Esta categoria não foi avaliada: ${erro.message}`,
-        em_conformidade: Conformidade.NAO_AVALIADO,
-      });
-    });
-
-    // Se nenhuma categoria foi avaliada, nao devolve um PDF "vazio" que parece
-    // um relatorio: responde erro para o front mostrar o motivo ao usuario.
-    if (categories.length > 0 && falhas.length === categories.length) {
-      // Nenhuma secao avaliada: a tentativa nao conta no limite de relatorios por hora.
+        err instanceof IaIndisponivelError
+          ? err
+          : new IaIndisponivelError('Não foi possível gerar a análise pela IA. Tente novamente.', 'outro');
+      this.logger.warn(`IA falhou no relatório (projeto ${projectId ?? '-'}): ${erro.motivo} - ${erro.message}`);
+      // Relatorio que nao saiu nao conta no limite de relatorios por hora.
       if (userId != null) this.quota.estornar(userId);
-      throw new ServiceUnavailableException(falhas[0].message);
+      throw new ServiceUnavailableException(erro.message);
     }
 
-    if (!allRespostas.length) {
-      throw new BadRequestException('Nenhum item marcado no checklist para gerar o relatório.');
+    const relatorio = montarRelatorio(entrada, avaliacao, { projeto: projectName, modelo });
+    const itens = relatorio.secoes.flatMap((s) => s.itens);
+    const semAvaliacao = itens.filter((i) => i.origem === 'nao_avaliado').length;
+    if (semAvaliacao === marcados.length) {
+      // A IA respondeu, mas sem nenhum dos itens pedidos: melhor avisar do que entregar um PDF vazio.
+      this.logger.warn(`IA devolveu avaliacao sem os itens pedidos (projeto ${projectId ?? '-'}).`);
+      if (userId != null) this.quota.estornar(userId);
+      throw new ServiceUnavailableException('A IA devolveu uma avaliação incompleta. Tente novamente.');
+    }
+    if (semAvaliacao) {
+      this.logger.warn(`IA deixou ${semAvaliacao} item(ns) sem avaliacao (projeto ${projectId ?? '-'}).`);
     }
 
-    const pdfBuffer = await this.ai.gerarPDF(allRespostas, projectName);
+    const pdfBuffer = await gerarRelatorioPdf(relatorio);
 
     // O Node recusa cabecalhos com caracteres fora do Latin-1: um projeto com nome
     // em outro alfabeto derrubava a resposta com ERR_INVALID_CHAR. Gera um nome

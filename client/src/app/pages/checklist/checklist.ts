@@ -44,8 +44,10 @@ export class Checklist implements OnInit, OnDestroy {
   checklistData: DisplayableChecklistCategory[] = [];
   isLoading = true;
   isGeneratingReport = false;
-  // Andamento do relatorio: quantas secoes foram para a IA e ha quanto tempo.
-  secoesRelatorio = 0;
+  // Andamento do relatorio: quantos itens foram para a IA, quantos entram como
+  // lacuna e ha quanto tempo.
+  itensIaRelatorio = 0;
+  itensLacunaRelatorio = 0;
   segundosRelatorio = 0;
   private relogioRelatorio?: ReturnType<typeof setInterval>;
 
@@ -273,25 +275,23 @@ export class Checklist implements OnInit, OnDestroy {
   generateReport(): void {
   if (this.isGeneratingReport) return;
 
-  const payload = (this.checklistData || [])
-    .map(cat => {
-      const checked = (cat.items || []).filter(i => !!i.completed);
-      if (checked.length === 0) return null;
+  // Vai o checklist inteiro: os itens marcados sao avaliados pela IA e os nao
+  // marcados entram no relatorio como lacunas, com a recomendacao do LGPD-Check.
+  const payload = (this.checklistData || []).map(cat => ({
+    categoria_nome: cat.nome,
+    items: (cat.items || []).map(i => ({
+      codigo: i.codigo ?? undefined,
+      titulo_item: i.titulo,
+      resposta_implementacao: i.answer ?? '',
+      resposta_tecnica: i.technicalDetails ?? '',
+      artigo_referente: i.lgpdReference ?? undefined,
+      marcado: !!i.completed,
+    })),
+  }));
+  const todosItens = payload.flatMap(c => c.items);
+  const marcados = todosItens.filter(i => i.marcado).length;
 
-      return {
-        categoria_nome: cat.nome,
-        items: checked.map(i => ({
-          codigo: i.codigo ?? undefined,
-          titulo_item: i.titulo,
-          resposta_implementacao: i.answer ?? '',
-          resposta_tecnica: i.technicalDetails ?? '',
-          artigo_referente: i.lgpdReference ?? undefined
-        }))
-      };
-    })
-    .filter(Boolean) as Array<{ categoria_nome: string; items: any[] }>;
-
-  if (!payload.length) {
+  if (!marcados) {
     // Antes so ia para o console e o botao parecia nao funcionar.
     this.feedback = {
       type: 'info',
@@ -310,7 +310,8 @@ export class Checklist implements OnInit, OnDestroy {
   if (this.project?.nome) form.append('projectName', this.project.nome);
 
   this.isGeneratingReport = true;
-  this.secoesRelatorio = payload.length;
+  this.itensIaRelatorio = marcados;
+  this.itensLacunaRelatorio = todosItens.length - marcados;
   this.segundosRelatorio = 0;
   this.pararRelogioRelatorio();
   this.relogioRelatorio = setInterval(() => this.segundosRelatorio++, 1000);

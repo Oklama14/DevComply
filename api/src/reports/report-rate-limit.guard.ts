@@ -27,17 +27,25 @@ export class ReportQuotaService {
 
   constructor(config: ConfigService) {
     const env = Number(config.get<string>('REPORTS_PER_HOUR'));
-    this.limite = Number.isFinite(env) && env > 0 ? env : RELATORIOS_POR_HORA_PADRAO;
+    this.limite =
+      Number.isFinite(env) && env > 0 ? env : RELATORIOS_POR_HORA_PADRAO;
   }
 
   /** Registra um relatorio. Se o limite ja foi atingido, devolve em quantos minutos libera. */
-  consumir(userId: number | string): { ok: true } | { ok: false; liberaEmMin: number } {
+  consumir(
+    userId: number | string,
+  ): { ok: true } | { ok: false; liberaEmMin: number } {
     const agora = Date.now();
-    const recentes = (this.porUsuario.get(userId) ?? []).filter((t) => agora - t < UMA_HORA_MS);
+    const recentes = (this.porUsuario.get(userId) ?? []).filter(
+      (t) => agora - t < UMA_HORA_MS,
+    );
 
     if (recentes.length >= this.limite) {
       this.porUsuario.set(userId, recentes);
-      const liberaEmMin = Math.max(1, Math.ceil((recentes[0] + UMA_HORA_MS - agora) / 60000));
+      const liberaEmMin = Math.max(
+        1,
+        Math.ceil((recentes[0] + UMA_HORA_MS - agora) / 60000),
+      );
       return { ok: false, liberaEmMin };
     }
 

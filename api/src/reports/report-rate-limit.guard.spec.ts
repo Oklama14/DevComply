@@ -1,11 +1,21 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ReportQuotaService, ReportRateLimitGuard, RELATORIOS_POR_HORA_PADRAO } from './report-rate-limit.guard';
+import {
+  ReportQuotaService,
+  ReportRateLimitGuard,
+  RELATORIOS_POR_HORA_PADRAO,
+} from './report-rate-limit.guard';
 
 const ctx = (userId?: number) =>
-  ({ switchToHttp: () => ({ getRequest: () => ({ user: userId == null ? undefined : { userId } }) }) }) as any;
-const config = (env: Record<string, string>) => ({ get: (k: string) => env[k] }) as unknown as ConfigService;
-const novoGuard = (env: Record<string, string>) => new ReportRateLimitGuard(new ReportQuotaService(config(env)));
+  ({
+    switchToHttp: () => ({
+      getRequest: () => ({ user: userId == null ? undefined : { userId } }),
+    }),
+  }) as any;
+const config = (env: Record<string, string>) =>
+  ({ get: (k: string) => env[k] }) as unknown as ConfigService;
+const novoGuard = (env: Record<string, string>) =>
+  new ReportRateLimitGuard(new ReportQuotaService(config(env)));
 
 describe('ReportRateLimitGuard', () => {
   afterEach(() => jest.useRealTimers());
@@ -20,8 +30,12 @@ describe('ReportRateLimitGuard', () => {
       fail('deveria bloquear');
     } catch (e) {
       expect(e).toBeInstanceOf(HttpException);
-      expect((e as HttpException).getStatus()).toBe(HttpStatus.TOO_MANY_REQUESTS);
-      expect((e as HttpException).message).toContain('Limite de 3 relatórios por hora');
+      expect((e as HttpException).getStatus()).toBe(
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+      expect((e as HttpException).message).toContain(
+        'Limite de 3 relatórios por hora',
+      );
     }
   });
 
@@ -43,7 +57,8 @@ describe('ReportRateLimitGuard', () => {
 
   it('usa o padrao quando REPORTS_PER_HOUR nao esta definido', () => {
     const guard = novoGuard({});
-    for (let i = 0; i < RELATORIOS_POR_HORA_PADRAO; i++) expect(guard.canActivate(ctx(9))).toBe(true);
+    for (let i = 0; i < RELATORIOS_POR_HORA_PADRAO; i++)
+      expect(guard.canActivate(ctx(9))).toBe(true);
     expect(() => guard.canActivate(ctx(9))).toThrow(HttpException);
   });
 
