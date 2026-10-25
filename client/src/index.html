@@ -7,13 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <!-- Aplica o tema antes do Angular subir (evita piscar branco no modo escuro).
-       Mesma regra do ThemeService: "devcomply-theme" = claro | escuro; sem valor = sistema. -->
+       Mesma regra do ThemeService: padrao = claro; "devcomply-theme" = escuro | sistema. -->
   <script>
     (function () {
       var pref = null;
       try { pref = localStorage.getItem('devcomply-theme'); } catch (e) {}
       var escuro = pref === 'escuro' ||
-        (pref !== 'claro' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        (pref === 'sistema' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
       document.documentElement.setAttribute('data-theme', escuro ? 'dark' : 'light');
       document.documentElement.style.colorScheme = escuro ? 'dark' : 'light';
     })();

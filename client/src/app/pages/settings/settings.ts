@@ -20,7 +20,7 @@ export class Settings implements OnInit {
   readonly theme = inject(ThemeService);
 
   readonly temas: Array<{ valor: PreferenciaTema; titulo: string; descricao: string }> = [
-    { valor: 'claro', titulo: 'Claro', descricao: 'Fundo claro' },
+    { valor: 'claro', titulo: 'Claro', descricao: 'Padrão do DevComply' },
     { valor: 'escuro', titulo: 'Escuro', descricao: 'Fundo escuro, menos brilho' },
     { valor: 'sistema', titulo: 'Automático', descricao: 'Segue o tema do seu sistema' },
   ];

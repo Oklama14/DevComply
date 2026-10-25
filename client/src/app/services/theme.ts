@@ -6,9 +6,11 @@ export type PreferenciaTema = 'claro' | 'escuro' | 'sistema';
 const CHAVE = 'devcomply-theme';
 
 /**
- * Tema claro/escuro. A escolha fica no localStorage ("devcomply-theme") so quando o
- * usuario escolhe Claro ou Escuro; "Automatico" segue o sistema e nao grava nada.
- * O index.html aplica o tema antes do Angular subir, para nao piscar branco.
+ * Tema claro/escuro. O padrao e o CLARO, para todo mundo: o escuro so liga quando o
+ * usuario escolhe "Escuro" (ou "Automatico", que segue o sistema) em Configuracoes
+ * ou no atalho da barra lateral. Nada fica no localStorage ("devcomply-theme")
+ * enquanto o tema for o padrao. O index.html aplica a mesma regra antes do Angular
+ * subir, para nao piscar.
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
@@ -26,7 +28,7 @@ export class ThemeService {
   definir(preferencia: PreferenciaTema): void {
     this.preferencia.set(preferencia);
     try {
-      if (preferencia === 'sistema') localStorage.removeItem(CHAVE);
+      if (preferencia === 'claro') localStorage.removeItem(CHAVE);
       else localStorage.setItem(CHAVE, preferencia);
     } catch {
       // armazenamento bloqueado: o tema vale so ate recarregar a pagina
@@ -40,12 +42,12 @@ export class ThemeService {
   }
 
   private lerPreferencia(): PreferenciaTema {
-    if (!this.browser) return 'sistema';
+    if (!this.browser) return 'claro';
     try {
       const v = localStorage.getItem(CHAVE);
-      return v === 'claro' || v === 'escuro' ? v : 'sistema';
+      return v === 'escuro' || v === 'sistema' ? v : 'claro';
     } catch {
-      return 'sistema';
+      return 'claro';
     }
   }
 
