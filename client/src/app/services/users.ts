@@ -19,6 +19,8 @@ export interface ChangePasswordPayload {
 }
 export interface UserSettings {
   hasGeminiKey: boolean;
+  /** Quando a chave foi salva sem o Google conseguir confirmar. */
+  aviso?: string;
 }
 
 @Injectable({ providedIn: 'root' })

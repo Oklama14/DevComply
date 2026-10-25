@@ -55,7 +55,18 @@
           formControlName="geminiApiKey"
           autocomplete="off"
           [placeholder]="hasGeminiKey ? '•••••••••••• (chave configurada)' : 'AIza...'"
+          [class.is-invalid]="!!keyError"
+          [attr.aria-invalid]="!!keyError"
+          [attr.aria-describedby]="keyError ? 'gemini-key-error' : null"
+          (input)="keyError = ''"
           class="form-control">
+
+        <p *ngIf="keyError" id="gemini-key-error" class="key-error" role="alert" data-testid="settings-gemini-key-error">
+          {{ keyError }}
+        </p>
+        <p *ngIf="keyAviso" class="key-aviso" role="status" data-testid="settings-gemini-key-aviso">
+          {{ keyAviso }}
+        </p>
 
         <div class="key-status" *ngIf="hasGeminiKey">
           <span class="badge-ok" data-testid="settings-gemini-badge">Chave configurada</span>
@@ -67,6 +78,8 @@
           Gere sua chave gratuitamente no
           <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a>.
           Se deixar em branco, os relatórios usam a chave padrão do sistema (quando disponível).
+          Só funcionam chaves do Google Gemini: chaves do ChatGPT, Claude ou DeepSeek são recusadas.
+          Ao salvar, a chave é conferida com o Google.
         </small>
         <small class="form-hint data-hint">
           🔒 A chave fica salva na sua conta, nunca é exibida de volta e é usada só para gerar os seus relatórios.
@@ -83,7 +96,7 @@
         data-testid="settings-submit"
         class="btn btn-primary" 
         [disabled]="loading">
-        <span *ngIf="loading">Salvando...</span>
+        <span *ngIf="loading">Conferindo a chave…</span>
         <span *ngIf="!loading">Salvar chave</span>
       </button>
     </div>

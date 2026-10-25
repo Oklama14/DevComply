@@ -769,7 +769,7 @@ export async function gerarRelatorioPdf(relatorio: Relatorio): Promise<Buffer> {
     })),
     ...(['leve', 'grave', 'catastrofica'] as const).map((g) => ({
       rotulo: `Gravidade ${CRITERIOS_GRAVIDADE[g].nome.toLowerCase()}`,
-      texto: CRITERIOS_GRAVIDADE[g].criterio,
+      texto: `${CRITERIOS_GRAVIDADE[g].criterio} Ex.: ${CRITERIOS_GRAVIDADE[g].exemplos}`,
     })),
     {
       rotulo: 'Não marcado',

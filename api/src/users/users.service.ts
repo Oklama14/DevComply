@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
   ConflictException,
@@ -15,6 +16,10 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { EncryptionService } from '../common/crypto/encryption.service';
+import {
+  identificarOutroProvedor,
+  verificarChaveGemini,
+} from '../services/gemini-key';
 import {
   POLITICA_PRIVACIDADE_VERSAO,
   TERMOS_USO_VERSAO,
@@ -77,16 +82,43 @@ export class UsersService {
     return { hasGeminiKey: !!user.geminiApiKey };
   }
 
+  /**
+   * Salva (ou apaga, se vazio) a chave do Gemini do usuario. Antes de salvar, recusa
+   * chave de outra IA e confere com o Google se a chave vale: o erro aparece em
+   * Configuracoes, e nao so na hora do relatorio.
+   */
   async updateGeminiKey(
     userId: number,
     apiKey?: string,
-  ): Promise<{ hasGeminiKey: boolean }> {
+  ): Promise<{ hasGeminiKey: boolean; aviso?: string }> {
     const user = await this.findOne(userId);
     if (!user) throw new NotFoundException('Usuario nao encontrado');
     const clean = apiKey?.trim();
+    let aviso: string | undefined;
+
+    if (clean) {
+      const outro = identificarOutroProvedor(clean);
+      if (outro) {
+        throw new BadRequestException(
+          `Essa chave parece ser da ${outro}. O DevComply usa só o Google Gemini: gere uma chave no Google AI Studio.`,
+        );
+      }
+      const verificacao = await verificarChaveGemini(clean);
+      if (verificacao === 'invalida') {
+        throw new BadRequestException(
+          'O Google recusou essa chave. Confira se você copiou a chave inteira do Google AI Studio e se ela não foi apagada.',
+        );
+      }
+      if (verificacao === 'indeterminada') {
+        this.logger.warn(`Chave do Gemini do usuario ${userId} salva sem confirmacao do Google.`);
+        aviso =
+          'Não foi possível confirmar a chave com o Google agora. Ela foi salva e será usada no próximo relatório.';
+      }
+    }
+
     user.geminiApiKey = clean ? this.encryption.encrypt(clean) : null;
     await this.repo.save(user);
-    return { hasGeminiKey: !!user.geminiApiKey };
+    return { hasGeminiKey: !!user.geminiApiKey, ...(aviso ? { aviso } : {}) };
   }
 
   /** Uso interno (geracao de relatorios). Retorna a chave crua do usuario. */

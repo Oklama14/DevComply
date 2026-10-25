@@ -5,6 +5,7 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { EncryptionService } from '../common/crypto/encryption.service';
 import * as bcrypt from 'bcryptjs';
+import * as geminiKey from '../services/gemini-key';
 
 jest.mock('bcryptjs');
 
@@ -52,6 +53,40 @@ describe('UsersService', () => {
   it('updateGeminiKey limpa a chave quando o valor e vazio', async () => {
     repo.findOne.mockResolvedValue({ id: 1 });
     await expect(service.updateGeminiKey(1, '   ')).resolves.toEqual({ hasGeminiKey: false });
+  });
+
+  describe('updateGeminiKey confere a chave antes de salvar', () => {
+    let verificar: jest.SpyInstance;
+    beforeEach(() => {
+      repo.findOne.mockResolvedValue({ id: 1 });
+      verificar = jest.spyOn(geminiKey, 'verificarChaveGemini');
+    });
+    afterEach(() => verificar.mockRestore());
+
+    it('recusa chave de outra IA sem consultar o Google', async () => {
+      await expect(service.updateGeminiKey(1, 'sk-proj-abc')).rejects.toThrow('OpenAI (ChatGPT)');
+      expect(verificar).not.toHaveBeenCalled();
+      expect(repo.save).not.toHaveBeenCalled();
+    });
+
+    it('recusa chave que o Google diz que nao vale', async () => {
+      verificar.mockResolvedValue('invalida');
+      await expect(service.updateGeminiKey(1, 'AIzaErrada')).rejects.toThrow('O Google recusou essa chave');
+      expect(repo.save).not.toHaveBeenCalled();
+    });
+
+    it('salva chave valida', async () => {
+      verificar.mockResolvedValue('valida');
+      await expect(service.updateGeminiKey(1, 'AIzaBoa')).resolves.toEqual({ hasGeminiKey: true });
+      expect(repo.save).toHaveBeenCalled();
+    });
+
+    it('salva com aviso quando o Google nao responde', async () => {
+      verificar.mockResolvedValue('indeterminada');
+      const r = await service.updateGeminiKey(1, 'AIzaTalvez');
+      expect(r.hasGeminiKey).toBe(true);
+      expect(r.aviso).toContain('Não foi possível confirmar');
+    });
   });
 
   it('exportAccount devolve os dados do titular sem senha e sem o valor da chave do Gemini', async () => {

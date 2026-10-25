@@ -11,7 +11,12 @@ import {
   ItemEntrada,
   SITUACOES,
 } from '../reports/relatorio.types';
-import { CRITERIOS_GRAVIDADE, CRITERIOS_SITUACAO } from '../reports/criterios';
+import {
+  CRITERIOS_GRAVIDADE,
+  CRITERIOS_SITUACAO,
+  REGRA_DESEMPATE_GRAVIDADE,
+} from '../reports/criterios';
+import { identificarOutroProvedor } from './gemini-key';
 
 /**
  * Modelos tentados em ordem. Desde set/2026 o Google limita o acesso aos modelos
@@ -124,7 +129,7 @@ export function montarPromptAvaliacao(
     .map(([chave, c]) => `- ${chave}: ${c.criterio}`)
     .join('\n');
   const criteriosGravidade = Object.entries(CRITERIOS_GRAVIDADE)
-    .map(([chave, c]) => `- ${chave}: ${c.criterio}`)
+    .map(([chave, c]) => `- ${chave}: ${c.criterio} Exemplos: ${c.exemplos}`)
     .join('\n');
   // Secao -> codigos das perguntas dela, para o resumo da secao nao falar de outras.
   const porSecao = new Map<string, string[]>();
@@ -160,6 +165,7 @@ export function montarPromptAvaliacao(
     '',
     'gravidade (só quando a situacao for parcial ou nao_atende; use "nenhuma" quando atende):',
     criteriosGravidade,
+    REGRA_DESEMPATE_GRAVIDADE,
     '',
     'Para cada item devolva:',
     '- codigo: igual ao recebido;',
@@ -172,6 +178,9 @@ export function montarPromptAvaliacao(
     '- evidencias: 1 a 2 provas que a equipe deve guardar para demonstrar o item numa auditoria (por exemplo:',
     '  print de tela com data, documento, registro no banco, log, relatório de teste), citando o que o usuário',
     '  descreveu; vazio quando nao_atende.',
+    'Use só as tecnologias, números e termos que aparecem na descrição do usuário. Não acrescente',
+    'mecanismos que ele não citou (por exemplo, firewall ou replicação entre regiões) e não troque um termo',
+    'técnico por outro mais forte (por exemplo, "outra zona" não é "outra região").',
     'Item marcado sem descrição não comprova nada: use parcial ou nao_atende e diga que falta descrever a',
     'implementação. Cada lacuna, recomendação e evidência deve tratar do próprio item; não traga assuntos de',
     'outros itens.',
@@ -252,6 +261,15 @@ export class AiService {
     responseSchema: Schema,
     apiKey?: string,
   ): Promise<{ dados: T; modelo: string }> {
+    // Chave de outra IA salva antes da conferencia em Configuracoes: nao manda ao Google.
+    const outro = apiKey?.trim() ? identificarOutroProvedor(apiKey) : null;
+    if (outro) {
+      throw new IaIndisponivelError(
+        `A chave salva em Configurações é da ${outro}. O DevComply usa só o Google Gemini: troque a chave ou apague-a para usar a chave do sistema.`,
+        'chave-invalida',
+      );
+    }
+
     const key = this.resolverChave(apiKey);
     if (!key) {
       throw new IaIndisponivelError(

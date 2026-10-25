@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -18,6 +18,7 @@ export class Settings implements OnInit {
   private usersService = inject(UsersService);
   private authService = inject(AuthService);
   readonly theme = inject(ThemeService);
+  private zone = inject(NgZone);
 
   readonly temas: Array<{ valor: PreferenciaTema; titulo: string; descricao: string }> = [
     { valor: 'claro', titulo: 'Claro', descricao: 'Padrão do DevComply' },
@@ -28,6 +29,9 @@ export class Settings implements OnInit {
   settingsForm!: FormGroup;
   loading = false;
   successMessage = '';
+  /** Erro de validacao da chave (outra IA, recusada pelo Google), mostrado junto do campo. */
+  keyError = '';
+  keyAviso = '';
   errorMessage = '';
   hasGeminiKey = false;
 
@@ -61,6 +65,8 @@ export class Settings implements OnInit {
     this.loading = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.keyError = '';
+    this.keyAviso = '';
 
     const key = (this.settingsForm.value.geminiApiKey ?? '').trim();
     if (!key) {
@@ -69,16 +75,25 @@ export class Settings implements OnInit {
       return;
     }
 
+    // A API confere a chave com o Google antes de salvar (pode levar alguns segundos).
+    // zone.run: com withFetch() a resposta pode chegar fora da zona do Angular.
     this.usersService.updateGeminiKey(key).subscribe({
-      next: (r) => {
+      next: (r) => this.zone.run(() => {
         this.hasGeminiKey = r.hasGeminiKey;
         this.settingsForm.get('geminiApiKey')?.reset('');
+        this.keyAviso = r.aviso ?? '';
         this.finishSave();
-      },
-      error: () => {
-        this.errorMessage = 'Nao foi possivel salvar a chave do Gemini.';
+      }),
+      error: (err) => this.zone.run(() => {
+        const msg = err?.error?.message;
+        if (err?.status === 400 && typeof msg === 'string') {
+          // Chave de outra IA ou recusada pelo Google: aviso junto do campo.
+          this.keyError = msg;
+        } else {
+          this.errorMessage = 'Nao foi possivel salvar a chave do Gemini.';
+        }
         this.loading = false;
-      },
+      }),
     });
   }
 

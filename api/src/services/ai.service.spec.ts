@@ -188,6 +188,18 @@ describe('AiService', () => {
     expect(modelosChamados()).toEqual(['m1', 'm2']);
   });
 
+  it('chave de outra IA salva pelo usuario nao e enviada ao Google', async () => {
+    const ai = new AiService(
+      config({ GOOGLE_API_KEY: 'k', GEMINI_MODEL: 'm1' }),
+    );
+    const err = await ai
+      .avaliarChecklist([marcado], [], 'sk-ant-api03-abc')
+      .catch((e) => e);
+    expect(err.motivo).toBe('chave-invalida');
+    expect(err.message).toContain('Anthropic (Claude)');
+    expect(generateContent).not.toHaveBeenCalled();
+  });
+
   it('chave invalida nao repete nem troca de modelo', async () => {
     generateContent.mockRejectedValue(
       erroHttp(400, 'API key not valid. Please pass a valid API key.'),
@@ -236,6 +248,9 @@ describe('AiService', () => {
     expect(prompt).toContain('Projeto avaliado: Clínica');
     expect(prompt).toContain('nao_atende:');
     expect(prompt).toContain('catastrofica:');
+    expect(prompt).toContain('Exemplos: política sem data de atualização');
+    expect(prompt).toContain('Na dúvida entre dois níveis');
+    expect(prompt).toContain('Use só as tecnologias, números e termos');
     expect(prompt).toContain('- evidencias:');
     // Resumo de secao amarrado aos codigos de cada secao
     expect(prompt).toContain('- Segurança de dados: S-01');

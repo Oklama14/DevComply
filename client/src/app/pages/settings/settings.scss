@@ -403,3 +403,35 @@ $red-600: #dc2626;
     border-color: $red-500;
   }
 }
+
+// Chave recusada (outra IA ou o Google disse que nao vale). O .form-group na
+// frente vence a regra aninhada de .form-control.
+.form-group .form-control.is-invalid {
+  border-color: var(--red-300);
+
+  &:focus {
+    border-color: #dc2626; // sem-tema
+    box-shadow: 0 0 0 3px var(--red-100);
+  }
+}
+
+.key-error,
+.key-aviso {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.key-error {
+  background: var(--red-50);
+  border: 1px solid var(--red-200);
+  color: var(--red-text);
+}
+
+.key-aviso {
+  background: var(--amber-50);
+  border: 1px solid var(--amber-200);
+  color: var(--amber-text);
+}
