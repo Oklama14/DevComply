@@ -9,8 +9,9 @@
 
     <div class="title-row">
       <h1>Checklist LGPD</h1>
-        <button class="btn btn-primary" data-testid="checklist-generate-report-top" (click)="generateReport()" [disabled]="isGeneratingReport">
-        <span class="spinner" *ngIf="isGeneratingReport"></span>
+        <button class="btn btn-primary" data-testid="checklist-generate-report-top" (click)="generateReport()" [disabled]="isGeneratingReport"
+                [class.is-loading]="isGeneratingReport" [attr.aria-busy]="isGeneratingReport">
+        <span class="spinner" *ngIf="isGeneratingReport" aria-hidden="true"></span>
         <svg *ngIf="!isGeneratingReport" class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
           <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
@@ -21,13 +22,28 @@
       </button>
     </div>
 
-    <!-- Feedback (relatório / salvar) -->
-    <div *ngIf="feedback" class="alert" [class.alert-error]="feedback.type === 'error'"
-         [class.alert-success]="feedback.type === 'success'" [class.alert-info]="feedback.type === 'info'"
-         role="status" aria-live="polite" data-testid="checklist-feedback">
-      <span>{{ feedback.message }}</span>
-      <button type="button" class="alert-close" aria-label="Fechar aviso" (click)="feedback = null">×</button>
-    </div>
+  </div>
+
+  <!-- Feedback (relatório / salvar). Fica preso no topo ao rolar a página: quem clica
+       no botão do fim também vê o andamento e o resultado do relatório. -->
+  <div *ngIf="feedback" class="alert alert-sticky" [class.alert-error]="feedback.type === 'error'"
+       [class.alert-success]="feedback.type === 'success'" [class.alert-info]="feedback.type === 'info'"
+       [class.alert-progress]="isGeneratingReport"
+       role="status" aria-live="polite" data-testid="checklist-feedback">
+    <ng-container *ngIf="isGeneratingReport; else mensagemSimples">
+      <span class="spinner spinner-info" aria-hidden="true"></span>
+      <div class="progress-text" data-testid="report-progress">
+        <strong>{{ feedback.message }}</strong>
+        <small>
+          Analisando {{ secoesRelatorio }} {{ secoesRelatorio === 1 ? 'seção' : 'seções' }} com IA.
+          Pode levar até 1 minuto; não feche esta aba.
+          <span class="elapsed" aria-hidden="true" data-testid="report-elapsed">{{ tempoRelatorio }}</span>
+        </small>
+        <div class="indeterminate" aria-hidden="true"><span></span></div>
+      </div>
+    </ng-container>
+    <ng-template #mensagemSimples><span>{{ feedback.message }}</span></ng-template>
+    <button *ngIf="!isGeneratingReport" type="button" class="alert-close" aria-label="Fechar aviso" (click)="feedback = null">×</button>
   </div>
 
   <!-- Cartão do projeto -->
@@ -162,8 +178,9 @@
   </div>
 
   <div class="right-actions">
-    <button class="btn btn-primary" data-testid="checklist-generate-report" (click)="generateReport()" [disabled]="isGeneratingReport">
-      <span class="spinner" *ngIf="isGeneratingReport"></span>
+    <button class="btn btn-primary" data-testid="checklist-generate-report" (click)="generateReport()" [disabled]="isGeneratingReport"
+                [class.is-loading]="isGeneratingReport" [attr.aria-busy]="isGeneratingReport">
+      <span class="spinner" *ngIf="isGeneratingReport" aria-hidden="true"></span>
       <svg *ngIf="!isGeneratingReport" class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
         <path d="M14 2v4a2 2 0 0 0 2 2h4"/>

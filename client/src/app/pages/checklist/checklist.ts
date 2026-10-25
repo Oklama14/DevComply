@@ -44,6 +44,16 @@ export class Checklist implements OnInit, OnDestroy {
   checklistData: DisplayableChecklistCategory[] = [];
   isLoading = true;
   isGeneratingReport = false;
+  // Andamento do relatorio: quantas secoes foram para a IA e ha quanto tempo.
+  secoesRelatorio = 0;
+  segundosRelatorio = 0;
+  private relogioRelatorio?: ReturnType<typeof setInterval>;
+
+  get tempoRelatorio(): string {
+    const m = Math.floor(this.segundosRelatorio / 60);
+    const s = this.segundosRelatorio % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
   feedback: Feedback | null = null;
 
   // Salvamento automatico: cada alteracao agenda um salvamento; os salvamentos
@@ -112,6 +122,7 @@ export class Checklist implements OnInit, OnDestroy {
 
   /** Ao sair da tela com alteracoes ainda na espera, salva na hora. */
   ngOnDestroy(): void {
+    this.pararRelogioRelatorio();
     if (this.estadoSalvamento === 'pendente') {
       this.persistir$().subscribe();
     }
@@ -120,7 +131,8 @@ export class Checklist implements OnInit, OnDestroy {
   /** Fechar/recarregar a aba com algo por salvar: o navegador pede confirmacao. */
   @HostListener('window:beforeunload', ['$event'])
   onBeforeUnload(event: BeforeUnloadEvent): void {
-    if (this.estadoSalvamento === 'pendente' || this.estadoSalvamento === 'salvando') {
+    // Tambem durante o relatorio: fechar a aba perde o PDF que esta sendo gerado.
+    if (this.estadoSalvamento === 'pendente' || this.estadoSalvamento === 'salvando' || this.isGeneratingReport) {
       event.preventDefault();
       event.returnValue = '';
     }
@@ -298,12 +310,21 @@ export class Checklist implements OnInit, OnDestroy {
   if (this.project?.nome) form.append('projectName', this.project.nome);
 
   this.isGeneratingReport = true;
-  this.feedback = { type: 'info', message: 'Gerando o relatório com IA. Isso pode levar alguns segundos…' };
+  this.secoesRelatorio = payload.length;
+  this.segundosRelatorio = 0;
+  this.pararRelogioRelatorio();
+  this.relogioRelatorio = setInterval(() => this.segundosRelatorio++, 1000);
+  this.feedback = { type: 'info', message: 'Gerando o relatório…' };
 
+  // zone.run: com withFetch() a resposta pode chegar fora da zona do Angular, e o
+  // botao ficaria em "Gerando relatório…" ate o proximo clique.
   this.checklistService.sendChecklistReportFile(form)
-    .pipe(finalize(() => this.isGeneratingReport = false))
+    .pipe(finalize(() => this.zone.run(() => {
+      this.isGeneratingReport = false;
+      this.pararRelogioRelatorio();
+    })))
     .subscribe({
-      next: (pdfBlob: Blob) => {
+      next: (pdfBlob: Blob) => this.zone.run(() => {
         const url = window.URL.createObjectURL(pdfBlob);
         const a = document.createElement('a');
         a.href = url;
@@ -311,10 +332,10 @@ export class Checklist implements OnInit, OnDestroy {
         a.click();
         window.URL.revokeObjectURL(url);
         this.feedback = { type: 'success', message: 'Relatório gerado. O download do PDF foi iniciado.' };
-      },
+      }),
       error: (err: any) => {
         console.error('[Relatório] Falha ao enviar', err);
-        this.feedback = { type: 'error', message: 'Não foi possível gerar o relatório. Tente novamente em instantes.' };
+        this.zone.run(() => this.feedback = { type: 'error', message: 'Não foi possível gerar o relatório. Tente novamente em instantes.' });
         // Ler o Blob e assincrono (Promise nativa, fora da zona): volta para a zona
         // para o Angular atualizar a tela com a mensagem da API.
         this.reportErrorMessage(err).then(message =>
@@ -323,6 +344,13 @@ export class Checklist implements OnInit, OnDestroy {
       },
     });
 }
+
+  private pararRelogioRelatorio(): void {
+    if (this.relogioRelatorio) {
+      clearInterval(this.relogioRelatorio);
+      this.relogioRelatorio = undefined;
+    }
+  }
 
   /** Com responseType 'blob', o corpo do erro (JSON da API) tambem chega como Blob. */
   private async reportErrorMessage(err: any): Promise<string> {

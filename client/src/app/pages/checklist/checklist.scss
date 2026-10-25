@@ -112,6 +112,12 @@ h1 {
   cursor: progress;
 }
 
+// Gerando relatorio: o botao fica com a cor cheia (nao parece desativado a toa)
+.btn.is-loading:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+
 // Aviso de feedback (relatorio / salvar)
 .alert {
   display: flex;
@@ -121,14 +127,21 @@ h1 {
   padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid $gray-200;
-  background: $gray-50;
+  // Tom por cima de um fundo solido: no tema escuro os tons sao translucidos, e o
+  // aviso preso no topo deixaria o conteudo aparecer por baixo.
+  background-color: var(--surface);
+  background-image: linear-gradient($gray-50, $gray-50);
   color: $gray-800;
   font-size: 14px;
   line-height: 1.5;
 
-  &.alert-info { background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-text); }
-  &.alert-success { background: $green-50; border-color: $green-200; color: var(--green-text); }
-  &.alert-error { background: var(--red-50); border-color: var(--red-200); color: var(--red-text); }
+  &.alert-info { background-image: linear-gradient(var(--blue-50), var(--blue-50)); border-color: var(--blue-200); color: var(--blue-text); }
+  &.alert-success { background-image: linear-gradient($green-50, $green-50); border-color: $green-200; color: var(--green-text); }
+  &.alert-error { background-image: linear-gradient(var(--red-50), var(--red-50)); border-color: var(--red-200); color: var(--red-text); }
+
+  &.alert-progress {
+    align-items: center;
+  }
 
   .alert-close {
     background: none;
@@ -140,6 +153,61 @@ h1 {
     opacity: 0.7;
 
     &:hover { opacity: 1; }
+  }
+}
+
+// Aviso preso no topo da area de conteudo enquanto a pagina rola
+.alert-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.progress-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+
+  small {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .elapsed {
+    margin-left: 4px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+}
+
+// Barra de andamento sem porcentagem: a API so responde no fim
+.indeterminate {
+  position: relative;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--blue-100);
+  overflow: hidden;
+
+  span {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -40%;
+    width: 40%;
+    border-radius: inherit;
+    background: var(--link);
+    animation: indeterminate 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes indeterminate {
+  to {
+    left: 100%;
   }
 }
 
@@ -712,9 +780,9 @@ textarea {
 
 .spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--surface);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.9); // sem-tema: sempre sobre o botao azul
   border-radius: 50%;
   border-top-color: transparent;
   animation: spin 0.8s linear infinite;
@@ -725,6 +793,26 @@ textarea {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+.spinner.spinner-info {
+  width: 20px;
+  height: 20px;
+  border-color: var(--link);
+  border-top-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+
+  .indeterminate span {
+    left: 0;
+    width: 100%;
+    opacity: 0.5;
+    animation: none;
   }
 }
 
