@@ -38,6 +38,7 @@ const ia: AvaliacaoIA = {
       pontos_fortes: ['A', 'A', ' '],
       lacunas: [],
       recomendacoes: [],
+      evidencias: ['Print', 'Log', 'Doc'],
     },
     {
       codigo: 'R-01',
@@ -46,6 +47,7 @@ const ia: AvaliacaoIA = {
       pontos_fortes: [],
       lacunas: ['Sem DPO'],
       recomendacoes: ['Nomeie'],
+      evidencias: ['Ata'],
     },
     {
       codigo: 'X-99',
@@ -100,11 +102,14 @@ describe('montarRelatorio', () => {
       situacao: 'nao_atende',
     });
     expect(t09.gravidade).toBeUndefined();
+    // Evidencias: no maximo 2; nada a comprovar quando nao atende.
+    expect(t03.evidencias).toEqual(['Print', 'Log']);
     expect(r01).toMatchObject({
       situacao: 'nao_atende',
       gravidade: 'leve',
       lacunas: ['Sem DPO'],
     });
+    expect(r.secoes[1].itens[0].evidencias).toEqual([]);
   });
 
   it('item marcado que a IA nao devolveu sai como nao avaliado', () => {

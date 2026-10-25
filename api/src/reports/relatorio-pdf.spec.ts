@@ -16,6 +16,7 @@ const item = (
   pontosFortes: [],
   lacunas: [],
   recomendacoes: [],
+  evidencias: [],
   ...extra,
 });
 
@@ -32,6 +33,7 @@ const relatorio: Relatorio = {
         item('T-03', {
           situacao: 'atende',
           pontosFortes: ['Política no rodapé'],
+          evidencias: ['Print da política com a data da versão'],
         }),
         item('T-09', {
           situacao: 'parcial',

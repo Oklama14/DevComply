@@ -35,6 +35,7 @@ const COR = {
   borda: '#e5e7eb',
   fundo: '#f9fafb',
   marca: '#2563eb',
+  evidencia: '#0f766e',
 };
 
 type Visual = 'atende' | 'parcial' | 'nao_atende' | 'nao_avaliado';
@@ -289,12 +290,26 @@ export async function gerarRelatorioPdf(relatorio: Relatorio): Promise<Buffer> {
   );
   y += 50;
 
-  const meta = [
-    'Método: LGPD-Check (Mendes, Viana e Rivero, SBES 2021; Neitzke et al., SBQS 2023)',
+  // Linha do metodo. A citacao completa fica em "Sobre este relatorio", no fim.
+  // lineBreak:false: o PDFKit quebrava o nome do modelo no hifen ("gemini-3.5-" / "flash-lite").
+  const sep = '   ·   ';
+  const metaBase = [
+    'Método: LGPD-Check (SBES 2021; SBQS 2023)',
     `${geral.total} perguntas`,
-    relatorio.modelo ? `Análise por IA: ${relatorio.modelo}` : 'Análise por IA',
-  ].join('   ·   ');
-  y += escrever(meta, MARGEM, y, UTIL, { tamanho: 8, cor: COR.fraco }) + 8;
+  ].join(sep);
+  const metaModelo = relatorio.modelo
+    ? `Análise por IA: ${relatorio.modelo}`
+    : 'Análise por IA';
+  fonte(false, 8, COR.fraco);
+  if (doc.widthOfString(metaBase + sep + metaModelo) <= UTIL) {
+    doc.text(metaBase + sep + metaModelo, MARGEM, y, { lineBreak: false });
+    y += 12;
+  } else {
+    doc.text(metaBase, MARGEM, y, { lineBreak: false });
+    doc.text(metaModelo, MARGEM, y + 11, { lineBreak: false });
+    y += 23;
+  }
+  y += 8;
   doc
     .moveTo(MARGEM, y)
     .lineTo(MARGEM + UTIL, y)
@@ -509,56 +524,19 @@ export async function gerarRelatorioPdf(relatorio: Relatorio): Promise<Buffer> {
     y += 10;
   }
 
-  // ---------- Como ler ----------
-  const linhasLegenda: Array<{
-    rotulo: string;
-    texto: string;
-    cor?: { fg: string; bg: string };
-  }> = [
-    ...(['atende', 'parcial', 'nao_atende'] as const).map((s) => ({
-      rotulo: CRITERIOS_SITUACAO[s].nome,
-      texto: CRITERIOS_SITUACAO[s].criterio,
-      cor: COR_VISUAL[s],
-    })),
-    ...(['leve', 'grave', 'catastrofica'] as const).map((g) => ({
-      rotulo: `Gravidade ${CRITERIOS_GRAVIDADE[g].nome.toLowerCase()}`,
-      texto: CRITERIOS_GRAVIDADE[g].criterio,
-    })),
-    {
-      rotulo: 'Não marcado',
-      texto:
-        'O item não foi marcado como implementado no checklist. Entra como "Não atende", sem análise da IA e sem gravidade, com a recomendação do LGPD-Check.',
-    },
-  ];
-  const larguraRotulo = 118;
-  const alturaLegenda =
-    30 +
-    linhasLegenda.reduce(
-      (s, l) =>
-        s + Math.max(15, altura(l.texto, false, 8.5, UTIL - larguraRotulo)) + 5,
-      0,
-    );
-  caber(Math.min(alturaLegenda, LIMITE_Y - MARGEM));
-  tituloSecao('Como ler este relatório', 11);
-  for (const l of linhasLegenda) {
-    const h = Math.max(15, altura(l.texto, false, 8.5, UTIL - larguraRotulo));
-    caber(h + 5);
-    if (l.cor) etiqueta(l.rotulo, MARGEM, y - 1, l.cor);
-    else
-      escrever(l.rotulo, MARGEM, y + 1, larguraRotulo - 8, {
-        negrito: true,
-        tamanho: 8.5,
-        cor: COR.suave,
-      });
-    escrever(l.texto, MARGEM + larguraRotulo, y + 1, UTIL - larguraRotulo, {
-      tamanho: 8.5,
-      cor: COR.suave,
-    });
-    y += h + 5;
-  }
-
   // ---------- Detalhes por secao ----------
-  novaPagina();
+  // Com espaco sobrando depois do plano de acao, comeca na mesma pagina.
+  if (LIMITE_Y - y < 260) {
+    novaPagina();
+  } else {
+    y += 12;
+    doc
+      .moveTo(MARGEM, y)
+      .lineTo(MARGEM + UTIL, y)
+      .lineWidth(1)
+      .stroke(COR.borda);
+    y += 22;
+  }
   y +=
     escrever('Detalhes por seção', MARGEM, y, UTIL, {
       negrito: true,
@@ -625,6 +603,11 @@ export async function gerarRelatorioPdf(relatorio: Relatorio): Promise<Buffer> {
         linhas: item.lacunas,
       },
       { rotulo: 'Recomendações', cor: COR.marca, linhas: item.recomendacoes },
+      {
+        rotulo: 'Evidências a guardar',
+        cor: COR.evidencia,
+        linhas: item.evidencias,
+      },
     ].filter((b) => b.linhas.length);
   };
 
@@ -772,6 +755,65 @@ export async function gerarRelatorioPdf(relatorio: Relatorio): Promise<Buffer> {
     }
     for (const item of secao.itens) desenharCard(item);
   });
+
+  // ---------- Como ler (no fim: quem decide le o resumo; a legenda e consulta) ----------
+  const linhasLegenda: Array<{
+    rotulo: string;
+    texto: string;
+    cor?: { fg: string; bg: string };
+  }> = [
+    ...(['atende', 'parcial', 'nao_atende'] as const).map((s) => ({
+      rotulo: CRITERIOS_SITUACAO[s].nome,
+      texto: CRITERIOS_SITUACAO[s].criterio,
+      cor: COR_VISUAL[s],
+    })),
+    ...(['leve', 'grave', 'catastrofica'] as const).map((g) => ({
+      rotulo: `Gravidade ${CRITERIOS_GRAVIDADE[g].nome.toLowerCase()}`,
+      texto: CRITERIOS_GRAVIDADE[g].criterio,
+    })),
+    {
+      rotulo: 'Não marcado',
+      texto:
+        'O item não foi marcado como implementado no checklist. Entra como "Não atende", sem análise da IA e sem gravidade, com a recomendação do LGPD-Check.',
+    },
+    {
+      rotulo: 'Evidências a guardar',
+      texto:
+        'O que manter arquivado para comprovar o item numa auditoria (print com data, documento, registro ou log), sugerido pela IA a partir do que foi descrito.',
+    },
+    {
+      rotulo: 'Sobre o método',
+      texto:
+        'Perguntas do LGPD-Check: Mendes, Viana e Rivero, "Developing an Inspection Checklist for the Adequacy Assessment of Software Systems to Quality Attributes of the Brazilian General Data Protection Law" (SBES 2021); Neitzke et al., "Enhancing LGPD Compliance: Evaluating a Checklist for LGPD Quality Attributes within a Government Office" (SBQS 2023). A situação dos itens marcados é avaliada por IA a partir das respostas do checklist.',
+    },
+  ];
+  const larguraRotulo = 118;
+  const alturaLegenda =
+    30 +
+    linhasLegenda.reduce(
+      (s, l) =>
+        s + Math.max(15, altura(l.texto, false, 8.5, UTIL - larguraRotulo)) + 5,
+      0,
+    );
+  caber(Math.min(alturaLegenda, LIMITE_Y - MARGEM));
+  y += 6;
+  tituloSecao('Como ler este relatório', 11);
+  for (const l of linhasLegenda) {
+    const h = Math.max(15, altura(l.texto, false, 8.5, UTIL - larguraRotulo));
+    caber(h + 5);
+    if (l.cor) etiqueta(l.rotulo, MARGEM, y - 1, l.cor);
+    else
+      escrever(l.rotulo, MARGEM, y + 1, larguraRotulo - 8, {
+        negrito: true,
+        tamanho: 8.5,
+        cor: COR.suave,
+      });
+    escrever(l.texto, MARGEM + larguraRotulo, y + 1, UTIL - larguraRotulo, {
+      tamanho: 8.5,
+      cor: COR.suave,
+    });
+    y += h + 5;
+  }
 
   // ---------- Rodape em todas as paginas ----------
   const paginas = doc.bufferedPageRange().count;

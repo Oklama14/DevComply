@@ -84,6 +84,7 @@ function itemAvaliado(
       situacao: 'nao_atende',
       pontosFortes: [],
       lacunas: [],
+      evidencias: [],
       recomendacoes: [
         entrada.recomendacaoCatalogo ??
           'Implemente o requisito e marque o item no checklist.',
@@ -98,6 +99,7 @@ function itemAvaliado(
       pontosFortes: [],
       lacunas: [],
       recomendacoes: [],
+      evidencias: [],
     };
   }
 
@@ -118,6 +120,8 @@ function itemAvaliado(
     lacunas:
       ia.situacao === 'atende' ? frases(ia.lacunas, 2) : frases(ia.lacunas),
     recomendacoes: frases(ia.recomendacoes),
+    // Nada implementado = nada para comprovar ainda.
+    evidencias: ia.situacao === 'nao_atende' ? [] : frases(ia.evidencias, 2),
   };
 }
 

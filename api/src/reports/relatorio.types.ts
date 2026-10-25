@@ -35,6 +35,8 @@ export interface AvaliacaoItemIA {
   pontos_fortes: string[];
   lacunas: string[];
   recomendacoes: string[];
+  /** O que guardar para provar o item numa auditoria (vazio quando nao atende). */
+  evidencias?: string[];
 }
 
 /** Resposta completa da IA (uma chamada por relatorio). */
@@ -63,6 +65,7 @@ export interface ItemRelatorio {
   pontosFortes: string[];
   lacunas: string[];
   recomendacoes: string[];
+  evidencias: string[];
 }
 
 export interface SecaoRelatorio {

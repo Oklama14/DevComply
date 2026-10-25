@@ -236,6 +236,10 @@ describe('AiService', () => {
     expect(prompt).toContain('Projeto avaliado: Clínica');
     expect(prompt).toContain('nao_atende:');
     expect(prompt).toContain('catastrofica:');
+    expect(prompt).toContain('- evidencias:');
+    // Resumo de secao amarrado aos codigos de cada secao
+    expect(prompt).toContain('- Segurança de dados: S-01');
+    expect(prompt).toContain('- Responsabilidade do controlador: R-01');
     expect(prompt).toContain('[S-01] Seção: Segurança de dados');
     expect(prompt).toContain('Implementação descrita: Login com senha');
     const naoMarcados = prompt.slice(prompt.indexOf('<nao_marcados>'));

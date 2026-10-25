@@ -90,6 +90,7 @@ const SCHEMA_AVALIACAO = {
           pontos_fortes: listaDeTextos,
           lacunas: listaDeTextos,
           recomendacoes: listaDeTextos,
+          evidencias: listaDeTextos,
         },
         required: [
           'codigo',
@@ -98,6 +99,7 @@ const SCHEMA_AVALIACAO = {
           'pontos_fortes',
           'lacunas',
           'recomendacoes',
+          'evidencias',
         ],
       },
     },
@@ -124,9 +126,14 @@ export function montarPromptAvaliacao(
   const criteriosGravidade = Object.entries(CRITERIOS_GRAVIDADE)
     .map(([chave, c]) => `- ${chave}: ${c.criterio}`)
     .join('\n');
-  const secoes = [
-    ...new Set([...marcados, ...naoMarcados].map((i) => i.secao)),
-  ];
+  // Secao -> codigos das perguntas dela, para o resumo da secao nao falar de outras.
+  const porSecao = new Map<string, string[]>();
+  for (const i of [...marcados, ...naoMarcados]) {
+    porSecao.set(i.secao, [...(porSecao.get(i.secao) ?? []), i.codigo]);
+  }
+  const secoes = [...porSecao.entries()]
+    .map(([secao, codigos]) => `- ${secao}: ${codigos.join(', ')}`)
+    .join('\n');
 
   const itens = marcados
     .map((i) =>
@@ -154,17 +161,28 @@ export function montarPromptAvaliacao(
     'gravidade (só quando a situacao for parcial ou nao_atende; use "nenhuma" quando atende):',
     criteriosGravidade,
     '',
-    'Para cada item devolva: codigo (igual ao recebido); situacao; gravidade; pontos_fortes (0 a 3 frases);',
-    'lacunas (0 a 3 frases; vazio quando atende); recomendacoes (0 a 3 ações concretas, cada uma começando',
-    'por um verbo; vazio quando não há lacuna). Item marcado sem descrição não comprova nada: use parcial ou',
-    'nao_atende e diga que falta descrever a implementação. Cada lacuna e recomendação deve tratar do próprio',
-    'item; não traga assuntos de outros itens.',
+    'Para cada item devolva:',
+    '- codigo: igual ao recebido;',
+    '- situacao e gravidade;',
+    '- pontos_fortes: 0 a 2 frases dizendo que parte do requisito está coberta e por quê. Não copie nem',
+    '  resuma a descrição do usuário. Em item parcial ou nao_atende, só o que de fato ajuda a cumprir o',
+    '  requisito; se nada ajuda, deixe vazio;',
+    '- lacunas: 0 a 3 frases; vazio quando atende;',
+    '- recomendacoes: 0 a 3 ações concretas, cada uma começando por um verbo; vazio quando não há lacuna;',
+    '- evidencias: 1 a 2 provas que a equipe deve guardar para demonstrar o item numa auditoria (por exemplo:',
+    '  print de tela com data, documento, registro no banco, log, relatório de teste), citando o que o usuário',
+    '  descreveu; vazio quando nao_atende.',
+    'Item marcado sem descrição não comprova nada: use parcial ou nao_atende e diga que falta descrever a',
+    'implementação. Cada lacuna, recomendação e evidência deve tratar do próprio item; não traga assuntos de',
+    'outros itens.',
     '',
     'resumo_executivo: 3 a 5 frases em linguagem simples, para um gestor que não é da área técnica, com o',
     'nível geral de conformidade, os principais riscos e o que fazer primeiro. Considere também os itens de',
     '<nao_marcados>, que o usuário declarou não ter implementado (eles não devem ser avaliados em itens).',
     '',
-    `secoes: para cada uma destas seções (${secoes.join('; ')}), devolva o nome exatamente como escrito e 1 a 2 frases sobre a situação dela.`,
+    'secoes: para cada seção abaixo, devolva o nome exatamente como escrito e 1 a 2 frases sobre a situação',
+    'dela, falando só das perguntas daquela seção (os códigos estão ao lado do nome):',
+    secoes,
     '',
     '<itens>',
     itens,
