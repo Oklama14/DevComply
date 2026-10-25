@@ -18,7 +18,7 @@ import { Resposta, GerarRelatorioDto, FrontCategory, FrontItem, Conformidade } f
 import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
-import { ReportRateLimitGuard } from './report-rate-limit.guard';
+import { ReportQuotaService, ReportRateLimitGuard } from './report-rate-limit.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('reports')
@@ -29,6 +29,7 @@ export class ReportsController {
     private readonly ai: AiService,
     private readonly projectsService: ProjectsService,
     private readonly usersService: UsersService,
+    private readonly quota: ReportQuotaService,
   ) {}
 
   // ====== 1) multipart/form-data: arquivo JSON ======
@@ -59,7 +60,7 @@ export class ReportsController {
     }
 
     const apiKey = (await this.usersService.getGeminiKey(req.user.userId)) ?? undefined;
-    return this.generateAndSendPdf(payload, res, body?.projectId, body?.projectName, apiKey);
+    return this.generateAndSendPdf(payload, res, body?.projectId, body?.projectName, apiKey, req.user.userId);
   }
 
 
@@ -75,7 +76,7 @@ export class ReportsController {
       throw new BadRequestException('Payload deve ser um array de categorias.');
     }
     const apiKey = (await this.usersService.getGeminiKey(req.user.userId)) ?? undefined;
-    return this.generateAndSendPdf(payload, res, undefined, undefined, apiKey);
+    return this.generateAndSendPdf(payload, res, undefined, undefined, apiKey, req.user.userId);
   }
 
   // ====== helper: chama IA e gera o PDF ======
@@ -85,6 +86,7 @@ export class ReportsController {
     projectId?: string | number,
     projectName?: string,
     apiKey?: string,
+    userId?: number,
   ) {
     const linha = (i: FrontItem, texto: string | undefined, vazio: string) => {
       const ref = [i.codigo, i.artigo_referente].filter(Boolean).join(' | ');
@@ -141,6 +143,8 @@ export class ReportsController {
     // Se nenhuma categoria foi avaliada, nao devolve um PDF "vazio" que parece
     // um relatorio: responde erro para o front mostrar o motivo ao usuario.
     if (categories.length > 0 && falhas.length === categories.length) {
+      // Nenhuma secao avaliada: a tentativa nao conta no limite de relatorios por hora.
+      if (userId != null) this.quota.estornar(userId);
       throw new ServiceUnavailableException(falhas[0].message);
     }
 

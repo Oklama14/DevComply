@@ -15,12 +15,25 @@ const logoPath = path.join(__dirname, '..', '..', 'logo.png');
 export const MODELOS_GEMINI_PADRAO = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
 
 const TIMEOUT_IA_MS = 60_000;
+/** Espera antes de repetir a chamada quando o Google responde com erro passageiro. */
+export const ESPERA_RETENTATIVA_MS = 2_000;
 
 /** Erro da IA com mensagem segura para mostrar ao usuario. */
 export class IaIndisponivelError extends Error {
   constructor(
     message: string,
-    readonly motivo: 'sem-chave' | 'chave-invalida' | 'cota' | 'modelo' | 'timeout' | 'resposta' | 'outro',
+    readonly motivo:
+      | 'sem-chave'
+      | 'chave-invalida'
+      | 'cota'
+      | 'modelo'
+      | 'timeout'
+      | 'resposta'
+      | 'instavel'
+      | 'rede'
+      | 'bloqueio'
+      | 'requisicao'
+      | 'outro',
   ) {
     super(message);
     this.name = 'IaIndisponivelError';
@@ -106,26 +119,96 @@ export class AiService {
         systemInstruction: instrucao,
       });
 
-      try {
-        const result = await this.withTimeout(model.generateContent(prompt), TIMEOUT_IA_MS);
-        const respostas = JSON.parse(result.response.text()) as Resposta[];
-        if (!Array.isArray(respostas)) {
-          throw new IaIndisponivelError('A IA retornou um formato inesperado.', 'resposta');
+      // Ate 2 tentativas no mesmo modelo: erro passageiro do Google (503 "model is
+      // overloaded", 500, queda de rede) costuma passar em segundos.
+      for (let tentativa = 1; tentativa <= 2; tentativa++) {
+        try {
+          const result = await this.withTimeout(model.generateContent(prompt), TIMEOUT_IA_MS);
+          const respostas = JSON.parse(result.response.text()) as Resposta[];
+          if (!Array.isArray(respostas)) {
+            throw new IaIndisponivelError('A IA retornou um formato inesperado.', 'resposta');
+          }
+          return respostas;
+        } catch (err) {
+          ultimoErro = err;
+          this.logger.warn(`Gemini ${nome} (tentativa ${tentativa}) falhou: ${this.resumoErro(err)}`);
+          if (tentativa === 1 && this.ehPassageiro(err)) {
+            await this.esperar(ESPERA_RETENTATIVA_MS);
+            continue;
+          }
+          break;
         }
-        return respostas;
-      } catch (err) {
-        ultimoErro = err;
-        const temProximo = i < modelos.length - 1;
-        // Modelo inexistente/aposentado: tenta o proximo da lista.
-        if (temProximo && this.ehModeloIndisponivel(err)) {
-          this.logger.warn(`Modelo ${nome} indisponivel; tentando ${modelos[i + 1]}.`);
-          continue;
-        }
-        break;
       }
+
+      // Antes so trocava de modelo no 404; agora tambem quando o modelo esta
+      // sobrecarregado, sem cota (a cota e por modelo) ou recusou o pedido.
+      const proximo = modelos[i + 1];
+      if (proximo && this.valeTentarOutroModelo(ultimoErro)) {
+        this.logger.warn(`Tentando o modelo ${proximo} no lugar de ${nome}.`);
+        continue;
+      }
+      break;
     }
 
     throw this.traduzirErro(ultimoErro);
+  }
+
+  private status(err: unknown): number | undefined {
+    const s = (err as { status?: unknown })?.status;
+    return typeof s === 'number' ? s : undefined;
+  }
+
+  private mensagem(err: unknown): string {
+    return String((err as Error)?.message ?? err);
+  }
+
+  /** Erro do lado do Google ou da rede, que costuma passar sozinho. */
+  private ehPassageiro(err: unknown): boolean {
+    const status = this.status(err);
+    if (status !== undefined) return status >= 500;
+    return this.ehErroDeRede(err);
+  }
+
+  private ehErroDeRede(err: unknown): boolean {
+    return /fetch failed|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|socket hang up|network/i.test(
+      this.mensagem(err),
+    );
+  }
+
+  private ehChaveInvalida(err: unknown): boolean {
+    const status = this.status(err);
+    return status === 401 || status === 403 || (status === 400 && /api key/i.test(this.mensagem(err)));
+  }
+
+  private valeTentarOutroModelo(err: unknown): boolean {
+    if (err instanceof IaIndisponivelError) return false;
+    if (this.ehChaveInvalida(err)) return false; // a outra tentativa usaria a mesma chave
+    if (/Tempo esgotado/.test(this.mensagem(err))) return false; // ja esperou 60 s
+    const status = this.status(err);
+    return (
+      this.ehModeloIndisponivel(err) ||
+      this.ehPassageiro(err) ||
+      status === 429 ||
+      status === 400
+    );
+  }
+
+  /** Trecho da mensagem do Google depois de "[503 Service Unavailable]", sem os detalhes em JSON. */
+  private detalheGoogle(err: unknown): string {
+    const msg = this.mensagem(err);
+    const m = msg.match(/\[\d{3}[^\]]*\]\s*([\s\S]*)$/);
+    const texto = (m ? m[1] : msg).split(' [{')[0].replace(/\s+/g, ' ').trim();
+    return texto.length > 200 ? texto.slice(0, 197) + '...' : texto;
+  }
+
+  /** Linha curta para o log (a chave vai no cabecalho da requisicao, nao aparece aqui). */
+  private resumoErro(err: unknown): string {
+    const status = this.status(err);
+    return `${status ?? (err as Error)?.name ?? 'erro'}: ${this.detalheGoogle(err)}`;
+  }
+
+  private esperar(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private ehModeloIndisponivel(err: unknown): boolean {
@@ -134,11 +217,11 @@ export class AiService {
     return status === 404 || /not found|no longer available|is not supported/i.test(msg);
   }
 
-  /** Converte o erro do SDK numa mensagem segura (sem detalhes internos) para o usuario. */
+  /** Converte o erro do SDK numa mensagem para o usuario (sem a chave nem detalhes internos). */
   private traduzirErro(err: unknown): IaIndisponivelError {
     if (err instanceof IaIndisponivelError) return err;
-    const status = (err as { status?: number })?.status;
-    const msg = String((err as Error)?.message ?? err);
+    const status = this.status(err);
+    const msg = this.mensagem(err);
 
     if (/Tempo esgotado/.test(msg)) {
       return new IaIndisponivelError('A IA demorou demais para responder. Tente novamente.', 'timeout');
@@ -164,10 +247,35 @@ export class AiService {
         'modelo',
       );
     }
+    if (status !== undefined && status >= 500) {
+      return new IaIndisponivelError(
+        `O Gemini está sobrecarregado ou instável agora (erro ${status} do Google). Tente novamente em alguns minutos.`,
+        'instavel',
+      );
+    }
+    if (status === undefined && this.ehErroDeRede(err)) {
+      return new IaIndisponivelError(
+        'O servidor não conseguiu se conectar ao Gemini. Tente novamente em instantes.',
+        'rede',
+      );
+    }
+    if (/blocked|SAFETY|RECITATION/i.test(msg)) {
+      return new IaIndisponivelError(
+        'O Gemini bloqueou a resposta pelos filtros de segurança. Revise o texto das respostas e tente novamente.',
+        'bloqueio',
+      );
+    }
+    if (status === 400) {
+      return new IaIndisponivelError(`O Gemini recusou o pedido (erro 400): ${this.detalheGoogle(err)}`, 'requisicao');
+    }
     if (err instanceof SyntaxError) {
       return new IaIndisponivelError('A IA retornou uma resposta inválida. Tente novamente.', 'resposta');
     }
-    return new IaIndisponivelError('Não foi possível gerar a análise pela IA. Tente novamente.', 'outro');
+    // Ainda generico, mas com o codigo/detalhe para dar para investigar sem abrir o log.
+    return new IaIndisponivelError(
+      `Não foi possível gerar a análise pela IA (${this.resumoErro(err)}). Tente novamente.`,
+      'outro',
+    );
   }
 
   private withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {

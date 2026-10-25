@@ -6,12 +6,14 @@ import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
 import { Conformidade } from '@/types/ai.types';
 import { ConfigService } from '@nestjs/config';
+import { ReportQuotaService } from './report-rate-limit.guard';
 
 describe('ReportsController', () => {
   let controller: ReportsController;
   const ai = { gerarJSON: jest.fn(), gerarPDF: jest.fn() };
   const users = { getGeminiKey: jest.fn() };
   const projects = { findOne: jest.fn() };
+  const quota = { consumir: jest.fn(() => ({ ok: true })), estornar: jest.fn(), limite: 10 };
 
   const req = { user: { userId: 7 } };
   const res = () => ({ setHeader: jest.fn(), send: jest.fn((b) => b) });
@@ -34,6 +36,7 @@ describe('ReportsController', () => {
         { provide: ProjectsService, useValue: projects },
         { provide: UsersService, useValue: users },
         { provide: ConfigService, useValue: { get: () => undefined } },
+        { provide: ReportQuotaService, useValue: quota },
       ],
     }).compile();
     controller = moduleRef.get(ReportsController);
@@ -78,5 +81,15 @@ describe('ReportsController', () => {
       controller.uploadChecklist(req, arquivo(payload), { projectId: '1' }, res() as any),
     ).rejects.toThrow(ServiceUnavailableException);
     expect(ai.gerarPDF).not.toHaveBeenCalled();
+    // A tentativa que falhou inteira nao conta no limite por hora.
+    expect(quota.estornar).toHaveBeenCalledWith(7);
+  });
+
+  it('nao estorna quando ao menos uma secao foi avaliada', async () => {
+    ai.gerarJSON
+      .mockResolvedValueOnce([{ titulo: 't', resumo: 'r', em_conformidade: Conformidade.HIGH }])
+      .mockRejectedValueOnce(new IaIndisponivelError('limite', 'cota'));
+    await controller.uploadChecklist(req, arquivo(payload), { projectId: '1' }, res() as any);
+    expect(quota.estornar).not.toHaveBeenCalled();
   });
 });
