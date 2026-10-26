@@ -1,0 +1,307 @@
+// Guia da lgpd-scan. Cores so pelos tokens do tema (styles.scss), para valer no
+// claro e no escuro.
+
+.guia-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 16px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.guia {
+  width: 100%;
+  max-width: 680px;
+  margin: auto 0;
+  background: var(--surface);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.guia-header {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 24px 8px;
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-900);
+    outline: none;
+  }
+}
+
+.guia-intro {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gray-600);
+
+  strong { color: var(--gray-900); }
+}
+
+.guia-fechar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--gray-500);
+  cursor: pointer;
+
+  &:hover { background: var(--gray-100); color: var(--gray-900); }
+}
+
+.passos {
+  list-style: none;
+  margin: 0;
+  padding: 8px 24px 0;
+}
+
+.passo {
+  display: flex;
+  gap: 14px;
+  padding: 16px 0;
+  border-top: 1px solid var(--gray-200);
+
+  &:first-child { border-top: none; }
+}
+
+.passo-num {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--blue-100);
+  color: var(--primary-text);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.passo-corpo {
+  flex: 1;
+  min-width: 0; // deixa o bloco de codigo rolar em vez de alargar o guia
+
+  h3 {
+    margin: 3px 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+
+  p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  p code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--gray-100);
+    color: var(--gray-900);
+  }
+
+  a {
+    color: var(--link);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.passo-tag {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  color: var(--gray-600);
+  font-size: 12px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.passo-nota {
+  font-size: 13px !important;
+  color: var(--gray-500);
+}
+
+.codigo {
+  margin: 0 0 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  background: var(--gray-50);
+  overflow: hidden;
+
+  pre {
+    margin: 0;
+    padding: 10px 12px 12px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gray-900);
+    white-space: pre;
+  }
+
+  &.pedido pre { white-space: pre-wrap; }
+}
+
+// Barra de cima do bloco: abas ou rotulo a esquerda, Copiar a direita. Fora do
+// texto, para nunca cobrir o fim de um comando longo.
+.codigo-barra {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--gray-200);
+  background: var(--gray-100);
+}
+
+.codigo-rotulo {
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-500);
+}
+
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  button {
+    padding: 4px 10px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: none;
+    color: var(--gray-500);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { color: var(--gray-900); }
+
+    &.ativa {
+      background: var(--surface);
+      border-color: var(--gray-300);
+      color: var(--gray-900);
+    }
+  }
+}
+
+.atualizar .codigo { margin-top: 8px; }
+
+.copiar {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--gray-700);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover { border-color: var(--gray-400); color: var(--gray-900); }
+}
+
+.atualizar {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--gray-500);
+
+  summary { cursor: pointer; }
+}
+
+.g-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:disabled { opacity: 0.7; cursor: progress; }
+}
+
+.g-btn-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+.g-btn-primary {
+  background: #2563eb;
+  color: #fff;
+
+  &:hover:not(:disabled) { background: #1d4ed8; }
+}
+
+.g-btn-secondary {
+  margin-bottom: 0;
+  background: var(--surface);
+  border-color: var(--gray-300);
+  color: var(--gray-700);
+
+  &:hover { background: var(--gray-50); }
+}
+
+.resultado {
+  font-size: 14px;
+  font-weight: 600;
+
+  &.ok { color: var(--green-text); }
+  &.erro { color: var(--red-text); }
+}
+
+.guia-footer {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--gray-200);
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--gray-500);
+  }
+}
+
+@media (max-width: 600px) {
+  .guia-backdrop { padding: 12px; }
+  .guia-header { padding: 20px 16px 4px; }
+  .passos { padding: 4px 16px 0; }
+  .passo { gap: 10px; }
+  .guia-footer {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+  .g-btn { width: 100%; justify-content: center; }
+}

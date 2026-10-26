@@ -140,10 +140,13 @@ export class ChecklistService implements OnApplicationBootstrap {
       schema: DECLARACOES_SCHEMA,
       projeto: projeto?.trim() || null,
       gerado_em: agora.toISOString(),
+      // Quem abrir o arquivo sem ter visto o guia da tela tambem sabe o que fazer.
       aviso:
-        'O que a equipe marcou e descreveu no checklist do DevComply. Declaracao nao ' +
-        'e evidencia: a lgpd-scan confronta cada item com o codigo ' +
-        '(python3 scripts/devcomply.py conciliar . --declaracoes devcomply-declaracoes.json).',
+        'O que a equipe marcou e descreveu no checklist do DevComply. Para comparar com o ' +
+        'codigo: salve este arquivo na raiz do repositorio e peca ao agente com a lgpd-scan ' +
+        'instalada (https://github.com/Oklama14/lgpd-scan): "Audite este projeto com a ' +
+        'lgpd-scan e compare com o que declaramos no DevComply". Declaracao nao e ' +
+        'evidencia: a skill confronta cada item com o codigo.',
       itens,
     };
   }

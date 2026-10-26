@@ -1,0 +1,123 @@
+<div class="guia-backdrop" (click)="fechar.emit()">
+  <div class="guia" role="dialog" aria-modal="true" aria-labelledby="guia-titulo"
+       data-testid="lgpd-scan-guide" (click)="$event.stopPropagation()">
+
+    <header class="guia-header">
+      <div>
+        <h2 id="guia-titulo" tabindex="-1" #titulo>Comparar com o código usando a lgpd-scan</h2>
+        <p class="guia-intro">
+          O checklist registra o que vocês <strong>declaram</strong>. A lgpd-scan é uma skill para agentes
+          de código (Claude Code, Codex, Gemini CLI, Cursor e OpenCode) que lê o código do projeto e
+          mostra o que está de fato <strong>implementado</strong>. Ela roda no seu computador: o código não
+          passa pelo DevComply.
+        </p>
+      </div>
+      <button type="button" class="guia-fechar" aria-label="Fechar guia" data-testid="lgpd-scan-guide-close"
+              (click)="fechar.emit()">×</button>
+    </header>
+
+    <ol class="passos">
+      <!-- 1. Instalar -->
+      <li class="passo">
+        <span class="passo-num" aria-hidden="true">1</span>
+        <div class="passo-corpo">
+          <h3>Instale a lgpd-scan <span class="passo-tag">só na primeira vez</span></h3>
+          <p>Precisa de Git e de Python 3.8 ou mais recente. No terminal (no Windows, o PowerShell):</p>
+
+          <div class="codigo">
+            <div class="codigo-barra">
+              <div class="abas" role="tablist" aria-label="Sistema operacional">
+                <button type="button" role="tab" data-testid="lgpd-scan-guide-tab-windows"
+                        [attr.aria-selected]="sistema === 'windows'" [class.ativa]="sistema === 'windows'"
+                        (click)="sistema = 'windows'">Windows</button>
+                <button type="button" role="tab" data-testid="lgpd-scan-guide-tab-unix"
+                        [attr.aria-selected]="sistema === 'unix'" [class.ativa]="sistema === 'unix'"
+                        (click)="sistema = 'unix'">macOS e Linux</button>
+              </div>
+              <button type="button" class="copiar" (click)="copiar('instalar', instalar[sistema])">
+                {{ copiado === 'instalar' ? 'Copiado ✓' : 'Copiar' }}
+              </button>
+            </div>
+            <pre role="tabpanel" data-testid="lgpd-scan-guide-install"><code>{{ instalar[sistema] }}</code></pre>
+          </div>
+          <p class="passo-nota">
+            O instalador encontra os agentes que você usa e deixa a skill valendo em todos os projetos.
+            <a [href]="repo" target="_blank" rel="noopener">Instruções completas no GitHub</a>.
+          </p>
+          <details class="atualizar">
+            <summary>Já instalou? Para atualizar</summary>
+            <div class="codigo">
+              <div class="codigo-barra">
+                <span class="codigo-rotulo">{{ sistema === 'windows' ? 'Windows' : 'macOS e Linux' }}</span>
+                <button type="button" class="copiar" (click)="copiar('atualizar', atualizar[sistema])">
+                  {{ copiado === 'atualizar' ? 'Copiado ✓' : 'Copiar' }}
+                </button>
+              </div>
+              <pre><code>{{ atualizar[sistema] }}</code></pre>
+            </div>
+          </details>
+        </div>
+      </li>
+
+      <!-- 2. Baixar as declaracoes -->
+      <li class="passo">
+        <span class="passo-num" aria-hidden="true">2</span>
+        <div class="passo-corpo">
+          <h3>Baixe as declarações deste projeto</h3>
+          <p>
+            Salve o <code>{{ arquivo }}</code> na <strong>pasta raiz do repositório</strong> do projeto, a
+            mesma do <code>package.json</code> ou do <code>pom.xml</code>.
+          </p>
+          <button type="button" class="g-btn g-btn-primary" data-testid="lgpd-scan-guide-download"
+                  (click)="baixar.emit()" [disabled]="exportando" [attr.aria-busy]="exportando">
+            <svg class="g-btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <path d="m7 10 5 5 5-5"/>
+              <path d="M12 15V3"/>
+            </svg>
+            {{ exportando ? 'Preparando…' : 'Baixar declarações' }}
+          </button>
+          <p class="resultado ok" *ngIf="resultado && !erro" role="status" data-testid="lgpd-scan-guide-result">
+            ✓ Baixado: {{ resultado.marcados }} de {{ resultado.total }} itens marcados.
+          </p>
+          <p class="resultado erro" *ngIf="erro" role="alert" data-testid="lgpd-scan-guide-error">{{ erro }}</p>
+          <p class="passo-nota">
+            O arquivo leva o que vocês marcaram e escreveram em cada item. Se não quiser versioná-lo,
+            adicione o nome dele ao <code>.gitignore</code>.
+          </p>
+        </div>
+      </li>
+
+      <!-- 3. Pedir ao agente -->
+      <li class="passo">
+        <span class="passo-num" aria-hidden="true">3</span>
+        <div class="passo-corpo">
+          <h3>Peça ao agente</h3>
+          <p>Abra o agente na pasta do projeto e envie:</p>
+          <div class="codigo pedido">
+            <div class="codigo-barra">
+              <span class="codigo-rotulo">Mensagem para o agente</span>
+              <button type="button" class="copiar" (click)="copiar('pedido', pedido)">
+                {{ copiado === 'pedido' ? 'Copiado ✓' : 'Copiar' }}
+              </button>
+            </div>
+            <pre data-testid="lgpd-scan-guide-prompt"><code>{{ pedido }}</code></pre>
+          </div>
+          <p>
+            O resultado sai no <code>RELATORIO-LGPD.md</code>. Comece pela seção
+            <strong>Declarado × código</strong>: são os itens marcados aqui que o código não mostra.
+          </p>
+        </div>
+      </li>
+    </ol>
+
+    <footer class="guia-footer">
+      <p>
+        A lgpd-scan não substitui o checklist. O que não fica no código (encarregado, contratos,
+        treinamento) continua sendo respondido aqui.
+      </p>
+      <button type="button" class="g-btn g-btn-secondary" (click)="fechar.emit()">Fechar</button>
+    </footer>
+  </div>
+</div>
