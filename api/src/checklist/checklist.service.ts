@@ -8,6 +8,11 @@ import { LgpdArticle } from './entities/lgpd-article.entity';
 
 import { SaveChecklistDto } from './dto/save-checklist.dto';
 import { ChecklistCategoryDto, ChecklistItemDto } from './dto/checklist.dto';
+import {
+  DECLARACOES_SCHEMA,
+  DeclaracaoItem,
+  DeclaracoesExport,
+} from './dto/declaracoes.dto';
 import { aplicarCatalogoLgpdCheck } from './catalog/lgpd-check.catalog';
 
 @Injectable()
@@ -89,6 +94,58 @@ export class ChecklistService implements OnApplicationBootstrap {
       where: { projetoId: projectId }, // ajuste para 'projectId' se sua entity usar inglês
       order: { id: 'ASC' },
     });
+  }
+
+  /**
+   * GET /checklist/project/:id/declaracoes — o checklist do projeto no formato
+   * `devcomply/declaracoes/1`, para a lgpd-scan confrontar com o codigo.
+   *
+   * Vao todos os itens, na ordem do checklist: o nao marcado tambem e uma
+   * declaracao ("nao implementamos"), e a skill o usa para achar o que esta
+   * implementado sem ter sido declarado. Item sem resposta salva conta como nao
+   * marcado, como no relatorio.
+   */
+  async exportarDeclaracoes(
+    projectId: number,
+    projeto: string | null,
+    agora: Date = new Date(),
+  ): Promise<DeclaracoesExport> {
+    const [estrutura, respostas] = await Promise.all([
+      this.getStructuredQuestions(),
+      this.findByProjectId(projectId),
+    ]);
+    const porPergunta = new Map(respostas.map((r) => [r.perguntaId, r]));
+
+    const itens: DeclaracaoItem[] = [];
+    for (const secao of estrutura) {
+      for (const pergunta of secao.items) {
+        const codigo = (pergunta.codigo ?? '').trim().toUpperCase();
+        if (!codigo) continue; // sem codigo a skill nao tem como ligar ao requisito
+        const resposta = porPergunta.get(pergunta.id);
+        const item: DeclaracaoItem = {
+          codigo,
+          secao: secao.nome,
+          pergunta: pergunta.titulo,
+          marcado: !!resposta?.conformidade,
+        };
+        const implementacao = resposta?.resposta?.trim();
+        if (implementacao) item.implementacao = implementacao;
+        const tecnico = resposta?.detalhesTecnicos?.trim();
+        if (tecnico) item.tecnico = tecnico;
+        itens.push(item);
+      }
+    }
+
+    return {
+      schema: DECLARACOES_SCHEMA,
+      projeto: projeto?.trim() || null,
+      gerado_em: agora.toISOString(),
+      aviso:
+        'O que a equipe marcou e descreveu no checklist do DevComply. Declaracao nao ' +
+        'e evidencia: a lgpd-scan confronta cada item com o codigo ' +
+        '(python3 scripts/devcomply.py conciliar . --declaracoes devcomply-declaracoes.json).',
+      itens,
+    };
   }
 
   /** POST /checklist/project/:id — salvar (upsert por pergunta) */

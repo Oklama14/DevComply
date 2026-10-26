@@ -13,6 +13,7 @@ import { SaveChecklistDto } from './dto/save-checklist.dto';
 import { ChecklistQuestion } from './entities/checklist-question.entity';
 import { ChecklistResponse } from './entities/checklist-response.entity';
 import { ChecklistCategoryDto } from './dto/checklist.dto';
+import { DeclaracoesExport } from './dto/declaracoes.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProjectsService } from '../projects/projects.service';
 
@@ -56,4 +57,16 @@ export class ChecklistController {
 
     return this.checklistService.findByProjectId(projectId);
   }
-}
+
+  // GET /checklist/project/:id/declaracoes - O checklist no formato da lgpd-scan
+  // (devcomply/declaracoes/1), para comparar o que foi declarado com o codigo.
+  @Get('project/:id/declaracoes')
+  async exportarDeclaracoes(
+    @Request() req,
+    @Param('id', ParseIntPipe) projectId: number,
+  ): Promise<DeclaracoesExport> {
+    // So o dono do projeto exporta; findOne da 404 para o projeto de outro usuario.
+    const projeto = await this.projectsService.findOne(projectId, req.user.userId);
+    return this.checklistService.exportarDeclaracoes(projectId, projeto.nome ?? null);
+  }
+}

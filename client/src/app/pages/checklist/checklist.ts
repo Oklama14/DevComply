@@ -3,9 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { EMPTY, Observable, Subject, forkJoin, of, switchMap } from 'rxjs';
-import { catchError, concatMap, debounceTime, finalize, tap, timeout } from 'rxjs/operators';
-import { ChecklistService, ChecklistCategory, ChecklistItem } from '../../services/checklist';
+import { EMPTY, Observable, Subject, concat, defer, forkJoin, of, switchMap, throwError } from 'rxjs';
+import { catchError, concatMap, debounceTime, finalize, ignoreElements, tap, timeout } from 'rxjs/operators';
+import { ChecklistService, ChecklistCategory, ChecklistItem, DeclaracoesExport } from '../../services/checklist';
 import { Project, ProjectsService } from '../../services/projects'
 import { Location } from '@angular/common';
 
@@ -28,6 +28,9 @@ type EstadoSalvamento = 'idle' | 'pendente' | 'salvando' | 'salvo' | 'erro';
 /** Espera depois da ultima alteracao antes de salvar sozinho. */
 const ESPERA_AUTOSAVE_MS = 1500;
 
+/** Nome que o comando da lgpd-scan espera (`--declaracoes devcomply-declaracoes.json`). */
+const ARQUIVO_DECLARACOES = 'devcomply-declaracoes.json';
+
 @Component({
   selector: 'app-checklist',
   standalone: true,
@@ -44,6 +47,7 @@ export class Checklist implements OnInit, OnDestroy {
   checklistData: DisplayableChecklistCategory[] = [];
   isLoading = true;
   isGeneratingReport = false;
+  isExportingDeclaracoes = false;
   // Andamento do relatorio: quantos itens foram para a IA, quantos entram como
   // lacuna e ha quanto tempo.
   itensIaRelatorio = 0;
@@ -345,6 +349,56 @@ export class Checklist implements OnInit, OnDestroy {
       },
     });
 }
+
+  /**
+   * Baixa as declaracoes no formato da lgpd-scan (devcomply/declaracoes/1). O arquivo
+   * sai do que esta salvo na conta, entao uma alteracao ainda na fila e salva antes;
+   * se o salvamento falhar, nao exporta uma versao velha sem avisar.
+   * Nada vai para a IA: e so um download.
+   */
+  exportDeclaracoes(): void {
+    if (!this.projectId || this.isExportingDeclaracoes) return;
+    const projectId = this.projectId;
+    const salvarAntes = ['pendente', 'salvando', 'erro'].includes(this.estadoSalvamento);
+
+    this.isExportingDeclaracoes = true;
+    concat(
+      salvarAntes ? this.persistir$().pipe(ignoreElements()) : EMPTY,
+      defer(() => this.estadoSalvamento === 'erro'
+        ? throwError(() => new Error('salvamento'))
+        : this.checklistService.getDeclaracoes(projectId)),
+    )
+      .pipe(finalize(() => this.zone.run(() => this.isExportingDeclaracoes = false)))
+      .subscribe({
+        next: (dados) => this.zone.run(() => this.baixarDeclaracoes(dados as DeclaracoesExport)),
+        error: (err: any) => this.zone.run(() => {
+          console.error('[Declaracoes] Falha ao exportar', err);
+          this.feedback = {
+            type: 'error',
+            message: err?.message === 'salvamento'
+              ? 'Não foi possível salvar as últimas alterações, então as declarações não foram exportadas. Tente de novo.'
+              : 'Não foi possível exportar as declarações. Tente novamente em instantes.',
+          };
+        }),
+      });
+  }
+
+  private baixarDeclaracoes(dados: DeclaracoesExport): void {
+    const blob = new Blob([JSON.stringify(dados, null, 2) + '\n'], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = ARQUIVO_DECLARACOES;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    const marcados = (dados.itens ?? []).filter(i => i.marcado).length;
+    this.feedback = {
+      type: 'success',
+      message: `Declarações exportadas: ${marcados} de ${dados.itens?.length ?? 0} itens marcados. ` +
+        `Coloque o ${ARQUIVO_DECLARACOES} na pasta do projeto e peça à lgpd-scan para comparar com o código.`,
+    };
+  }
 
   private pararRelogioRelatorio(): void {
     if (this.relogioRelatorio) {

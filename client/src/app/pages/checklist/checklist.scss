@@ -652,9 +652,22 @@ textarea {
   
   .right-actions {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 16px;
     align-items: center;
   }
+}
+
+// Explica o botao de exportar para a lgpd-scan, logo abaixo do rodape.
+.export-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: $gray-500;
+  text-align: right;
+
+  strong { color: $gray-700; font-weight: 600; }
 }
 
 // Responsividade
@@ -739,7 +752,16 @@ textarea {
       width: 100%;
       justify-content: center;
     }
+
+    // Tres botoes nao cabem lado a lado num celular.
+    .right-actions {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+    }
   }
+
+  .export-note { text-align: left; }
 }
 
 // Disclaimer sobre IA

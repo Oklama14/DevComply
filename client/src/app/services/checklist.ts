@@ -15,6 +15,24 @@ export interface ChecklistItem {
   obrigatorio?: boolean;  // false = item opcional (boa pratica)
 }
 
+/** Item de `devcomply/declaracoes/1`, o formato que a lgpd-scan le. */
+export interface DeclaracaoItem {
+  codigo: string;
+  secao: string;
+  pergunta: string;
+  marcado: boolean;
+  implementacao?: string;
+  tecnico?: string;
+}
+
+export interface DeclaracoesExport {
+  schema: string;
+  projeto: string | null;
+  gerado_em: string;
+  aviso: string;
+  itens: DeclaracaoItem[];
+}
+
 export interface ChecklistCategory {
   id: number;
   nome: string;
@@ -46,6 +64,11 @@ export class ChecklistService {
   /** Salvar respostas ( backend: POST /checklist/project/:id) */
   saveChecklistResponses(projectId: number, responses: any[]): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/checklist/project/${projectId}`, responses);
+  }
+
+  /** Declaracoes do checklist para a lgpd-scan (backend: GET /checklist/project/:id/declaracoes) */
+  getDeclaracoes(projectId: number): Observable<DeclaracoesExport> {
+    return this.http.get<DeclaracoesExport>(`${this.apiUrl}/checklist/project/${projectId}/declaracoes`);
   }
 
 // Envia o arquivo JSON (multipart/form-data)
