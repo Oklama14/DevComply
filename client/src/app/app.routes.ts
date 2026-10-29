@@ -34,6 +34,10 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: Dashboard },
       { path: 'projects', component: Projects },
+      {
+        path: 'projects/:id/relatorios',
+        loadComponent: () => import('./pages/project-reports/project-reports').then(m => m.ProjectReports),
+      },
       { path: 'checklist/:id', component: Checklist },
       { path: 'checklist', redirectTo: 'projects', pathMatch: 'full' },
       { path: 'settings', component: Settings },

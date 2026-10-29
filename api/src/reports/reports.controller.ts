@@ -1,6 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -22,6 +28,44 @@ import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
 import { ReportQuotaService, ReportRateLimitGuard } from './report-rate-limit.guard';
+import { ItemHistorico, ReportHistoryService } from './report-history.service';
+
+/**
+ * O Node recusa cabecalhos com caracteres fora do Latin-1: um projeto com nome em
+ * outro alfabeto derrubava a resposta com ERR_INVALID_CHAR. Gera um nome ASCII (sem
+ * acentos; o resto vira "_").
+ */
+export function nomeArquivoRelatorio(
+  projectId?: string | number,
+  projectName?: string,
+  geradoEm?: Date,
+): string {
+  const safeProject =
+    (projectName
+      ? String(projectName)
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .trim()
+          .replace(/[^A-Za-z0-9\-_]+/g, '_')
+      : 'relatorio') || 'relatorio';
+  // Data no horario de Brasilia (AAAA-MM-DD-HHmm), para dois downloads do historico
+  // nao sairem com o mesmo nome.
+  const quando = geradoEm
+    ? '-' +
+      new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Sao_Paulo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+        .format(geradoEm)
+        .replace(' ', '-')
+        .replace(':', '')
+    : '';
+  return `relatorio-lgpd${projectId ? '-' + projectId : ''}-${safeProject}${quando}.pdf`;
+}
 
 @UseGuards(JwtAuthGuard)
 @Controller('reports')
@@ -33,7 +77,47 @@ export class ReportsController {
     private readonly projectsService: ProjectsService,
     private readonly usersService: UsersService,
     private readonly quota: ReportQuotaService,
+    private readonly historico: ReportHistoryService,
   ) {}
+
+  // ====== Historico de relatorios do projeto ======
+
+  @Get('project/:projectId')
+  async listarHistorico(
+    @Request() req,
+    @Param('projectId', ParseIntPipe) projectId: number,
+  ): Promise<ItemHistorico[]> {
+    await this.projectsService.findOne(projectId, req.user.userId);
+    return this.historico.listar(projectId);
+  }
+
+  /** Monta o PDF de novo a partir do que ficou guardado: nao chama a IA nem gasta o limite. */
+  @Get('project/:projectId/:reportId/pdf')
+  async baixarDoHistorico(
+    @Request() req,
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('reportId', ParseIntPipe) reportId: number,
+    @Res() res: Response,
+  ) {
+    const projeto = await this.projectsService.findOne(projectId, req.user.userId);
+    const relatorio = await this.historico.buscar(projectId, reportId);
+    const pdfBuffer = await gerarRelatorioPdf(relatorio);
+    const filename = nomeArquivoRelatorio(projectId, relatorio.projeto ?? projeto.nome, relatorio.geradoEm);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(pdfBuffer);
+  }
+
+  @Delete('project/:projectId/:reportId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async excluirDoHistorico(
+    @Request() req,
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('reportId', ParseIntPipe) reportId: number,
+  ): Promise<void> {
+    await this.projectsService.findOne(projectId, req.user.userId);
+    await this.historico.remover(projectId, reportId);
+  }
 
   // ====== 1) multipart/form-data: arquivo JSON ======
   @Post('checklist')
@@ -130,18 +214,18 @@ export class ReportsController {
 
     const pdfBuffer = await gerarRelatorioPdf(relatorio);
 
-    // O Node recusa cabecalhos com caracteres fora do Latin-1: um projeto com nome
-    // em outro alfabeto derrubava a resposta com ERR_INVALID_CHAR. Gera um nome
-    // ASCII (sem acentos; o resto vira "_").
-    const safeProject =
-      (projectName
-        ? String(projectName)
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .trim()
-            .replace(/[^A-Za-z0-9\-_]+/g, '_')
-        : 'relatorio') || 'relatorio';
-    const filename = `relatorio-lgpd${projectId ? '-' + projectId : ''}-${safeProject}.pdf`;
+    // Relatorio de um projeto entra no historico. Se gravar falhar, o PDF sai assim
+    // mesmo: o usuario ja esperou a IA, e o historico e um extra.
+    const idProjeto = Number(projectId);
+    if (projectId != null && projectId !== '' && Number.isInteger(idProjeto) && idProjeto > 0) {
+      try {
+        await this.historico.salvar(idProjeto, relatorio);
+      } catch (err) {
+        this.logger.warn(`Relatorio do projeto ${idProjeto} nao entrou no historico: ${String(err)}`);
+      }
+    }
+
+    const filename = nomeArquivoRelatorio(projectId, projectName);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

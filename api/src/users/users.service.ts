@@ -190,8 +190,10 @@ export class UsersService {
       [userId],
     );
 
+    // O historico vai inteiro: resumo e conteudo de cada relatorio guardado.
     const relatorios = await m.query(
-      `SELECT id, status, pontuacao, "projetoId" AS projeto_id
+      `SELECT id, "projetoId" AS projeto_id, criado_em, status, modelo,
+              pontuacao AS indice_conformidade, resumo, conteudo
          FROM relatorios WHERE "projetoId" IN (${doTitular}) ORDER BY id`,
       [userId],
     );

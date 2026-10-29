@@ -1,6 +1,6 @@
 import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ProjectsService, Project } from '../../services/projects';
 import { NewProjectModal } from '../../components/new-project-modal/new-project-modal';
 import { Location } from '@angular/common';
@@ -10,7 +10,7 @@ import { ProgressStatusPipe } from '../../pipes/progress-status.pipe';
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, NewProjectModal, ProgressStatusPipe],
+  imports: [CommonModule, NewProjectModal, ProgressStatusPipe, RouterLink],
   templateUrl: './projects.html',
   styleUrls: ['./projects.scss']
 })

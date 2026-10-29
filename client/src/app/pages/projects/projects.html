@@ -44,6 +44,9 @@
           <button class="btn-secondary" data-testid="project-start-checklist" (click)="startChecklist(project.id)">
             Iniciar Checklist
           </button>
+          <a class="btn-secondary" data-testid="project-reports" [routerLink]="['/projects', project.id, 'relatorios']">
+            Relatórios
+          </a>
 
           <!-- pass primitives directly -->
           <button class="btn-edit btn-secondary" data-testid="project-edit"

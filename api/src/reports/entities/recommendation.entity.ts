@@ -13,6 +13,6 @@ export class Recommendation {
   descricao: string;
 
   // Relação: Várias recomendações pertencem a um relatório
-  @ManyToOne(() => Report, report => report.recomendacoes)
+  @ManyToOne(() => Report, report => report.recomendacoes, { onDelete: 'CASCADE' })
   relatorio: Report;
 }

@@ -1,0 +1,194 @@
+<div class="page" data-testid="reports-page">
+  <div class="page-header">
+    <nav class="breadcrumb" aria-label="Você está em">
+      <a routerLink="/dashboard">Home</a>
+      <span aria-hidden="true">›</span>
+      <a routerLink="/projects">Projetos</a>
+      <span aria-hidden="true">›</span>
+      <span>Relatórios</span>
+    </nav>
+
+    <div class="title-row">
+      <div>
+        <h1>Relatórios do projeto</h1>
+        <p class="subtitulo" *ngIf="project" data-testid="reports-project-name">{{ project.nome }}</p>
+      </div>
+      <a class="btn btn-primary" *ngIf="projectId" [routerLink]="['/checklist', projectId]"
+         data-testid="reports-open-checklist">
+        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+          <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+          <path d="M12 18v-6"/>
+          <path d="M9 15h6"/>
+        </svg>
+        Gerar novo relatório
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="mensagem" class="alert" [class.alert-success]="mensagem.tipo === 'sucesso'"
+       [class.alert-error]="mensagem.tipo === 'erro'" role="status" aria-live="polite" data-testid="reports-message">
+    <span>{{ mensagem.texto }}</span>
+    <button type="button" class="alert-close" aria-label="Fechar aviso" (click)="mensagem = null">×</button>
+  </div>
+
+  <div *ngIf="carregando" class="estado" data-testid="reports-loading">Carregando relatórios…</div>
+
+  <div *ngIf="!carregando && erroCarregar" class="estado erro" role="alert" data-testid="reports-error">
+    {{ erroCarregar }}
+    <button type="button" class="link" (click)="carregar()">Tentar de novo</button>
+  </div>
+
+  <!-- Nenhum relatorio ainda -->
+  <section *ngIf="!carregando && !erroCarregar && !linhas.length" class="vazio" data-testid="reports-empty">
+    <h2>Nenhum relatório ainda</h2>
+    <p>
+      Cada relatório gerado no checklist fica guardado aqui, com a data e o índice de conformidade. Com dois
+      ou mais, esta página mostra como o projeto evoluiu e o que foi resolvido de um para o outro.
+    </p>
+    <a class="btn btn-primary" *ngIf="projectId" [routerLink]="['/checklist', projectId]">Ir para o checklist</a>
+  </section>
+
+  <ng-container *ngIf="!carregando && !erroCarregar && ultimo as atual">
+    <!-- Evolucao -->
+    <section class="evolucao" data-testid="reports-evolution">
+      <div class="destaque">
+        <span class="rotulo">Índice de conformidade no último relatório</span>
+        <div class="indice-linha">
+          <strong class="indice" data-testid="reports-current-index">
+            {{ atual.pontuacao == null ? '—' : atual.pontuacao + '%' }}
+          </strong>
+          <span class="faixa" [attr.data-faixa]="faixa(atual.pontuacao)">
+            <span class="faixa-ponto" aria-hidden="true"></span>{{ rotuloFaixa(atual.pontuacao) }}
+          </span>
+        </div>
+        <p class="comparacao" *ngIf="atual.temAnterior" data-testid="reports-comparison">
+          <ng-container *ngIf="atual.variacao != null">
+            <ng-container *ngIf="atual.variacao !== 0; else mesmoIndice">
+              <span class="variacao" [class.sobe]="atual.variacao > 0" [class.desce]="atual.variacao < 0">
+                {{ atual.variacao > 0 ? '▲ ' + atual.variacao : '▼ ' + (-atual.variacao) }}
+                {{ atual.variacao === 1 || atual.variacao === -1 ? 'ponto' : 'pontos' }}
+              </span>
+              em relação ao relatório anterior.
+            </ng-container>
+            <ng-template #mesmoIndice>Mesmo índice do relatório anterior.</ng-template>
+          </ng-container>
+          {{ atual.resolvidas.length }} {{ atual.resolvidas.length === 1 ? 'lacuna resolvida' : 'lacunas resolvidas' }}
+          e {{ atual.novas.length }} {{ atual.novas.length === 1 ? 'nova' : 'novas' }}.
+        </p>
+        <p class="comparacao" *ngIf="primeiro as inicio">
+          Desde o primeiro relatório, em {{ inicio.criadoEm | date: 'dd/MM/yyyy' }}:
+          de {{ inicio.pontuacao == null ? '—' : inicio.pontuacao + '%' }}
+          para {{ atual.pontuacao == null ? '—' : atual.pontuacao + '%' }}, em {{ linhas.length }} relatórios.
+        </p>
+      </div>
+
+      <!-- Uma serie so: o titulo nomeia, sem legenda. A lista abaixo e a tabela do grafico. -->
+      <figure class="grafico" *ngIf="barras.length > 1" data-testid="reports-chart">
+        <figcaption>Índice de conformidade por relatório</figcaption>
+        <div class="grafico-corpo">
+          <div class="eixo-y" aria-hidden="true">
+            <span>100%</span><span>50%</span><span>0%</span>
+          </div>
+          <div class="plot">
+            <div class="grade" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="colunas">
+              <div class="coluna" *ngFor="let b of barras; let ultimaBarra = last; trackBy: trackId" tabindex="0"
+                   [attr.aria-label]="(b.criadoEm | date: 'dd/MM/yyyy HH:mm') + ': ' + (b.pontuacao == null ? 'sem índice' : b.pontuacao + '%')">
+                <span class="valor" *ngIf="ultimaBarra && b.pontuacao != null" aria-hidden="true"
+                      [style.bottom]="'calc(' + b.pontuacao + '% + 4px)'">{{ b.pontuacao }}%</span>
+                <div class="barra" [class.sem-indice]="b.pontuacao == null"
+                     [style.height.%]="b.pontuacao == null ? 0 : b.pontuacao"></div>
+                <div class="dica" role="tooltip" [style.bottom]="'calc(' + (b.pontuacao ?? 0) + '% + 8px)'">
+                  <strong>{{ b.pontuacao == null ? '—' : b.pontuacao + '%' }}</strong>
+                  {{ b.criadoEm | date: 'dd/MM/yyyy HH:mm' }}
+                </div>
+              </div>
+            </div>
+            <div class="eixo-x" aria-hidden="true">
+              <span>{{ barras[0].criadoEm | date: 'dd/MM' }}</span>
+              <span>{{ barras[barras.length - 1].criadoEm | date: 'dd/MM' }}</span>
+            </div>
+          </div>
+        </div>
+      </figure>
+    </section>
+
+    <!-- Lista -->
+    <section class="lista">
+      <h2>Todos os relatórios</h2>
+      <article class="relatorio" *ngFor="let l of linhas; trackBy: trackId" data-testid="report-row"
+               [attr.data-report-id]="l.id">
+        <div class="rel-topo">
+          <div>
+            <div class="rel-data">{{ l.criadoEm | date: 'dd/MM/yyyy' }} às {{ l.criadoEm | date: 'HH:mm' }}</div>
+            <div class="rel-modelo" *ngIf="l.modelo">Avaliado por {{ l.modelo }}</div>
+          </div>
+          <div class="rel-indice">
+            <strong data-testid="report-index">{{ l.pontuacao == null ? '—' : l.pontuacao + '%' }}</strong>
+            <span class="variacao" *ngIf="l.variacao != null" [class.sobe]="l.variacao > 0" [class.desce]="l.variacao < 0"
+                  data-testid="report-change">
+              {{ l.variacao > 0 ? '▲ ' + l.variacao + ' pts' : l.variacao < 0 ? '▼ ' + (-l.variacao) + ' pts' : 'sem variação' }}
+            </span>
+          </div>
+        </div>
+
+        <ng-container *ngIf="l.resumo as r">
+          <dl class="rel-numeros">
+            <div><dt>Atende</dt><dd>{{ r.atende }}</dd></div>
+            <div><dt>Atende parcialmente</dt><dd>{{ r.parcial }}</dd></div>
+            <div><dt>Não atende</dt><dd>{{ r.nao_atende }}</dd></div>
+            <div *ngIf="r.nao_avaliado"><dt>Não avaliado</dt><dd>{{ r.nao_avaliado }}</dd></div>
+          </dl>
+          <p class="rel-lacunas" *ngIf="r.pendentes.length">
+            <strong>Lacunas:</strong>
+            <ng-container *ngIf="r.lacunas.catastrofica"> {{ r.lacunas.catastrofica }} {{ r.lacunas.catastrofica === 1 ? 'catastrófica' : 'catastróficas' }} ·</ng-container>
+            <ng-container *ngIf="r.lacunas.grave"> {{ r.lacunas.grave }} {{ r.lacunas.grave === 1 ? 'grave' : 'graves' }} ·</ng-container>
+            <ng-container *ngIf="r.lacunas.nao_implementado"> {{ r.lacunas.nao_implementado }} {{ r.lacunas.nao_implementado === 1 ? 'não implementada' : 'não implementadas' }} ·</ng-container>
+            <ng-container *ngIf="r.lacunas.leve"> {{ r.lacunas.leve }} {{ r.lacunas.leve === 1 ? 'leve' : 'leves' }} ·</ng-container>
+            <span class="codigos"><span class="codigo" *ngFor="let c of r.pendentes; let ult = last">{{ c }}{{ ult ? '' : ',' }}</span></span>
+          </p>
+          <p class="rel-lacunas" *ngIf="!r.pendentes.length"><strong>Nenhuma lacuna.</strong></p>
+        </ng-container>
+
+        <p class="rel-mudancas" *ngIf="l.resolvidas.length || l.novas.length" data-testid="report-diff">
+          <span *ngIf="l.resolvidas.length" class="resolvidas">✓ Resolvidas desde o anterior: {{ l.resolvidas.join(', ') }}</span>
+          <span *ngIf="l.novas.length" class="novas">+ Novas: {{ l.novas.join(', ') }}</span>
+        </p>
+
+        <div class="rel-acoes">
+          <button type="button" class="btn btn-secondary" data-testid="report-download" (click)="baixar(l)"
+                  [disabled]="baixandoId === l.id" [attr.aria-busy]="baixandoId === l.id">
+            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <path d="m7 10 5 5 5-5"/>
+              <path d="M12 15V3"/>
+            </svg>
+            {{ baixandoId === l.id ? 'Preparando…' : 'Baixar PDF' }}
+          </button>
+
+          <ng-container *ngIf="confirmandoId !== l.id; else confirmar">
+            <button type="button" class="btn btn-link-danger" data-testid="report-delete" (click)="pedirExclusao(l)">
+              Excluir
+            </button>
+          </ng-container>
+          <ng-template #confirmar>
+            <span class="confirmar-texto">Excluir este relatório do histórico?</span>
+            <button type="button" class="btn btn-danger" data-testid="report-delete-confirm" (click)="excluir(l)"
+                    [disabled]="excluindoId === l.id">
+              {{ excluindoId === l.id ? 'Excluindo…' : 'Excluir' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancelarExclusao()">Cancelar</button>
+          </ng-template>
+        </div>
+      </article>
+    </section>
+  </ng-container>
+
+  <p class="nota" *ngIf="!carregando && !erroCarregar">
+    Os relatórios ficam guardados até você excluí-los aqui ou excluir a conta. Baixar de novo monta o PDF a partir
+    do que foi guardado: não chama a IA nem conta no limite de relatórios por hora.
+  </p>
+</div>

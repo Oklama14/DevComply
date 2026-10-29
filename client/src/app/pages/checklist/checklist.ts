@@ -339,7 +339,10 @@ export class Checklist implements OnInit, OnDestroy {
         a.download = `relatorio-lgpd-${this.project?.id ?? 'sem-projeto'}.pdf`;
         a.click();
         window.URL.revokeObjectURL(url);
-        this.feedback = { type: 'success', message: 'Relatório gerado. O download do PDF foi iniciado.' };
+        this.feedback = {
+          type: 'success',
+          message: 'Relatório gerado e guardado em Relatórios anteriores. O download do PDF foi iniciado.',
+        };
       }),
       error: (err: any) => {
         console.error('[Relatório] Falha ao enviar', err);

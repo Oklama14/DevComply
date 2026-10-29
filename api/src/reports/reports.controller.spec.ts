@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BadRequestException,
+  NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ReportsController } from './reports.controller';
@@ -9,6 +10,7 @@ import { ProjectsService } from '@/projects/projects.service';
 import { UsersService } from '@/users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { ReportQuotaService } from './report-rate-limit.guard';
+import { ReportHistoryService } from './report-history.service';
 import * as pdf from './relatorio-pdf';
 
 describe('ReportsController', () => {
@@ -20,6 +22,12 @@ describe('ReportsController', () => {
     consumir: jest.fn(() => ({ ok: true })),
     estornar: jest.fn(),
     limite: 10,
+  };
+  const historico = {
+    salvar: jest.fn(),
+    listar: jest.fn(),
+    buscar: jest.fn(),
+    remover: jest.fn(),
   };
   let gerarPdf: jest.SpyInstance;
 
@@ -97,6 +105,7 @@ describe('ReportsController', () => {
         { provide: UsersService, useValue: users },
         { provide: ConfigService, useValue: { get: () => undefined } },
         { provide: ReportQuotaService, useValue: quota },
+        { provide: ReportHistoryService, useValue: historico },
       ],
     }).compile();
     controller = moduleRef.get(ReportsController);
@@ -144,6 +153,65 @@ describe('ReportsController', () => {
     expect(disposition).toBe(
       'attachment; filename="relatorio-lgpd-1-Avaliacao_.pdf"',
     );
+
+    // O relatorio do projeto entra no historico, com o mesmo conteudo do PDF.
+    expect(historico.salvar).toHaveBeenCalledWith(1, relatorio);
+  });
+
+  it('relatorio sem projeto nao entra no historico', async () => {
+    ai.avaliarChecklist.mockResolvedValue({ avaliacao: avaliacaoOk, modelo: 'm' });
+    await controller.uploadChecklist(req, arquivo(payload), {}, res() as any);
+    expect(gerarPdf).toHaveBeenCalled();
+    expect(historico.salvar).not.toHaveBeenCalled();
+  });
+
+  it('se gravar no historico falhar, o PDF sai assim mesmo', async () => {
+    ai.avaliarChecklist.mockResolvedValue({ avaliacao: avaliacaoOk, modelo: 'm' });
+    historico.salvar.mockRejectedValue(new Error('banco fora'));
+    const r = res();
+    await controller.uploadChecklist(req, arquivo(payload), { projectId: '1' }, r as any);
+    expect(r.send).toHaveBeenCalledWith(Buffer.from('%PDF'));
+  });
+
+  describe('historico', () => {
+    it('lista so depois de conferir que o projeto e do usuario', async () => {
+      historico.listar.mockResolvedValue([{ id: 3 }]);
+      await expect(controller.listarHistorico(req, 1)).resolves.toEqual([{ id: 3 }]);
+      expect(projects.findOne).toHaveBeenCalledWith(1, 7);
+      expect(historico.listar).toHaveBeenCalledWith(1);
+    });
+
+    it('projeto de outro usuario: nao lista, nao baixa, nao exclui', async () => {
+      projects.findOne.mockRejectedValue(new NotFoundException());
+      await expect(controller.listarHistorico(req, 9)).rejects.toThrow(NotFoundException);
+      await expect(controller.baixarDoHistorico(req, 9, 3, res() as any)).rejects.toThrow(NotFoundException);
+      await expect(controller.excluirDoHistorico(req, 9, 3)).rejects.toThrow(NotFoundException);
+      expect(historico.listar).not.toHaveBeenCalled();
+      expect(historico.buscar).not.toHaveBeenCalled();
+      expect(historico.remover).not.toHaveBeenCalled();
+    });
+
+    it('baixar de novo monta o PDF do que ficou guardado, sem IA e sem gastar o limite', async () => {
+      projects.findOne.mockResolvedValue({ id: 1, nome: 'Loja' });
+      const guardado = { projeto: 'Loja', geradoEm: new Date('2026-10-29T15:04:00Z'), secoes: [] };
+      historico.buscar.mockResolvedValue(guardado);
+      const r = res();
+
+      await controller.baixarDoHistorico(req, 1, 3, r as any);
+
+      expect(historico.buscar).toHaveBeenCalledWith(1, 3);
+      expect(gerarPdf).toHaveBeenCalledWith(guardado);
+      expect(ai.avaliarChecklist).not.toHaveBeenCalled();
+      expect(quota.consumir).not.toHaveBeenCalled();
+      const disposition = r.setHeader.mock.calls.find(([h]) => h === 'Content-Disposition')[1];
+      // Data no horario de Brasilia: 15:04 UTC = 12:04.
+      expect(disposition).toBe('attachment; filename="relatorio-lgpd-1-Loja-2026-10-29-1204.pdf"');
+    });
+
+    it('exclui um relatorio do historico do projeto', async () => {
+      await controller.excluirDoHistorico(req, 1, 3);
+      expect(historico.remover).toHaveBeenCalledWith(1, 3);
+    });
   });
 
   it('pede para marcar algum item quando nada foi marcado (sem chamar a IA)', async () => {

@@ -9,6 +9,9 @@
 
     <div class="title-row">
       <h1>Checklist LGPD</h1>
+      <div class="title-actions">
+        <a class="btn btn-secondary" *ngIf="projectId" [routerLink]="['/projects', projectId, 'relatorios']"
+           data-testid="checklist-reports-history">Relatórios anteriores</a>
         <button class="btn btn-primary" data-testid="checklist-generate-report-top" (click)="generateReport()" [disabled]="isGeneratingReport"
                 [class.is-loading]="isGeneratingReport" [attr.aria-busy]="isGeneratingReport">
         <span class="spinner" *ngIf="isGeneratingReport" aria-hidden="true"></span>
@@ -20,6 +23,7 @@
         </svg>
         {{ isGeneratingReport ? 'Gerando relatório…' : 'Gerar Relatório' }}
       </button>
+      </div>
     </div>
 
   </div>
