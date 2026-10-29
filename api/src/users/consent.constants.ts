@@ -7,5 +7,5 @@
  * suba a versao aqui — quem aceitou a versao anterior continua com o registro
  * daquilo que de fato leu.
  */
-export const POLITICA_PRIVACIDADE_VERSAO = '2026-10-24';
+export const POLITICA_PRIVACIDADE_VERSAO = '2026-10-29';
 export const TERMOS_USO_VERSAO = '2026-10-23';

@@ -28,6 +28,7 @@
               }
             ],
             "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
               "src/styles.scss"
             ]
           },
@@ -88,6 +89,7 @@
               }
             ],
             "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
               "src/styles.scss"
             ]
           }
