@@ -384,7 +384,7 @@ $border-color: var(--gray-200);
   .footer-content {
     @include container;
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 3rem;
     margin-bottom: 2rem;
   }

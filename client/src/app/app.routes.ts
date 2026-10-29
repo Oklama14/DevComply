@@ -33,6 +33,8 @@ const SEO_LANDING: SeoRota = {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     inLanguage: 'pt-BR',
+    // O codigo-fonte, linkado no rodape da landing.
+    sameAs: ['https://github.com/Oklama14/DevComply'],
     citation: [
       'https://sol.sbc.org.br/index.php/sbes/article/view/18822',
       'https://sol.sbc.org.br/index.php/sbqs/article/view/27108',
