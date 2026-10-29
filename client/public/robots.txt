@@ -1,0 +1,26 @@
+# DevComply - regras para robos de busca.
+#
+# Tudo liberado. As paginas publicas (inicio, Politica, Termos) chegam com o texto
+# pronto; a area logada responde com noindex e nao aparece nos buscadores.
+#
+# Isso inclui as buscas das IAs: OAI-SearchBot (ChatGPT), Googlebot (Google e
+# Gemini), Bingbot (Bing e Copilot; o ChatGPT tambem consulta o Bing), PerplexityBot
+# e Claude-SearchBot. Bloquear um deles tira o DevComply das respostas daquela IA.
+#
+# Treino de modelos e outra decisao: para impedir que o conteudo seja usado no
+# treino, descomente os blocos abaixo. Isso nao tira o site das buscas do ChatGPT
+# nem do Google.
+#
+# User-agent: GPTBot
+# Disallow: /
+#
+# User-agent: Google-Extended
+# Disallow: /
+#
+# User-agent: ClaudeBot
+# Disallow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://dev-comply.vercel.app/sitemap.xml

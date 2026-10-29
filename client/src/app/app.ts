@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './services/theme';
+import { SeoService } from './services/seo';
 
 @Component({
   selector: 'app-root',
@@ -16,4 +17,10 @@ export class AppComponent {
   // Instancia o ThemeService no boot: aplica o tema em todas as telas e acompanha
   // a troca de tema do sistema quando a preferencia e "Automatico".
   private readonly theme = inject(ThemeService);
+
+  constructor() {
+    // Titulo, descricao, canonical e noindex de cada rota (services/seo.ts). Roda
+    // tambem no build, na pre-renderizacao das paginas publicas.
+    inject(SeoService).iniciar();
+  }
 }
