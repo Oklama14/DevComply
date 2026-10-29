@@ -3,6 +3,8 @@ import {
   AiService,
   IaIndisponivelError,
   MODELOS_GEMINI_PADRAO,
+  TIMEOUT_IA_MS,
+  TIMEOUT_RESERVA_MS,
   montarPromptAvaliacao,
 } from './ai.service';
 import { ItemEntrada } from '../reports/relatorio.types';
@@ -59,6 +61,9 @@ const ok = (v: unknown = avaliacao) => ({
 const erroHttp = (status: number, message: string) =>
   Object.assign(new Error(message), { status });
 
+const modelosChamados = () =>
+  getGenerativeModel.mock.calls.map((c: any[]) => c[0].model);
+
 describe('AiService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -77,6 +82,80 @@ describe('AiService', () => {
       'a',
       'b',
     ]);
+  });
+
+  describe('raciocinio e prazo', () => {
+    afterEach(() => {
+      const prazo = (AiService.prototype as any).prazo;
+      if (prazo.mockRestore) prazo.mockRestore();
+    });
+
+    const configDoModelo = (n: number) => (getGenerativeModel.mock.calls[n] as any[])[0].generationConfig;
+
+    it('pede raciocinio baixo ao Gemini 3 Flash e nada ao Flash-Lite nem a familia 2.5', async () => {
+      generateContent.mockResolvedValue(ok());
+      await avaliar(new AiService(config({ GOOGLE_API_KEY: 'k' })));
+      expect(configDoModelo(0).thinkingConfig).toEqual({ thinkingLevel: 'low' });
+
+      const ai = new AiService(config({ GOOGLE_API_KEY: 'k' }));
+      expect(ai.nivelRaciocinio('gemini-3.5-flash-lite')).toBeNull();
+      expect(ai.nivelRaciocinio('gemini-2.5-flash')).toBeNull();
+      expect(ai.nivelRaciocinio('gemini-3.1-pro')).toBeNull();
+      expect(ai.nivelRaciocinio('gemini-3.8-flash')).toBe('low');
+    });
+
+    it('GEMINI_THINKING_LEVEL troca o nivel, e "padrao" deixa o Google decidir', () => {
+      expect(new AiService(config({ GEMINI_THINKING_LEVEL: 'medium' })).nivelRaciocinio('gemini-3.8-flash')).toBe('medium');
+      expect(new AiService(config({ GEMINI_THINKING_LEVEL: 'padrao' })).nivelRaciocinio('gemini-3.8-flash')).toBeNull();
+    });
+
+    it('modelo que recusa o nivel de raciocinio: repete no mesmo modelo, sem ele', async () => {
+      generateContent
+        .mockRejectedValueOnce(erroHttp(400, '[400 Bad Request] Invalid value at generation_config.thinking_config.thinking_level'))
+        .mockResolvedValueOnce(ok());
+      const ai = new AiService(config({ GOOGLE_API_KEY: 'k', GEMINI_MODEL: 'gemini-3.9-flash,m2' }));
+
+      const r = await avaliar(ai);
+
+      expect(r.modelo).toBe('gemini-3.9-flash');
+      expect(modelosChamados()).toEqual(['gemini-3.9-flash', 'gemini-3.9-flash']);
+      expect(configDoModelo(0).thinkingConfig).toEqual({ thinkingLevel: 'low' });
+      expect(configDoModelo(1).thinkingConfig).toBeUndefined();
+    });
+
+    it('primeiro modelo estoura o prazo: cancela o pedido e o reserva responde', async () => {
+      jest.spyOn(AiService.prototype as any, 'prazo').mockReturnValue(5);
+      let sinal: AbortSignal | undefined;
+      generateContent
+        .mockImplementationOnce((_prompt: string, opcoes: { signal: AbortSignal }) => {
+          sinal = opcoes.signal;
+          return new Promise(() => undefined); // nunca responde
+        })
+        .mockResolvedValueOnce(ok());
+      const ai = new AiService(config({ GOOGLE_API_KEY: 'k', GEMINI_MODEL: 'm1,m2' }));
+
+      const r = await avaliar(ai);
+
+      expect(r.modelo).toBe('m2');
+      expect(modelosChamados()).toEqual(['m1', 'm2']);
+      expect(sinal?.aborted).toBe(true);
+    });
+
+    it('todos estouram o prazo: mensagem de demora', async () => {
+      jest.spyOn(AiService.prototype as any, 'prazo').mockReturnValue(5);
+      generateContent.mockImplementation(() => new Promise(() => undefined));
+      const ai = new AiService(config({ GOOGLE_API_KEY: 'k', GEMINI_MODEL: 'm1,m2' }));
+
+      await expect(avaliar(ai)).rejects.toMatchObject({ motivo: 'timeout' });
+      expect(modelosChamados()).toEqual(['m1', 'm2']);
+    });
+
+    it('o reserva tem prazo menor que o primeiro modelo', () => {
+      const ai = new AiService(config({})) as any;
+      expect(ai.prazo(0)).toBe(TIMEOUT_IA_MS);
+      expect(ai.prazo(1)).toBe(TIMEOUT_RESERVA_MS);
+      expect(TIMEOUT_RESERVA_MS).toBeLessThan(TIMEOUT_IA_MS);
+    });
   });
 
   it('falha com mensagem clara quando nao ha chave (nem do usuario nem global)', async () => {
@@ -127,8 +206,6 @@ describe('AiService', () => {
       503,
       'Error fetching from https://x/models/m1:generateContent: [503 Service Unavailable] The model is overloaded. Please try again later.',
     );
-  const modelosChamados = () =>
-    getGenerativeModel.mock.calls.map((c: any[]) => c[0].model);
 
   it('repete a chamada no mesmo modelo quando o Google responde 503 (sobrecarga)', async () => {
     generateContent

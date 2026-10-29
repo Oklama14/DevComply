@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   GoogleGenerativeAI,
   SchemaType,
+  type GenerationConfig,
+  type GenerativeModel,
   type Schema,
 } from '@google/generative-ai';
 import { ConfigService } from '@nestjs/config';
@@ -28,8 +30,24 @@ export const MODELOS_GEMINI_PADRAO = [
   'gemini-3.5-flash-lite',
 ];
 
-/** Uma chamada avalia o checklist inteiro (ate 18 itens), entao o prazo e maior. */
-const TIMEOUT_IA_MS = 120_000;
+/**
+ * Prazo de cada chamada. Uma chamada avalia o checklist inteiro (ate 18 itens), entao
+ * o primeiro modelo tem mais tempo; o reserva (Flash-Lite, bem mais rapido) entra
+ * quando o primeiro estoura o prazo, com menos. Pior caso: 120 + 60 s.
+ */
+export const TIMEOUT_IA_MS = 120_000;
+export const TIMEOUT_RESERVA_MS = 60_000;
+
+/**
+ * Nivel de raciocinio pedido aos modelos Gemini 3 Flash (generationConfig.thinkingConfig
+ * .thinkingLevel). O padrao do Google nesses modelos e "medium", e com ele o relatorio
+ * de 18 itens passou de 120 s em producao (out/2026). "low" e o nivel que a
+ * documentacao indica para menor latencia; a avaliacao segue criterios escritos, nao
+ * pede raciocinio longo. GEMINI_THINKING_LEVEL troca o nivel, e "padrao" deixa o
+ * Google decidir. Nao vai para os Flash-Lite (o padrao deles ja e o minimo) nem para
+ * a familia 2.5, que usa outro campo (thinkingBudget).
+ */
+export const NIVEL_RACIOCINIO_PADRAO = 'low';
 /** Espera antes de repetir a chamada quando o Google responde com erro passageiro. */
 export const ESPERA_RETENTATIVA_MS = 2_000;
 
@@ -283,27 +301,32 @@ export class AiService {
     let ultimoErro: unknown;
 
     for (const [i, nome] of modelos.entries()) {
-      const model = client.getGenerativeModel({
-        model: nome,
-        generationConfig: {
-          responseMimeType: 'application/json',
-          responseSchema,
-        },
-        systemInstruction: instrucao,
-      });
+      let raciocinio = this.nivelRaciocinio(nome);
+      const criar = (nivel: string | null): GenerativeModel =>
+        client.getGenerativeModel({
+          model: nome,
+          generationConfig: {
+            responseMimeType: 'application/json',
+            responseSchema,
+            // O SDK 0.24 nao tipa thinkingConfig, mas manda o generationConfig como
+            // esta para a API.
+            ...(nivel ? { thinkingConfig: { thinkingLevel: nivel } } : {}),
+          } as GenerationConfig,
+          systemInstruction: instrucao,
+        });
+      let model = criar(raciocinio);
+      const prazo = this.prazo(i);
 
       // Ate 2 tentativas no mesmo modelo: erro passageiro do Google (503 "model is
       // overloaded", 500, queda de rede) costuma passar em segundos.
       for (let tentativa = 1; tentativa <= 2; tentativa++) {
         try {
           const inicio = Date.now();
-          const result = await this.withTimeout(
-            model.generateContent(prompt),
-            TIMEOUT_IA_MS,
-          );
+          const result = await this.chamarComPrazo(model, prompt, prazo);
           const dados = JSON.parse(result.response.text()) as T;
           this.logger.log(
-            `Gemini ${nome} respondeu em ${Math.round((Date.now() - inicio) / 1000)} s.`,
+            `Gemini ${nome} respondeu em ${Math.round((Date.now() - inicio) / 1000)} s` +
+              ` (raciocinio: ${raciocinio ?? 'padrao do Google'}).`,
           );
           return { dados, modelo: nome };
         } catch (err) {
@@ -311,6 +334,12 @@ export class AiService {
           this.logger.warn(
             `Gemini ${nome} (tentativa ${tentativa}) falhou: ${this.resumoErro(err)}`,
           );
+          // Modelo que nao aceita o nivel de raciocinio pedido: repete sem ele.
+          if (tentativa === 1 && raciocinio && this.recusouRaciocinio(err)) {
+            raciocinio = null;
+            model = criar(null);
+            continue;
+          }
           if (tentativa === 1 && this.ehPassageiro(err)) {
             await this.esperar(ESPERA_RETENTATIVA_MS);
             continue;
@@ -366,7 +395,9 @@ export class AiService {
   private valeTentarOutroModelo(err: unknown): boolean {
     if (err instanceof IaIndisponivelError) return false;
     if (this.ehChaveInvalida(err)) return false; // a outra tentativa usaria a mesma chave
-    if (/Tempo esgotado/.test(this.mensagem(err))) return false; // ja esperou 60 s
+    // Estourou o prazo: o reserva e mais rapido e tem prazo proprio, menor. Antes o
+    // relatorio falhava aqui, depois de 2 minutos de espera, sem tentar mais nada.
+    if (this.ehTempoEsgotado(err)) return true;
     const status = this.status(err);
     return (
       this.ehModeloIndisponivel(err) ||
@@ -476,13 +507,49 @@ export class AiService {
     );
   }
 
-  private withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  /** Nivel de raciocinio para o modelo, ou null para nao mandar o campo. */
+  nivelRaciocinio(nome: string): string | null {
+    const env = this.configService.get<string>('GEMINI_THINKING_LEVEL')?.trim().toLowerCase();
+    if (env && ['padrao', 'padrão', 'default', 'nenhum', 'off'].includes(env)) return null;
+    const versao = Number(/^gemini-(\d+)/i.exec(nome)?.[1]);
+    if (!(versao >= 3) || /lite/i.test(nome) || !/flash/i.test(nome)) return null;
+    return env || NIVEL_RACIOCINIO_PADRAO;
+  }
+
+  /** Prazo da chamada: o primeiro modelo tem mais tempo que os reservas. */
+  private prazo(indiceModelo: number): number {
+    return indiceModelo === 0 ? TIMEOUT_IA_MS : TIMEOUT_RESERVA_MS;
+  }
+
+  /**
+   * Chama o Gemini com prazo. Ao estourar, cancela a requisicao: antes ela seguia
+   * rodando no Google depois que o relatorio ja tinha falhado.
+   */
+  private chamarComPrazo(model: GenerativeModel, prompt: string, ms: number) {
+    const controle = new AbortController();
+    return this.withTimeout(
+      model.generateContent(prompt, { signal: controle.signal }),
+      ms,
+      () => controle.abort(),
+    );
+  }
+
+  private ehTempoEsgotado(err: unknown): boolean {
+    return /Tempo esgotado/.test(this.mensagem(err));
+  }
+
+  /** 400 do Google por causa do thinkingConfig (modelo que nao aceita o nivel pedido). */
+  private recusouRaciocinio(err: unknown): boolean {
+    return this.status(err) === 400 && /thinking/i.test(this.mensagem(err));
+  }
+
+  private withTimeout<T>(p: Promise<T>, ms: number, aoEsgotar?: () => void): Promise<T> {
     let timer: NodeJS.Timeout | undefined;
     const timeout = new Promise<T>((_, reject) => {
-      timer = setTimeout(
-        () => reject(new Error('Tempo esgotado na chamada da IA')),
-        ms,
-      );
+      timer = setTimeout(() => {
+        aoEsgotar?.();
+        reject(new Error('Tempo esgotado na chamada da IA'));
+      }, ms);
     });
     return Promise.race([p, timeout]).finally(() => clearTimeout(timer));
   }
