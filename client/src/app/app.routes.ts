@@ -38,9 +38,16 @@ const SEO_LANDING: SeoRota = {
         inLanguage: 'pt-BR',
         // O codigo-fonte, linkado no rodape da landing.
         sameAs: ['https://github.com/Oklama14/DevComply'],
+        // As referencias listadas na secao "De onde vem as perguntas".
         citation: [
           'https://sol.sbc.org.br/index.php/sbes/article/view/18822',
           'https://sol.sbc.org.br/index.php/sbqs/article/view/27108',
+          'https://dspace.mackenzie.br/handle/10899/31245',
+          'https://doi.org/10.1145/3701625.3701663',
+          'https://sol.sbc.org.br/index.php/sbsi_estendido/article/view/24587',
+          'https://sol.sbc.org.br/index.php/washes/article/view/29457',
+          'https://sol.sbc.org.br/index.php/erigo/article/view/32223',
+          'https://doi.org/10.1145/3702038.3702058',
         ],
       },
       // As perguntas frequentes da landing, com o mesmo texto da pagina.

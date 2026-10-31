@@ -431,6 +431,33 @@ $header-h: 4rem;
   }
 }
 
+// Lista de referencias: so a primeira linha de cada uma fica rente a margem.
+.refs-title {
+  margin: 3rem 0 1rem;
+  font-size: 1.125rem;
+  color: var(--gray-900);
+  scroll-margin-top: $header-h;
+}
+
+.refs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--gray-600);
+
+  li {
+    padding-left: 1.25rem;
+    text-indent: -1.25rem;
+    overflow-wrap: anywhere;
+
+    & + li {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
 // ---------- Seus dados ----------
 
 .data-list {
