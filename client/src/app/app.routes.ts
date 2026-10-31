@@ -12,32 +12,39 @@ import { PoliticaPrivacidade } from './pages/politica-privacidade/politica-priva
 import { TermosUso } from './pages/termos-uso/termos-uso';
 import { ProfileComponent } from './pages/profile/profile';
 import { SeoRota } from './services/seo';
+import { faqJsonLd } from './pages/landing/landing.content';
 import { environment } from '../environments/environment';
 
 const DESCRICAO_SITE =
-  'Checklist de conformidade com a LGPD para desenvolvedores, baseado em checklists validados ' +
-  'academicamente, com relatório e recomendações técnicas geradas por IA.';
+  'Checklist de LGPD para quem desenvolve software: responda e receba um relatório com índice de ' +
+  'conformidade, lacunas por gravidade e plano de ação.';
 
 // Paginas publicas: pre-renderizadas no build (app.routes.server.ts) e indexadas.
 const SEO_LANDING: SeoRota = {
-  titulo: 'DevComply: conformidade com a LGPD no desenvolvimento de software',
+  titulo: 'DevComply: ferramenta e checklist de LGPD para desenvolvedores',
   descricao: DESCRICAO_SITE,
   indexar: true,
   // Dados estruturados: so o que a pagina mostra (sem preco: a landing nao fala nisso).
   jsonLd: {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'DevComply',
-    url: environment.siteUrl + '/',
-    description: DESCRICAO_SITE,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Web',
-    inLanguage: 'pt-BR',
-    // O codigo-fonte, linkado no rodape da landing.
-    sameAs: ['https://github.com/Oklama14/DevComply'],
-    citation: [
-      'https://sol.sbc.org.br/index.php/sbes/article/view/18822',
-      'https://sol.sbc.org.br/index.php/sbqs/article/view/27108',
+    '@graph': [
+      {
+        '@type': 'WebApplication',
+        name: 'DevComply',
+        url: environment.siteUrl + '/',
+        description: DESCRICAO_SITE,
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Web',
+        inLanguage: 'pt-BR',
+        // O codigo-fonte, linkado no rodape da landing.
+        sameAs: ['https://github.com/Oklama14/DevComply'],
+        citation: [
+          'https://sol.sbc.org.br/index.php/sbes/article/view/18822',
+          'https://sol.sbc.org.br/index.php/sbqs/article/view/27108',
+        ],
+      },
+      // As perguntas frequentes da landing, com o mesmo texto da pagina.
+      faqJsonLd(),
     ],
   },
 };
